@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="faq.css">
+        <link rel="stylesheet" href="contact.css">
+        <title>InvoicePro | FAQ</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
+
+</head>
+
+<body>
+        <header class="header">
+
+    <div class="logo">
+
+        <img src="logo.png" alt="InvoicePro">
+
+        <h2>Invoice<span>Pro</span></h2>
+
+    </div>
+
+    <nav>
+
+<a href="features.html">Features</a>
+
+<a href="pricing.html">Pricing</a>
+
+<a href="about.html">About</a>
+
+<a href="faq.html" class="active" >FAQ</a>
+
+<a href="contact.html">Contact</a>
+
+</nav>
+
+<div class="header-buttons">
+
+<a href="login.html"
+class="login-btn">
+
+Login
+
+</a>
+
+<a href="contact.html"
+class="signup-btn">
+
+Next
+
+</a>
+
+</div>
+
+</header>
+
+<section class="faq-hero">
+
+    <div class="faq-left">
+
+        <div class="faq-badge">
+
+            <i class="ri-chat-3-line"></i>
+            <span>FAQ</span>
+
+        </div>
+
+        <h1>
+            Frequently Asked
+            <br>
+            Questions
+        </h1><br /><br /><br />
+
+        <span>
+            Find answers to the most common questions
+            about InvoicePro and how it can help your
+            business get paid faster.
+        </span><br /><br />
+
+        <div class="search-box">
+
+            <i class="ri-search-line"></i>
+
+            <input
+                type="text"
+                placeholder="Search for questions..."
+            >
+
+        </div>
+
+    </div>
+
+    <div class="blur blur1"></div>
+    <div class="blur blur2"></div>
+    <div class="blur blur3"></div>
+
+</section>
+<section class="faq-section">
+
+    <!-- LEFT SIDEBAR -->
+
+    <aside class="faq-sidebar">
+
+        <div class="faq-menu">
+
+            <button class="active">
+                <i class="ri-chat-3-line"></i>
+                All Questions
+            </button>
+
+            <button>
+                <i class="ri-information-line"></i>
+                General
+            </button>
+
+            <button>
+                <i class="ri-user-line"></i>
+                Account & Security
+            </button>
+
+            <button>
+                <i class="ri-file-list-3-line"></i>
+                Invoices
+            </button>
+
+            <button>
+                <i class="ri-bank-card-line"></i>
+                Payments
+            </button>
+
+            <button>
+                <i class="ri-star-line"></i>
+                Features
+            </button>
+
+            <button>
+                <i class="ri-bill-line"></i>
+                Billing & Plans
+            </button>
+
+            <button>
+                <i class="ri-puzzle-line"></i>
+                Integrations
+            </button>
+
+            <button>
+                <i class="ri-more-2-line"></i>
+                Others
+            </button>
+
+        </div>
+
+        <div class="support-box">
+
+            <i class="ri-customer-service-line"></i>
+
+            <h3>Still have questions?</h3>
+
+            <p>
+                Our support team is here
+                to help you.
+            </p>
+
+            <a href="contact.html">
+                Contact Support
+            </a>
+
+        </div>
+
+    </aside>
+
+    <!-- FAQ -->
+
+    <div class="faq-content">
+
+        <div class="faq-item active">
+
+            <div class="faq-title">
+
+                <h3>What is InvoicePro?</h3>
+
+                <span>-</span>
+
+            </div>
+
+            <div class="faq-answer">
+
+                InvoicePro is an all-in-one invoice generator that helps businesses create, send and get paid faster. You can customize invoices, track payments and manage your clients easily.
+
+            </div>
+
+        </div>
+
+        <div class="faq-item">
+
+            <div class="faq-title">
+
+                <h3>Do I need to create an account to create invoices?</h3>
+
+                <span>+</span>
+
+            </div>
+
+            <div class="faq-answer">
+
+                Yes (compulsory), otherwise invoice creation is unavailable.
+
+            </div>
+
+        </div>
+
+        <div class="faq-item">
+
+            <div class="faq-title">
+
+                <h3>Is InvoicePro free to use?</h3>
+
+                <span>+</span>
+
+            </div>
+
+            <div class="faq-answer">
+
+                Yes. Creating invoices is completely free.
+
+            </div>
+
+        </div>
+
+        <!-- Continue using the same structure
+             for the remaining questions -->
+
+    </div>
+
+</section>
+
+<script>
+    const faqs = document.querySelectorAll(".faq-item");
+
+faqs.forEach(item => {
+
+    item.querySelector(".faq-title").onclick = () => {
+
+        faqs.forEach(faq => {
+
+            if(faq !== item){
+
+                faq.classList.remove("active");
+                faq.querySelector("span").textContent = "+";
+
+            }
+
+        });
+
+        item.classList.toggle("active");
+
+        item.querySelector("span").textContent =
+            item.classList.contains("active") ? "-" : "+";
+
+    };
+
+});
+</script>
+
+<section class="faq-cta">
+
+    <div class="cta-image">
+
+        <img src="support.png" alt="Support">
+
+    </div>
+
+    <div class="cta-content">
+
+        <h2>Can't find what you're looking for?</h2>
+
+        <p>
+            Our support team is always ready to help you with
+            any questions you may have.
+        </p>
+
+    </div>
+
+    <div class="cta-btn">
+
+        <a href="contact.html">
+            Contact Us
+            <i class="ri-arrow-right-line"></i>
+        </a>
+
+    </div>
+
+</section>
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+<div class="footer-grid">
+
+<div>
+
+
+<div class="footer-logo">
+    <img src="logo.png" alt="InvoicePro">
+    Invoice<span>Pro</span>
+</div>
+
+</div>
+
+<p>
+
+The all-in-one invoice generator that helps businesses create, send and get paid faster.
+
+</p>
+
+
+
+<div>
+
+<h3>Product</h3>
+
+<a href="features.html">Features</a>
+
+<a href="pricing.html">Pricing</a>
+
+<a href="templates.html">Invoice Templates</a>
+
+<a href="integrations.html">Integrations</a>
+
+</div>
+
+<div>
+
+<h3>Resources</h3>
+
+<a href="help.html">Help Center</a>
+
+<a href="documentation.html">Documentation</a>
+
+<a href="learn-more.html">Guides</a>
+
+<a href="faq.html">FAQ</a>
+
+</div>
+
+<div>
+
+<h3>Company</h3>
+
+<a href="about.html">About Us</a>
+
+<a href="contact.html">Contact</a>
+
+<a href="privacy.html">Privacy Policy</a>
+
+<a href="terms.html">Terms</a>
+
+</div>
+
+<div>
+
+<h3>Newsletter</h3>
+
+<p>
+
+Subscribe for updates and tips.
+
+</p>
+
+<div class="newsletter">
+
+<input
+type="email"
+placeholder="Enter your email">
+
+<button>
+
+Subscribe
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="footer-bottom">
+
+<p>
+
+© 2026 InvoicePro. All rights reserved.
+
+</p>
+
+     <!--   <span>🌐 English ▼</span-->
+</div>
+
+</footer>
+
+</div>
+    <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+<script src="api.js"></script>
+</body>
+
+</html>
