@@ -1,0 +1,782 @@
+:root {
+    --primary: #4F46E5;
+    --primary-dark: #4338CA;
+    --primary-light: #EEF2FF;
+
+    --body: #F6F8FC;
+    --white: #FFFFFF;
+
+    --text: #111827;
+    --text-secondary: #6B7280;
+    --border: #E5E7EB;
+
+    --danger: #DC2626;
+    --danger-light: #FEF2F2;
+
+    --shadow-sm:
+        0 4px 12px rgba(15, 23, 42, 0.06);
+
+    --shadow-md:
+        0 15px 40px rgba(15, 23, 42, 0.14);
+
+    --radius: 16px;
+}
+
+
+/* =========================================================
+   FILE INPUT
+   ========================================================= */
+
+#profileImageInput {
+    display: none;
+}
+
+
+/* =========================================================
+   MODAL OVERLAY
+   ========================================================= */
+
+.modal {
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(15, 23, 42, 0.48);
+
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+
+    z-index: 1000;
+
+    opacity: 0;
+
+    transition:
+        opacity 0.2s ease;
+}
+
+
+/*
+   JavaScript can add this class when opening
+*/
+
+.modal.show,
+.modal.active {
+    display: flex;
+
+    opacity: 1;
+}
+
+
+/* =========================================================
+   MODAL CONTENT
+   ========================================================= */
+
+.modal-content {
+    width: 100%;
+    max-width: 460px;
+
+    background: var(--white);
+
+    border-radius: var(--radius);
+
+    box-shadow: var(--shadow-md);
+
+    overflow: hidden;
+
+    transform: translateY(15px) scale(0.98);
+
+    transition:
+        transform 0.25s ease;
+}
+
+
+/*
+   Smooth entrance
+*/
+
+.modal.show .modal-content,
+.modal.active .modal-content {
+    transform: translateY(0) scale(1);
+}
+
+
+/* =========================================================
+   MODAL HEADER
+   ========================================================= */
+
+.modal-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 22px 24px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+
+.modal-header h2 {
+    margin: 0;
+
+    color: var(--text);
+
+    font-size: 19px;
+    font-weight: 700;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+   ========================================================= */
+
+.modal-close {
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: transparent;
+
+    color: var(--text-secondary);
+
+    font-size: 25px;
+    font-weight: 400;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.modal-close:hover {
+    background: #F3F4F6;
+
+    color: var(--text);
+
+    transform: rotate(90deg);
+}
+
+
+.modal-close:active {
+    transform: rotate(90deg) scale(0.92);
+}
+
+
+/* =========================================================
+   MODAL BODY
+   ========================================================= */
+
+.modal-body {
+    padding: 24px;
+}
+
+
+.modal-body label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: var(--text);
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   INPUTS & SELECT
+   ========================================================= */
+
+.modal-body input,
+.modal-body select {
+    width: 100%;
+
+    height: 48px;
+
+    padding: 0 14px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 10px;
+
+    outline: none;
+
+    background: var(--white);
+
+    color: var(--text);
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+
+.modal-body input::placeholder {
+    color: #9CA3AF;
+}
+
+
+/* Focus state */
+
+.modal-body input:focus,
+.modal-body select:focus {
+
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 3px rgba(79, 70, 229, 0.12);
+
+    background: #FFFFFF;
+}
+
+
+/* Hover state */
+
+.modal-body input:hover,
+.modal-body select:hover {
+    border-color: #C7D2FE;
+}
+
+
+/* Select */
+
+.modal-body select {
+    cursor: pointer;
+
+    appearance: auto;
+}
+
+
+/* =========================================================
+   MODAL FOOTER
+   ========================================================= */
+
+.modal-footer {
+    display: flex;
+
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    padding: 18px 24px;
+
+    border-top: 1px solid var(--border);
+
+    background: #FAFAFC;
+}
+
+
+/* =========================================================
+   GENERAL MODAL BUTTONS
+   ========================================================= */
+
+.modal-footer button {
+    min-height: 44px;
+
+    padding: 0 18px;
+
+    border-radius: 10px;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.15s ease;
+}
+
+
+.modal-footer button:active {
+    transform: scale(0.97);
+}
+
+
+/* =========================================================
+   PRIMARY BUTTON
+   ========================================================= */
+
+.modal-footer .btn-primary {
+    border: 1px solid var(--primary);
+
+    background: var(--primary);
+
+    color: #FFFFFF;
+
+    box-shadow:
+        0 3px 8px rgba(79, 70, 229, 0.18);
+}
+
+
+.modal-footer .btn-primary:hover {
+    background: var(--primary-dark);
+
+    border-color: var(--primary-dark);
+
+    box-shadow:
+        0 5px 12px rgba(79, 70, 229, 0.25);
+}
+
+
+/* =========================================================
+   SECONDARY BUTTON
+   ========================================================= */
+
+.modal-footer .btn-secondary {
+    border: 1px solid var(--border);
+
+    background: #FFFFFF;
+
+    color: #374151;
+}
+
+
+.modal-footer .btn-secondary:hover {
+    background: #F3F4F6;
+
+    border-color: #D1D5DB;
+
+    color: #111827;
+}
+
+
+/* =========================================================
+   DISABLED BUTTON
+   ========================================================= */
+
+.modal-footer button:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+
+    box-shadow: none;
+
+    transform: none;
+}
+
+
+/* =========================================================
+   TOAST CONTAINER
+   ========================================================= */
+
+#toastContainer {
+    position: fixed;
+
+    left: 50%;
+
+    bottom: 24px;
+
+    transform: translateX(-50%);
+
+    width: min(
+        calc(100% - 32px),
+        420px
+    );
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 10px;
+
+    z-index: 9999;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+
+.toast {
+    width: 100%;
+
+    min-height: 52px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 14px 16px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 12px;
+
+    background: #FFFFFF;
+
+    color: var(--text);
+
+    box-shadow:
+        0 10px 30px rgba(15, 23, 42, 0.15);
+
+    font-size: 14px;
+    font-weight: 500;
+
+    pointer-events: auto;
+
+    animation:
+        toastSlideUp 0.3s ease forwards;
+}
+
+
+/* =========================================================
+   TOAST TYPES
+   ========================================================= */
+
+.toast.success {
+    border-color: #BBF7D0;
+
+    background: #F0FDF4;
+
+    color: #166534;
+}
+
+
+.toast.error {
+    border-color: #FECACA;
+
+    background: #FEF2F2;
+
+    color: #991B1B;
+}
+
+
+.toast.warning {
+    border-color: #FDE68A;
+
+    background: #FFFBEB;
+
+    color: #92400E;
+}
+
+
+.toast.info {
+    border-color: #C7D2FE;
+
+    background: var(--primary-light);
+
+    color: #3730A3;
+}
+
+
+/* =========================================================
+   TOAST ANIMATION
+   ========================================================= */
+
+@keyframes toastSlideUp {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(18px)
+            scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+
+/* =========================================================
+   MODAL EXIT ANIMATION SUPPORT
+   ========================================================= */
+
+.modal.closing {
+    opacity: 0;
+}
+
+
+.modal.closing .modal-content {
+    transform:
+        translateY(15px)
+        scale(0.98);
+}
+
+
+/* =========================================================
+   MOBILE RESPONSIVENESS
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .modal {
+        padding: 14px;
+    }
+
+
+    .modal-content {
+        max-width: 100%;
+
+        border-radius: 14px;
+    }
+
+
+    .modal-header {
+        padding: 18px 18px;
+    }
+
+
+    .modal-header h2 {
+        font-size: 17px;
+    }
+
+
+    .modal-body {
+        padding: 20px 18px;
+    }
+
+
+    .modal-footer {
+        padding: 16px 18px;
+
+        gap: 10px;
+    }
+
+
+    .modal-footer button {
+        flex: 1;
+
+        min-height: 46px;
+
+        padding: 0 12px;
+    }
+
+
+    #toastContainer {
+        bottom: 18px;
+
+        width: calc(100% - 28px);
+    }
+
+
+    .toast {
+        min-height: 50px;
+
+        padding: 13px 14px;
+
+        font-size: 13px;
+    }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 360px) {
+
+    .modal-header {
+        padding: 16px;
+    }
+
+
+    .modal-body {
+        padding: 18px 16px;
+    }
+
+
+    .modal-footer {
+        padding: 14px 16px;
+
+        flex-direction: column;
+    }
+
+
+    .modal-footer button {
+        width: 100%;
+
+        flex: none;
+    }
+}
+
+.modal-footer button:focus-visible,
+.modal-close:focus-visible,
+.modal-body input:focus-visible,
+.modal-body select:focus-visible {
+
+    outline: 3px solid rgba(79, 70, 229, 0.20);
+
+    outline-offset: 2px;
+}
+
+/* =========================================================
+   INVOICEPRO — GLOBAL SELECT STYLING
+   ========================================================= */
+
+select {
+    width: 100%;
+
+    min-height: 48px;
+
+    padding: 0 42px 0 14px;
+
+    border: 1px solid #D9DDE8;
+
+    border-radius: 10px;
+
+    background-color: #FFFFFF;
+
+    color: #172554;
+
+    font-family: "Inter", sans-serif;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    outline: none;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+
+    appearance: auto;
+    -webkit-appearance: auto;
+}
+
+
+/* Hover */
+
+select:hover {
+    border-color: #A5B4FC;
+
+    background-color: #FFFFFF;
+}
+
+
+/* Focus */
+
+select:focus {
+    border-color: #4F46E5;
+
+    box-shadow:
+        0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+
+
+/* Disabled */
+
+select:disabled {
+    background: #F3F4F6;
+
+    color: #9CA3AF;
+
+    cursor: not-allowed;
+
+    opacity: 0.7;
+}
+
+
+/* =========================================================
+   OPTIONS
+   ========================================================= */
+
+select option {
+    background: #FFFFFF;
+
+    color: #172554;
+
+    padding: 12px;
+
+    font-family: "Inter", sans-serif;
+
+    font-size: 14px;
+}
+
+
+/* Selected option */
+
+select option:checked {
+    background-color: #172554;
+
+    color: #FFFFFF;
+
+    font-weight: 600;
+}
+
+
+/* Hovered option where supported */
+
+select option:hover {
+    background-color: #EEF2FF;
+
+    color: #172554;
+}
+
+
+/* =========================================================
+   MODAL SELECT
+   ========================================================= */
+
+.modal-body select {
+    background-color: #FFFFFF;
+
+    color: #172554;
+}
+
+
+.modal-body select option {
+    background-color: #FFFFFF;
+
+    color: #172554;
+}
+
+
+.modal-body select option:checked {
+    background-color: #172554;
+
+    color: #FFFFFF;
+}
