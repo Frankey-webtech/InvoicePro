@@ -8,7 +8,10 @@
 <meta name="viewport"
 content="width=device-width, initial-scale=1.0">
 
-<title>Pricing | InvoicePro</title>
+<meta name="description"
+content="InvoicePro pricing plans for freelancers and businesses.">
+
+<title>InvoicePro | Pricing</title>
 
 <link rel="preconnect"
 href="https://fonts.googleapis.com">
@@ -17,118 +20,401 @@ href="https://fonts.googleapis.com">
 href="https://fonts.gstatic.com"
 crossorigin>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
 rel="stylesheet">
 
 <link rel="stylesheet"
-href="pricing.css">
+href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
+<link rel="stylesheet"
+href="pricing.css">
 
 </head>
 
 <body>
 
-<div class="page">
+<div class="pricing-page">
 
-<!-- ================= HEADER ================= -->
+<header class="pricing-header">
 
-<header class="header">
+<div class="pricing-header-inner">
 
-<div class="logo">
+<a href="index.html"
+class="pricing-brand">
 
-<img src="logo.png" alt="InvoicePro" class="logo-icon">
+<img src="logo.png"
+alt="InvoicePro"
+class="pricing-brand-logo">
 
-<h2>Invoice<span>Pro</span></h2>
-
+<div class="pricing-brand-name">
+Invoice<span>Pro</span>
 </div>
 
-<nav>
+</a>
 
-<a href="features.html">Features</a>
+<nav class="pricing-navigation">
 
-<a class="active" href="pricing.html">Pricing</a>
+<a href="features.html">
+Features
+</a>
 
-<a href="about.html">About Us</a>
+<a href="pricing.html"
+class="pricing-nav-active">
+Pricing
+</a>
 
-<a href="faq.html">FAQ</a>
+<a href="about.html">
+About Us
+</a>
 
-<a href="contact.html">Contact</a>
+<a href="faq.html">
+FAQ
+</a>
+
+<a href="contact.html">
+Contact
+</a>
 
 </nav>
 
-<div class="header-buttons">
+<div class="pricing-header-actions">
 
 <a href="login.html"
-class="login-btn">
-
+class="pricing-login-button">
 Login
-
 </a>
 
 <a href="about.html"
-class="primary-btn">
-
+class="pricing-next-button">
 Next
-
+<i class="ri-arrow-right-line"></i>
 </a>
+
+</div>
+
+<button
+type="button"
+class="pricing-menu-button"
+id="pricingMenuButton"
+aria-label="Open navigation">
+
+<i class="ri-menu-line"></i>
+
+</button>
 
 </div>
 
 </header>
 
-<!-- ================= HERO ================= -->
+<div class="pricing-mobile-navigation"
+id="pricingMobileNavigation">
 
-<section class="hero">
+<a href="features.html">
+Features
+</a>
 
-<div class="badge">
-
+<a href="pricing.html"
+class="pricing-nav-active">
 Pricing
+</a>
+
+<a href="about.html">
+About Us
+</a>
+
+<a href="faq.html">
+FAQ
+</a>
+
+<a href="contact.html">
+Contact
+</a>
+
+<a href="login.html">
+Login
+</a>
 
 </div>
 
+<main>
+
+<section class="pricing-hero">
+
+<div class="pricing-eyebrow">
+<i class="ri-price-tag-3-line"></i>
+Simple pricing
+</div>
+
 <h1>
-
-Simple, Transparent Pricing
-
+Plans that grow with your business
 </h1>
 
 <p>
-
-Choose the perfect plan for your business.
-Upgrade or downgrade anytime as your needs change.
-
+Start for free and upgrade when you need more invoices,
+clients, templates and business tools.
 </p>
 
-<!-- BILLING SWITCH -->
+<div class="pricing-location-status"
+id="pricingLocationStatus">
 
-<div class="billing">
+<i class="ri-map-pin-line"></i>
 
-<span>
-
-Monthly billing
-
+<span id="pricingLocationText">
+Checking your location...
 </span>
 
-<label class="switch">
+</div>
+
+</section>
+
+<section class="pricing-loading-section"
+id="pricingLoadingSection">
+
+<div class="pricing-loader">
+
+<div class="pricing-spinner"></div>
+
+<h2>
+Preparing your pricing
+</h2>
+
+<p>
+We're determining the plans available in your country.
+</p>
+
+</div>
+
+</section>
+
+<section class="pricing-location-section"
+id="pricingLocationSection">
+
+<div class="pricing-location-card">
+
+<div class="pricing-location-icon">
+
+<i class="ri-map-pin-user-line"></i>
+
+</div>
+
+<div class="pricing-location-content">
+
+<div class="pricing-location-badge">
+Location required
+</div>
+
+<h2>
+Turn on your location
+</h2>
+
+<p>
+We use your location only to determine your country
+and display pricing in your country's currency.
+</p>
+
+<button
+type="button"
+class="pricing-location-button"
+id="enableLocationButton">
+
+<i class="ri-map-pin-line"></i>
+
+Turn on location
+
+</button>
+
+<p class="pricing-location-error"
+id="pricingLocationError"></p>
+
+</div>
+
+</div>
+
+</section>
+
+<section class="pricing-content"
+id="pricingContent">
+
+<div class="pricing-country-bar">
+
+<div class="pricing-country-information">
+
+<div class="pricing-country-icon">
+<i class="ri-global-line"></i>
+</div>
+
+<div>
+
+<span class="pricing-country-label">
+Pricing for
+</span>
+
+<strong id="pricingCountry">
+—
+</strong>
+
+</div>
+
+</div>
+
+<div class="pricing-currency-information">
+
+<span>
+Currency
+</span>
+
+<strong id="pricingCurrency">
+—
+</strong>
+
+</div>
+
+</div>
+
+<div class="pricing-billing-header">
+
+<div>
+
+<span class="pricing-section-label">
+Choose your plan
+</span>
+
+<h2>
+Simple, transparent pricing
+</h2>
+
+<p>
+Everything you need to manage your invoices professionally.
+</p>
+
+</div>
+
+<div class="pricing-billing-toggle">
+
+<span id="monthlyBillingLabel">
+Monthly
+</span>
+
+<label class="pricing-switch">
 
 <input
 type="checkbox"
-id="billing">
+id="billingToggle">
 
-<span class="slider"></span>
+<span class="pricing-switch-slider"></span>
 
 </label>
 
-<span>
-
-Yearly billing
-
+<span id="yearlyBillingLabel">
+Yearly
 </span>
 
-<div class="save">
-
+<span class="pricing-save-badge">
 Save up to 20%
+</span>
+
+</div>
+
+</div>
+
+<div class="pricing-grid"
+id="pricingGrid"></div>
+
+</section>
+
+<section class="pricing-benefits">
+
+<div class="pricing-benefits-header">
+
+<span class="pricing-section-label">
+Why InvoicePro?
+</span>
+
+<h2>
+Everything you need to get started
+</h2>
+
+</div>
+
+<div class="pricing-benefits-grid">
+
+<div class="pricing-benefit-card">
+
+<div class="pricing-benefit-icon">
+<i class="ri-gift-line"></i>
+</div>
+
+<div>
+
+<h3>
+Start free
+</h3>
+
+<p>
+Use the Free plan without a subscription commitment.
+</p>
+
+</div>
+
+</div>
+
+<div class="pricing-benefit-card">
+
+<div class="pricing-benefit-icon">
+<i class="ri-shield-check-line"></i>
+</div>
+
+<div>
+
+<h3>
+Secure platform
+</h3>
+
+<p>
+Your business information is handled with security in mind.
+</p>
+
+</div>
+
+</div>
+
+<div class="pricing-benefit-card">
+
+<div class="pricing-benefit-icon">
+<i class="ri-refresh-line"></i>
+</div>
+
+<div>
+
+<h3>
+Upgrade anytime
+</h3>
+
+<p>
+Move to a higher plan as your business grows.
+</p>
+
+</div>
+
+</div>
+
+<div class="pricing-benefit-card">
+
+<div class="pricing-benefit-icon">
+<i class="ri-customer-service-2-line"></i>
+</div>
+
+<div>
+
+<h3>
+Support when needed
+</h3>
+
+<p>
+Get help when you need assistance with your InvoicePro account.
+</p>
+
+</div>
 
 </div>
 
@@ -136,347 +422,72 @@ Save up to 20%
 
 </section>
 
-<!-- ================= PRICING CARDS ================= -->
+</main>
 
-<section class="pricing-grid">
+<footer class="pricing-footer">
 
-<!-- FREE -->
+<div class="pricing-footer-inner">
 
-<div class="plan">
+<div class="pricing-footer-brand">
 
-<h2>Free</h2>
+<img src="logo.png"
+alt="InvoicePro">
 
-<p class="small">
+<div>
+Invoice<span>Pro</span>
+</div>
 
-Perfect for getting started
+</div>
 
+<p>
+Professional invoicing made simple.
 </p>
 
-<h1>
+</div>
 
-$0
+</footer>
 
-<span>/month</span>
+</div>
 
-</h1>
+<div class="pricing-toast"
+id="pricingToast">
 
-<p class="yearly">
+<div class="pricing-toast-icon">
+<i class="ri-information-line"></i>
+</div>
 
-Free Forever
+<div class="pricing-toast-content">
 
-</p>
+<strong id="pricingToastTitle">
+Notice
+</strong>
 
-<hr>
+<span id="pricingToastMessage"></span>
 
-<ul>
+</div>
 
-<li>✔ Up to 3 Clients</li>
+<button
+type="button"
+id="pricingToastClose"
+aria-label="Close notification">
 
-<li>✔ Up to 5 Invoices / month</li>
+<i class="ri-close-line"></i>
 
-<li>✔ Basic Templates</li>
-
-<li>✔ Email Invoices</li>
-
-<li>✔ Invoice Reports</li>
-
-</ul>
-
-<button onclick="selectPlan('Free Plan', 0, 'Forever')">
-    Continue
 </button>
 
 </div>
 
-<!-- BASIC -->
+<script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+<script src="api.js"></script>
+<script src="pricing.js"></script>
 
-<div class="plan">
+</body>
 
-<h2>Basic</h2>
-
-<p class="small">
-
-Ideal for freelancers
-
-</p>
-
-<h1>
-
-$9
-
-<span>/month</span>
-
-</h1>
-
-<p class="yearly">
-
-Billed yearly as $108
-
-</p>
-
-<hr>
-
-<ul>
-
-<li>✔ Up to 50 Clients</li>
-
-<li>✔ Unlimited Invoices</li>
-
-<li>✔ Custom Templates</li>
-
-<li>✔ Email Invoices</li>
-
-<li>✔ Payment Tracking</li>
-
-<li>✔ Basic Reports</li>
-
-</ul>
-<button onclick="selectPlan('Basic Plan', 9, 'Monthly')">
-    Continue
-</button>
-
-</div>
-
-<!-- PRO -->
-
-<div class="plan featured">
-
-<div class="popular">
-
-★ Most Popular
-
-</div>
-
-<h2>Pro</h2>
-
-<p class="small">
-
-For growing businesses
-
-</p>
-
-<h1>
-
-$19
-
-<span>/month</span>
-
-</h1>
-
-<p class="yearly">
-
-Billed yearly as $228
-
-</p>
-
-<hr>
-
-<ul>
-
-<li>✔ Unlimited Clients</li>
-
-<li>✔ Unlimited Invoices</li>
-
-<li>✔ Custom Templates</li>
-
-<li>✔ Email Invoices</li>
-
-<li>✔ Payment Tracking</li>
-
-<li>✔ Advanced Reports</li>
-
-<li>✔ Recurring Invoices</li>
-
-<li>✔ Priority Support</li>
-
-</ul>
-
-<button onclick="selectPlan('Pro Plan', 19, 'Monthly')">
-    Continue
-</button>
-
-</div>
-
-<!-- BUSINESS -->
-
-<div class="plan">
-
-<h2>Business</h2>
-
-<p class="small">
-
-For large businesses
-
-</p>
-
-<h1>
-
-$39
-
-<span>/month</span>
-
-</h1>
-
-<p class="yearly">
-
-Billed yearly as $468
-
-</p>
-
-<hr>
-
-<ul>
-
-<li>✔ Unlimited Clients</li>
-
-<li>✔ Unlimited Invoices</li>
-
-<li>✔ Custom Templates</li>
-
-<li>✔ Email Invoices</li>
-
-<li>✔ Payment Tracking</li>
-
-<li>✔ Advanced Reports</li>
-
-<li>✔ Team Members</li>
-
-<li>✔ Priority Support</li>
-
-</ul>
-
-<button onclick="selectPlan('Business Plan', 39, 'Monthly')">
-    Continue
-</button>
-
-</div>
-
-</section>
-
-<!-- ================= BENEFITS ================= -->
-
-<section class="benefits">
-
-<div class="benefit">
-
-<div class="icon purple">
-    <i class="ri-gift-line"></i>
-</div>
-
-<div>
-
-<h3>
-
-14-Day Free Trial
-
-</h3>
-
-<p>
-
-Try all premium features free for 14 days.
-
-</p>
-
-</div>
-
-</div>
-
-<div class="benefit">
-
-<div class="icon green">
-    <i class="ri-shield-check-line"></i>
-</div>
-
-<div>
-
-<h3>
-
-No Credit Card
-
-</h3>
-
-<p>
-
-No credit card required to start your trial.
-
-</p>
-
-</div>
-
-</div>
-
-<div class="benefit">
-    <div class="icon orange">
-    <i class="ri-close-circle-line"></i>
-
-</div>
-
-<div>
-
-<h3>
-
-Cancel Anytime
-
-</h3>
-
-<p>
-
-Change or cancel your subscription anytime.
-
-</p>
-
-</div>
-
-</div>
-
-<div class="benefit">
-<div class="icon violet">
-    <i class="ri-customer-service-2-line"></i>
-</div>
-
-
-
-<div>
-
-<h3>
-
-24/7 Support
-
-</h3>
-
-<p>
-
-We're here whenever you need help.
-
-</p>
-
-</div>
-
-</div>
-                  <!--   <span>🌐 English ▼</span-->
-
-</section>
+</html>
 </div>
     <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
 <script src="api.js"></script>
-<script>
-    function selectPlan(name, price, billing){
-
-    const plan = {
-
-        name: name,
-        price: price,
-        billing: billing
-
-    };
-
-    localStorage.setItem("selectedPlan", JSON.stringify(plan));
-
-    window.location.href = "signup.html";
-
-}
-</script>
-
+<script src="pricing.js"></script>
 </body>
 
 </html>
