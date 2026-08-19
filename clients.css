@@ -1,0 +1,3188 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+html {
+    width: 100%;
+    min-height: 100%;
+    scroll-behavior: smooth;
+}
+
+
+body {
+    width: 100%;
+    min-height: 100vh;
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    background: #f6f8fb;
+    color: #1f2937;
+
+    overflow-x: hidden;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+
+/* =========================
+   LINKS
+   ========================= */
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+
+/* =========================
+   BUTTONS
+   ========================= */
+
+button {
+    font-family: inherit;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+
+/* =========================
+   FORM ELEMENTS
+   ========================= */
+
+input,
+select,
+textarea {
+    font-family: inherit;
+}
+
+
+input,
+select,
+textarea {
+    outline: none;
+}
+
+
+textarea {
+    resize: vertical;
+}
+
+
+/* =========================
+   IMAGES
+   ========================= */
+
+i {
+    display: block;
+    max-width: 100%;
+}
+
+
+/* =========================
+   LISTS
+   ========================= */
+
+ul,
+ol {
+    list-style: none;
+}
+
+/* =========================
+   MAIN CONTENT FOUNDATION
+   ========================= 
+
+.main-content {
+    width: 100%;
+    flex: 1;
+
+    padding: 28px 32px 0;
+
+    background: #f6f8fb;
+}
+
+
+/* =========================
+   CLIENTS PAGE FOUNDATION
+   ========================= */
+
+.clients-page {
+    width: 100%;
+    max-width: 1600px;
+
+    margin: 0 auto;
+}
+
+
+/* =========================
+   UTILITY
+   ========================= */
+
+.hidden {
+    display: none !important;
+}
+
+
+.no-scroll {
+    overflow: hidden !important;
+}
+
+
+/* =========================
+   SCROLLBAR
+   ========================= */
+
+::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+
+/* =========================
+   TEXT SELECTION
+   ========================= */
+
+::selection {
+
+    background: #dbeafe;
+
+    color: #1e3a8a;
+}
+
+
+/* =========================================================
+   PROFILE SECTION
+   ========================================================= */
+
+#profileSection {
+
+    position: relative;
+
+    min-height: 48px;
+
+    padding: 4px 6px 4px 7px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    border: 1px solid transparent;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+#profileSection:hover {
+
+    background: #f8fafc;
+
+    border-color: #e5e7eb;
+}
+
+
+/* =========================================================
+   PROFILE IMAGE
+   ========================================================= */
+
+#profileImage {
+
+    width: 38px;
+
+    height: 38px;
+
+    flex-shrink: 0;
+
+    display: block;
+
+    object-fit: cover;
+
+    border-radius: 50%;
+
+    border: 2px solid #ffffff;
+
+    box-shadow:
+        0 1px 4px rgba(15, 23, 42, 0.12);
+}
+
+
+/* =========================================================
+   PROFILE INFORMATION
+   ========================================================= */
+
+#profileInfo {
+
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    gap: 2px;
+}
+
+
+#profileName {
+
+    margin: 0;
+
+    max-width: 150px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    color: #1e293b;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    line-height: 1.3;
+}
+
+
+#profileRole {
+
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 10px;
+
+    font-weight: 400;
+
+    line-height: 1.3;
+}
+
+
+/* =========================================================
+   PROFILE MENU BUTTON
+   ========================================================= */
+
+#profileMenuButton {
+
+    width: 28px;
+
+    height: 28px;
+
+    margin-left: 2px;
+
+    padding: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    background: transparent;
+
+    border: none;
+
+    border-radius: 6px;
+
+    color: #64748b;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+
+#profileMenuButton:hover {
+
+    background: #e2e8f0;
+
+    color: #1e293b;
+}
+
+
+#profileMenuButton i {
+
+    display: block;
+
+    font-size: 16px;
+
+    transition:
+        transform 0.2s ease;
+}
+
+
+/* =========================================================
+   PROFILE DROPDOWN
+   ========================================================= */
+
+#profileDropdown {
+
+    position: absolute;
+
+    top: calc(100% + 8px);
+
+    right: 0;
+
+    width: 190px;
+
+    padding: 6px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 12px 30px rgba(15, 23, 42, 0.12),
+        0 3px 8px rgba(15, 23, 42, 0.05);
+
+    z-index: 3000;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+    transform: translateY(-6px);
+
+    transition:
+        opacity 0.2s ease,
+        visibility 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+/* =========================================================
+   PROFILE DROPDOWN — SHOW
+   ========================================================= */
+
+#profileDropdown.show {
+
+    opacity: 1;
+
+    visibility: visible;
+
+    pointer-events: auto;
+
+    transform: translateY(0);
+}
+
+
+/* =========================================================
+   PROFILE DROPDOWN LINKS
+   ========================================================= */
+
+#profileDropdown a {
+
+    width: 100%;
+
+    padding: 10px 11px;
+
+    display: flex;
+
+    align-items: center;
+
+    color: #475569;
+
+    background: transparent;
+
+    border-radius: 7px;
+
+    text-decoration: none;
+
+    font-size: 12px;
+
+    font-weight: 500;
+
+    line-height: 1.4;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+
+#profileDropdown a:hover {
+
+    background: #f1f5f9;
+
+    color: #1e293b;
+}
+
+
+/* =========================================================
+   PROFILE DROPDOWN ARROW
+   ========================================================= */
+
+#profileSection.dropdown-open #profileMenuButton i {
+
+    transform: rotate(180deg);
+}
+
+
+/* =========================================================
+   PROFILE SECTION — TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    #profileInfo {
+
+        display: none;
+    }
+
+
+    #profileSection {
+
+        gap: 4px;
+
+        padding-left: 5px;
+
+        padding-right: 5px;
+    }
+
+
+    #profileDropdown {
+
+        right: 0;
+
+        width: 180px;
+    }
+
+}
+
+
+/* =========================================================
+   PROFILE SECTION — MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    #profileSection {
+
+        min-height: 42px;
+
+        padding: 3px 4px;
+    }
+
+
+    #profileImage {
+
+        width: 34px;
+
+        height: 34px;
+    }
+
+
+    #profileMenuButton {
+
+        width: 25px;
+
+        height: 25px;
+    }
+
+
+    #profileDropdown {
+
+        top: calc(100% + 6px);
+
+        right: 0;
+
+        width: 175px;
+    }
+
+
+    #profileDropdown a {
+
+        padding: 9px 10px;
+
+        font-size: 11px;
+    }
+
+}
+#profileImage {
+
+    width: 38px;
+    height: 38px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    background: #f1f5f9;
+
+    border: 1px solid #e2e8f0;
+}
+
+
+/* =========================================================
+   PROFILE INFORMATION
+   ========================================================= */
+
+#profileInfo {
+
+    min-width: 0;
+
+    max-width: 150px;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+
+    gap: 2px;
+}
+
+
+#profileName {
+
+    margin: 0;
+
+    overflow: hidden;
+
+    color: #1e293b;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    line-height: 1.3;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+}
+
+
+#profileRole {
+
+    margin: 0;
+
+    overflow: hidden;
+
+    color: #94a3b8;
+
+    font-size: 11px;
+
+    font-weight: 400;
+
+    line-height: 1.3;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   PROFILE DROPDOWN BUTTON
+   ========================================================= */
+
+#profileMenuButton {
+
+    width: 28px;
+    height: 28px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: transparent;
+
+    border-radius: 6px;
+
+    color: #64748b;
+
+    font-size: 18px;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+#profileMenuButton:hover {
+
+    background: #e2e8f0;
+
+    color: #334155;
+}
+
+
+/* =========================================================
+   PROFILE DROPDOWN
+   ========================================================= */
+
+#profileDropdown {
+
+    position: absolute;
+
+    top: calc(100% + 8px);
+
+    right: 0;
+
+    width: 190px;
+
+    padding: 6px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 12px 30px rgba(15, 23, 42, 0.10),
+        0 3px 8px rgba(15, 23, 42, 0.05);
+
+    z-index: 1100;
+
+    /*
+       Visibility/display is intentionally NOT controlled here.
+
+       Your existing JavaScript handles the opening and closing
+       of the profile dropdown.
+    */
+}
+
+
+#profileDropdown a {
+
+    width: 100%;
+
+    min-height: 38px;
+
+    padding: 0 11px;
+
+    display: flex;
+    align-items: center;
+
+    border-radius: 7px;
+
+    color: #475569;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+
+#profileDropdown a:hover {
+
+    background: #f1f5f9;
+
+    color: #1e293b;
+}
+
+
+/* =========================================================
+   HEADER RESPONSIVENESS
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+    .page-wrapper > .page-header {
+
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+
+    #profileInfo {
+
+        max-width: 120px;
+    }
+
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .page-wrapper > .page-header {
+
+        min-height: 68px;
+
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+
+    .header-left {
+
+        gap: 12px;
+    }
+
+
+    .page-wrapper > .page-header .page-title h1 {
+
+        font-size: 20px;
+    }
+
+
+    #profileInfo {
+
+        display: none;
+    }
+
+
+    #profileSection {
+
+        padding-left: 4px;
+        padding-right: 4px;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .page-wrapper > .page-header {
+
+        min-height: 62px;
+
+        padding-left: 14px;
+        padding-right: 14px;
+
+        gap: 10px;
+    }
+
+
+    .header-left {
+
+        gap: 10px;
+    }
+
+
+    .menu-toggle,
+    .notification-btn,
+    #helpButton {
+
+        width: 38px;
+        height: 38px;
+    }
+
+
+    .page-wrapper > .page-header .page-title h1 {
+
+        font-size: 18px;
+    }
+
+
+    .header-right {
+
+        gap: 4px;
+    }
+
+
+    #profileImage {
+
+        width: 35px;
+        height: 35px;
+    }
+
+
+    #profileMenuButton {
+
+        display: none;
+    }
+
+
+    #profileDropdown {
+
+        right: -4px;
+
+        width: 175px;
+    }
+
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+    .page-wrapper > .page-header {
+
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+
+    #helpButton {
+
+        display: none;
+    }
+
+
+    .page-wrapper > .page-header .page-title h1 {
+
+        font-size: 17px;
+    }
+
+}
+
+/* =========================================================
+   INVOICEPRO CLIENTS PAGE
+   SECTION 4 — CLIENTS PAGE HEADING
+   ========================================================= */
+
+
+/* =========================================================
+   CLIENTS PAGE
+   ========================================================= */
+
+.clients-page {
+
+    width: 100%;
+    max-width: 1600px;
+
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   PAGE TITLE SECTION
+   ========================================================= */
+
+.page-title-section {
+
+    width: 100%;
+
+    margin-bottom: 24px;
+
+    background: transparent;
+}
+
+
+.page-title-section > .page-header {
+
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 24px;
+}
+
+
+/* =========================================================
+   PAGE DESCRIPTION
+   ========================================================= */
+
+.page-description {
+
+    margin: 5px 0 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+
+    font-weight: 400;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   ADD CLIENT BUTTON
+   ========================================================= */
+
+.add-client-btn {
+
+    min-width: 140px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    padding: 0 16px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    background: #2563eb;
+
+    border: 1px solid #2563eb;
+
+    border-radius: 8px;
+
+    color: #ffffff;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    line-height: 1;
+
+    white-space: nowrap;
+
+    box-shadow:
+        0 2px 5px rgba(37, 99, 235, 0.15);
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.15s ease;
+}
+
+
+/* =========================================================
+   ADD CLIENT BUTTON HOVER
+   ========================================================= */
+
+.add-client-btn:hover {
+
+    background: #1d4ed8;
+
+    border-color: #1d4ed8;
+
+    box-shadow:
+        0 4px 10px rgba(37, 99, 235, 0.20);
+}
+
+
+/* =========================================================
+   ADD CLIENT BUTTON ACTIVE
+   ========================================================= */
+
+.add-client-btn:active {
+
+    transform: translateY(1px);
+
+    box-shadow:
+        0 2px 5px rgba(37, 99, 235, 0.15);
+}
+
+
+/* =========================================================
+   ADD CLIENT ICON
+   ========================================================= */
+
+#addClientIcon {
+
+    width: 16px;
+    height: 16px;
+
+    flex-shrink: 0;
+
+    object-fit: contain;
+
+    /*
+       The SVG itself determines its color.
+       No filter is applied here so the original icon
+       remains intact.
+    */
+}
+
+
+/* =========================================================
+   ADD CLIENT TEXT
+   ========================================================= */
+
+#addClientText {
+
+    display: inline-block;
+
+    line-height: 1;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .main-content {
+
+        padding-left: 22px;
+        padding-right: 22px;
+    }
+
+
+    .page-title-section {
+
+        margin-bottom: 22px;
+    }
+
+
+    .page-title-section > .page-header {
+
+        gap: 18px;
+    }
+
+
+    .page-description {
+
+        font-size: 13px;
+    }
+
+
+    .add-client-btn {
+
+        height: 41px;
+
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 650px) {
+
+    .main-content {
+
+        padding: 22px 16px 0;
+    }
+
+
+    .page-title-section > .page-header {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 14px;
+    }
+
+
+    .page-description {
+
+        margin-top: 4px;
+
+        font-size: 13px;
+
+        line-height: 1.5;
+    }
+
+
+    .add-client-btn {
+
+        width: 100%;
+
+        min-width: 0;
+
+        height: 43px;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+    .main-content {
+
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+
+    .page-description {
+
+        font-size: 12px;
+    }
+
+
+    .add-client-btn {
+
+        font-size: 13px;
+    }
+
+}
+
+/* =========================================================
+   INVOICEPRO CLIENTS PAGE
+   SECTION 5 — STATISTICS CARDS
+   ========================================================= */
+
+
+/* =========================================================
+   STATS GRID
+   ========================================================= */
+
+.stats-grid {
+
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+
+    gap: 18px;
+
+    margin-top: 24px;
+}
+
+
+/* =========================================================
+   STAT CARD
+   ========================================================= */
+
+.stat-card {
+
+    min-width: 0;
+    min-height: 112px;
+
+    padding: 20px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 15px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.03);
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+/* =========================================================
+   STAT CARD HOVER
+   ========================================================= */
+
+.stat-card:hover {
+
+    border-color: #dbe1e8;
+
+    box-shadow:
+        0 6px 18px rgba(15, 23, 42, 0.06);
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   STAT ICON
+   ========================================================= */
+
+.stat-icon {
+
+    width: 48px;
+    height: 48px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #eff6ff;
+}
+
+
+/* =========================================================
+   STAT ICON IMAGE
+   ========================================================= */
+
+.stat-icon i {
+
+    width: 24px;
+    height: 24px;
+
+    object-fit: contain;
+}
+
+
+/* =========================================================
+   TOTAL CLIENTS ICON
+   ========================================================= */
+
+#totalClientsIcon {
+
+    background: #eff6ff;
+}
+
+
+/* =========================================================
+   ACTIVE CLIENTS ICON
+   ========================================================= */
+
+#activeClientsIcon {
+
+    background: #ecfdf5;
+}
+
+
+/* =========================================================
+   INACTIVE CLIENTS ICON
+   ========================================================= */
+
+#inactiveClientsIcon {
+
+    background: #f8fafc;
+}
+
+
+/* =========================================================
+   OUTSTANDING BALANCE ICON
+   ========================================================= */
+
+#outstandingBalanceIcon {
+
+    background: #fff7ed;
+}
+
+
+/* =========================================================
+   STAT CONTENT
+   ========================================================= */
+
+.stat-content {
+
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+
+    gap: 5px;
+}
+
+
+/* =========================================================
+   STAT LABEL
+   ========================================================= */
+
+.stat-label {
+
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 12px;
+
+    font-weight: 500;
+
+    line-height: 1.4;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   STAT VALUE
+   ========================================================= */
+
+.stat-value {
+
+    margin: 0;
+
+    color: #111827;
+
+    font-size: 24px;
+
+    font-weight: 700;
+
+    line-height: 1.2;
+
+    letter-spacing: -0.3px;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   INDIVIDUAL STAT VALUE ADJUSTMENT
+   ========================================================= */
+
+#outstandingBalanceValue {
+
+    font-size: 21px;
+}
+
+
+
+.stats-section {
+
+    width: 100%;
+
+    margin: 0;
+
+    padding: 0;
+}
+
+
+/* =========================================================
+   LARGE TABLET
+   ========================================================= */
+
+@media (max-width: 1150px) {
+
+    .stats-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 16px;
+    }
+
+
+    .stat-card {
+
+        min-height: 105px;
+
+        padding: 18px;
+    }
+
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .stats-grid {
+
+        margin-top: 22px;
+
+        gap: 14px;
+    }
+
+
+    .stat-card {
+
+        min-height: 100px;
+
+        padding: 16px;
+
+        gap: 13px;
+    }
+
+
+    .stat-icon {
+
+        width: 44px;
+        height: 44px;
+
+        border-radius: 9px;
+    }
+
+
+    .stat-icon i {
+
+        width: 22px;
+        height: 22px;
+    }
+
+
+    .stat-label {
+
+        font-size: 11px;
+    }
+
+
+    .stat-value {
+
+        font-size: 22px;
+    }
+
+
+    #outstandingBalanceValue {
+
+        font-size: 19px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .stats-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 12px;
+
+        margin-top: 20px;
+    }
+
+
+    .stat-card {
+
+        min-height: 96px;
+
+        padding: 14px;
+
+        gap: 10px;
+
+        border-radius: 10px;
+    }
+
+
+    .stat-icon {
+
+        width: 40px;
+        height: 40px;
+
+        border-radius: 8px;
+    }
+
+
+    .stat-icon i {
+
+        width: 20px;
+        height: 20px;
+    }
+
+
+    .stat-content {
+
+        gap: 4px;
+    }
+
+
+    .stat-label {
+
+        font-size: 10px;
+    }
+
+
+    .stat-value {
+
+        font-size: 20px;
+    }
+
+
+    #outstandingBalanceValue {
+
+        font-size: 17px;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 400px) {
+
+    .stats-grid {
+
+        gap: 10px;
+    }
+
+
+    .stat-card {
+
+        padding: 12px;
+
+        gap: 8px;
+    }
+
+
+    .stat-icon {
+
+        width: 36px;
+        height: 36px;
+    }
+
+
+    .stat-icon i {
+
+        width: 18px;
+        height: 18px;
+    }
+
+
+    .stat-label {
+
+        font-size: 9px;
+    }
+
+
+    .stat-value {
+
+        font-size: 18px;
+    }
+
+
+    #outstandingBalanceValue {
+
+        font-size: 15px;
+    }
+
+}
+
+/* =========================================================
+   INVOICEPRO CLIENTS PAGE
+   SECTION 6 — CLIENTS TABLE SECTION + TOOLBAR
+   ========================================================= */
+
+
+/* =========================================================
+   CLIENTS TABLE SECTION
+   ========================================================= */
+
+.clients-table-section {
+
+    width: 100%;
+
+    margin-top: 24px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.03);
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   TABLE TOOLBAR
+   ========================================================= */
+
+.table-toolbar {
+
+    width: 100%;
+
+    min-height: 72px;
+
+    padding: 14px 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 18px;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    background: #ffffff;
+}
+
+
+/* =========================================================
+   TOOLBAR LEFT
+   ========================================================= */
+
+.toolbar-left {
+
+    min-width: 0;
+
+    flex: 1;
+
+    display: flex;
+    align-items: center;
+}
+
+
+/* =========================================================
+   TABLE SEARCH
+   ========================================================= */
+
+.table-search {
+
+    position: relative;
+
+    width: 100%;
+    max-width: 340px;
+
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+}
+
+
+/* =========================================================
+   SEARCH ICON
+   ========================================================= */
+
+#tableSearchIcon {
+
+    position: absolute;
+
+    left: 12px;
+
+    width: 17px;
+    height: 17px;
+
+    object-fit: contain;
+
+    pointer-events: none;
+
+    opacity: 0.65;
+
+    z-index: 1;
+}
+
+
+/* =========================================================
+   SEARCH INPUT
+   ========================================================= */
+
+.table-search-input {
+
+    width: 100%;
+    height: 40px;
+
+    padding: 0 13px 0 38px;
+
+    background: #f8fafc;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 8px;
+
+    color: #1e293b;
+
+    font-size: 13px;
+
+    font-weight: 400;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.table-search-input::placeholder {
+
+    color: #94a3b8;
+
+    opacity: 1;
+}
+
+
+.table-search-input:hover {
+
+    border-color: #cbd5e1;
+}
+
+
+.table-search-input:focus {
+
+    background: #ffffff;
+
+    border-color: #93c5fd;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+
+/* =========================================================
+   TOOLBAR RIGHT
+   ========================================================= */
+
+.toolbar-right {
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+}
+
+
+/* =========================================================
+   TABLE SELECT
+   ========================================================= */
+
+.table-select {
+
+    height: 40px;
+
+    min-width: 125px;
+
+    padding: 0 32px 0 11px;
+
+    background-color: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 8px;
+
+    color: #475569;
+
+    font-family: inherit;
+
+    font-size: 12px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.table-select:hover {
+
+    border-color: #cbd5e1;
+
+    background: #f8fafc;
+}
+
+
+.table-select:focus {
+
+    background: #ffffff;
+
+    border-color: #93c5fd;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+
+/* =========================================================
+   EXPORT DROPDOWN
+   ========================================================= */
+
+.export-dropdown {
+
+    position: relative;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   EXPORT BUTTON
+   ========================================================= */
+
+.export-btn {
+
+    height: 40px;
+
+    min-width: 96px;
+
+    padding: 0 13px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 8px;
+
+    color: #475569;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.export-btn:hover {
+
+    background: #f8fafc;
+
+    border-color: #cbd5e1;
+
+    color: #1e293b;
+}
+
+
+/* =========================================================
+   EXPORT MENU
+   ========================================================= */
+
+.export-menu {
+
+    position: absolute;
+
+    top: calc(100% + 7px);
+
+    right: 0;
+
+    width: 160px;
+
+    padding: 6px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 9px;
+
+    box-shadow:
+        0 12px 30px rgba(15, 23, 42, 0.10),
+        0 3px 8px rgba(15, 23, 42, 0.05);
+
+    z-index: 500;
+
+    /*
+       Visibility/open state intentionally left alone.
+
+       Existing JavaScript should control whether the
+       export menu is shown or hidden.
+    */
+}
+
+
+/* =========================================================
+   EXPORT MENU BUTTONS
+   ========================================================= */
+
+.export-menu button {
+
+    width: 100%;
+
+    min-height: 36px;
+
+    padding: 0 10px;
+
+    display: flex;
+    align-items: center;
+
+    background: transparent;
+
+    border-radius: 6px;
+
+    color: #475569;
+
+    font-family: inherit;
+
+    font-size: 12px;
+
+    font-weight: 500;
+
+    text-align: left;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.export-menu button:hover {
+
+    background: #f1f5f9;
+
+    color: #1e293b;
+}
+
+
+/* =========================================================
+   TABLE WRAPPER
+   ========================================================= */
+
+.table-wrapper {
+
+    width: 100%;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    -webkit-overflow-scrolling: touch;
+}
+
+
+/* =========================================================
+   TABLE WRAPPER SCROLLBAR
+   ========================================================= */
+
+.table-wrapper::-webkit-scrollbar {
+
+    height: 6px;
+}
+
+
+.table-wrapper::-webkit-scrollbar-track {
+
+    background: #f8fafc;
+}
+
+
+.table-wrapper::-webkit-scrollbar-thumb {
+
+    background: #cbd5e1;
+
+    border-radius: 10px;
+}
+
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+
+    background: #94a3b8;
+}
+
+
+/* =========================================================
+   LARGE TABLET
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+    .table-toolbar {
+
+        align-items: stretch;
+
+        flex-direction: column;
+
+        padding: 14px 16px;
+
+        gap: 12px;
+    }
+
+
+    .toolbar-left {
+
+        width: 100%;
+    }
+
+
+    .table-search {
+
+        max-width: none;
+    }
+
+
+    .toolbar-right {
+
+        width: 100%;
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
+        gap: 8px;
+    }
+
+
+    .table-select,
+    .export-btn {
+
+        width: 100%;
+
+        min-width: 0;
+    }
+
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .clients-table-section {
+
+        margin-top: 20px;
+
+        border-radius: 10px;
+    }
+
+
+    .table-toolbar {
+
+        padding: 13px;
+    }
+
+
+    .toolbar-right {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .table-select,
+    .export-btn {
+
+        height: 39px;
+    }
+
+
+    .export-menu {
+
+        right: 0;
+
+        width: 155px;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 430px) {
+
+    .table-toolbar {
+
+        padding: 12px;
+    }
+
+
+    .toolbar-right {
+
+        grid-template-columns: 1fr;
+    }
+
+
+    .table-search,
+    .table-search-input {
+
+        height: 40px;
+    }
+
+
+    .table-select,
+    .export-btn {
+
+        width: 100%;
+
+        height: 40px;
+    }
+
+
+    .export-menu {
+
+        width: 100%;
+
+        min-width: 160px;
+    }
+
+}
+
+/* =========================================================
+   INVOICEPRO CLIENTS PAGE
+   SECTION 7 — CLIENTS TABLE
+   ========================================================= */
+
+
+/* =========================================================
+   CLIENTS TABLE
+   ========================================================= */
+
+.clients-table {
+
+    width: 100%;
+
+    min-width: 900px;
+
+    border-collapse: separate;
+
+    border-spacing: 0;
+
+    background: #ffffff;
+
+    table-layout: auto;
+}
+
+
+/* =========================================================
+   TABLE HEAD
+   ========================================================= */
+
+.clients-table thead {
+
+    background: #f8fafc;
+}
+
+
+/* =========================================================
+   TABLE HEADER CELLS
+   ========================================================= */
+
+.clients-table thead th {
+
+    height: 48px;
+
+    padding: 0 18px;
+
+    background: #f8fafc;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    color: #64748b;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    line-height: 1;
+
+    text-align: left;
+
+    white-space: nowrap;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.35px;
+}
+
+
+/* =========================================================
+   FIRST HEADER CELL
+   ========================================================= */
+
+.clients-table thead th:first-child {
+
+    padding-left: 20px;
+}
+
+
+/* =========================================================
+   LAST HEADER CELL
+   ========================================================= */
+
+.clients-table thead th:last-child {
+
+    padding-right: 20px;
+
+    text-align: right;
+}
+
+
+/* =========================================================
+   TABLE BODY
+   ========================================================= */
+
+.clients-table tbody {
+
+    background: #ffffff;
+}
+
+
+/* =========================================================
+   TABLE ROW
+   ========================================================= */
+
+.clients-table tbody tr {
+
+    transition:
+        background 0.15s ease;
+}
+
+
+/* =========================================================
+   TABLE ROW HOVER
+   ========================================================= */
+
+.clients-table tbody tr:hover {
+
+    background: #f8fafc;
+}
+
+
+/* =========================================================
+   TABLE CELLS
+   ========================================================= */
+
+.clients-table tbody td {
+
+    height: 68px;
+
+    padding: 12px 18px;
+
+    border-bottom: 1px solid #f1f5f9;
+
+    color: #475569;
+
+    font-size: 13px;
+
+    font-weight: 400;
+
+    line-height: 1.4;
+
+    vertical-align: middle;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   FIRST TABLE CELL
+   ========================================================= */
+
+.clients-table tbody td:first-child {
+
+    padding-left: 20px;
+
+    color: #1e293b;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   LAST TABLE CELL
+   ========================================================= */
+
+.clients-table tbody td:last-child {
+
+    padding-right: 20px;
+
+    text-align: right;
+}
+
+
+/* =========================================================
+   LAST ROW
+   ========================================================= */
+
+.clients-table tbody tr:last-child td {
+
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   CLIENT NAME
+   ========================================================= */
+
+.client-name {
+
+    color: #1e293b;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+.client-name:hover {
+
+    color: #2563eb;
+}
+
+
+/* =========================================================
+   CLIENT EMAIL
+   ========================================================= */
+
+.client-email {
+
+    color: #64748b;
+
+    font-size: 12px;
+
+    font-weight: 400;
+}
+
+
+/* =========================================================
+   CLIENT PHONE
+   ========================================================= */
+
+.client-phone {
+
+    color: #64748b;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   INVOICE COUNT
+   ========================================================= */
+
+.client-invoices {
+
+    color: #475569;
+
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   OUTSTANDING BALANCE
+   ========================================================= */
+
+.client-balance {
+
+    color: #1e293b;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   STATUS BADGE
+   ========================================================= */
+
+.status-badge {
+
+    min-width: 68px;
+
+    min-height: 25px;
+
+    padding: 4px 9px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 999px;
+
+    font-size: 10px;
+
+    font-weight: 600;
+
+    line-height: 1;
+
+    text-transform: capitalize;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   ACTIVE STATUS
+   ========================================================= */
+
+.status-badge.active {
+
+    background: #ecfdf5;
+
+    color: #059669;
+}
+
+
+/* =========================================================
+   INACTIVE STATUS
+   ========================================================= */
+
+.status-badge.inactive {
+
+    background: #f1f5f9;
+
+    color: #64748b;
+}
+
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+.client-actions {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 4px;
+}
+
+
+/* =========================================================
+   ACTION BUTTON
+   ========================================================= */
+
+.client-action-btn {
+
+    width: 32px;
+    height: 32px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: transparent;
+
+    border: 1px solid transparent;
+
+    border-radius: 7px;
+
+    color: #64748b;
+
+    font-size: 17px;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.client-action-btn:hover {
+
+    background: #f1f5f9;
+
+    border-color: #e2e8f0;
+
+    color: #1e293b;
+}
+
+
+/* =========================================================
+   VIEW ACTION
+   ========================================================= */
+
+.client-action-btn.view-action:hover {
+
+    background: #eff6ff;
+
+    border-color: #dbeafe;
+
+    color: #2563eb;
+}
+
+
+/* =========================================================
+   EDIT ACTION
+   ========================================================= */
+
+.client-action-btn.edit-action:hover {
+
+    background: #f0fdf4;
+
+    border-color: #dcfce7;
+
+    color: #16a34a;
+}
+
+
+/* =========================================================
+   DELETE ACTION
+   ========================================================= */
+
+.client-action-btn.delete-action:hover {
+
+    background: #fef2f2;
+
+    border-color: #fee2e2;
+
+    color: #dc2626;
+}
+
+
+/* =========================================================
+   GENERIC TABLE ACTION BUTTONS
+   =========================================================
+
+   These are useful if your JavaScript creates buttons with
+   different classes than the three optional classes above.
+   ========================================================= */
+
+.clients-table tbody td button {
+
+    font-family: inherit;
+}
+
+
+/* =========================================================
+   EMPTY TABLE STATE
+   ========================================================= */
+
+.clients-table-empty {
+
+    min-height: 180px;
+
+    padding: 40px 20px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    color: #94a3b8;
+
+    font-size: 13px;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   TABLE RESPONSIVE TEXT
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+    .clients-table {
+
+        min-width: 850px;
+    }
+
+
+    .clients-table thead th {
+
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+
+    .clients-table tbody td {
+
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+
+    .clients-table thead th:first-child,
+    .clients-table tbody td:first-child {
+
+        padding-left: 16px;
+    }
+
+
+    .clients-table thead th:last-child,
+    .clients-table tbody td:last-child {
+
+        padding-right: 16px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE TABLE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .clients-table {
+
+        min-width: 850px;
+    }
+
+
+    .clients-table thead th {
+
+        height: 46px;
+
+        font-size: 10px;
+    }
+
+
+    .clients-table tbody td {
+
+        height: 64px;
+
+        font-size: 12px;
+    }
+
+
+    .client-name {
+
+        font-size: 12px;
+    }
+
+
+    .client-email,
+    .client-phone {
+
+        font-size: 11px;
+    }
+
+
+    .client-action-btn {
+
+        width: 30px;
+        height: 30px;
+
+        font-size: 16px;
+    }
+
+}
+
+
+/* =========================================================
+   TABLE TOUCH EXPERIENCE
+   ========================================================= */
+
+@media (hover: none) {
+
+    .clients-table tbody tr:hover {
+
+        background: #ffffff;
+    }
+
+
+    .client-action-btn:hover {
+
+        background: transparent;
+
+        border-color: transparent;
+
+        color: #64748b;
+    }
+
+}
+
+
+
+/* =========================================================
+   HEADER LEFT
+   ========================================================= */
+
+.header-left {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    min-width: 0;
+
+    flex: 1;
+}
+
+
+/* =========================================================
+   HEADER PAGE TITLE
+   ========================================================= */
+
+.page-header > .header-left .page-title {
+
+    min-width: 0;
+}
+
+
+.page-header > .header-left .page-title h1 {
+
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 22px;
+
+    font-weight: 700;
+
+    line-height: 1.25;
+}
+
+.view-client-btn,
+.edit-client-btn,
+.delete-client-btn {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #dbeafe;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    color: #2563eb;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.view-client-btn i,
+.edit-client-btn i,
+.delete-client-btn i {
+    font-size: 18px;
+}
+
+.view-client-btn:hover,
+.edit-client-btn:hover,
+.delete-client-btn:hover {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
+}
+
+.client-invoices-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.client-invoice-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 18px;
+    padding: 16px 18px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    transition: 0.2s ease;
+}
+
+.client-invoice-card:hover {
+    border-color: #2563eb;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.client-invoice-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.client-invoice-info strong {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.client-invoice-info span {
+    font-size: 13px;
+    color: #6b7280;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.client-invoice-amount {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+    white-space: nowrap;
+}
+
+.client-invoice-card .status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 72px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.client-invoice-card .status-badge.paid {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.client-invoice-card .status-badge.pending {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.client-invoice-card .status-badge.overdue {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.client-invoice-card .status-badge.draft {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.client-invoice-card .status-badge.cancelled {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.send-client-invoice-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border: none;
+    border-radius: 7px;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: 0.2s ease;
+}
+
+.send-client-invoice-button:hover {
+    background: #1d4ed8;
+}
+
+.send-client-invoice-button i {
+    font-size: 14px;
+}
+
+.invoice-sent-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.client-invoices-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.client-invoice-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 18px;
+    padding: 16px 18px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    transition: 0.2s ease;
+}
+
+.client-invoice-card:hover {
+    border-color: #2563eb;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.client-invoice-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.client-invoice-info strong {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.client-invoice-info span {
+    font-size: 13px;
+    color: #6b7280;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.client-invoice-amount {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+    white-space: nowrap;
+}
+
+.client-invoice-card .status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 72px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.client-invoice-card .status-badge.paid {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.client-invoice-card .status-badge.pending {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.client-invoice-card .status-badge.overdue {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.client-invoice-card .status-badge.draft {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.client-invoice-card .status-badge.cancelled {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.send-client-invoice-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border: none;
+    border-radius: 7px;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: 0.2s ease;
+}
+
+.send-client-invoice-button:hover {
+    background: #1d4ed8;
+}
+
+.send-client-invoice-button i {
+    font-size: 14px;
+}
+
+.invoice-sent-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+
+    .client-invoice-card {
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        padding: 14px;
+    }
+
+    .client-invoice-amount {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .client-invoice-card .status-badge,
+    .send-client-invoice-button,
+    .invoice-sent-label {
+        grid-column: 1 / -1;
+        justify-self: start;
+    }
+
+}
+
+.send-invoice-items {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.send-invoice-item-row {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr) 70px 110px 120px;
+    align-items: center;
+    width: 100%;
+    padding: 11px 0;
+    border-bottom: 1px solid #eeeeee;
+    gap: 8px;
+}
+
+.send-invoice-item-number {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    text-align: left;
+}
+
+.send-invoice-item-number::after {
+    content: ".";
+}
+
+.send-invoice-item-description {
+    font-size: 14px;
+    font-weight: 500;
+    color: #111827;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.send-invoice-item-quantity {
+    font-size: 13px;
+    color: #6b7280;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.send-invoice-item-price {
+    font-size: 13px;
+    color: #6b7280;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.send-invoice-item-total {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.send-invoice-item-row:last-child {
+    border-bottom: none;
+}
+
+@media (max-width: 600px) {
+
+    .send-invoice-item-row {
+        grid-template-columns: 24px minmax(0, 1fr) auto;
+        gap: 6px;
+        padding: 12px 0;
+    }
+
+    .send-invoice-item-description {
+        white-space: normal;
+        line-height: 1.4;
+    }
+
+    .send-invoice-item-quantity {
+        grid-column: 2;
+        grid-row: 2;
+        text-align: left;
+        font-size: 12px;
+    }
+
+    .send-invoice-item-price {
+        grid-column: 3;
+        grid-row: 2;
+        font-size: 12px;
+    }
+
+    .send-invoice-item-total {
+        grid-column: 3;
+        grid-row: 1;
+        font-size: 13px;
+    }
+
+}
