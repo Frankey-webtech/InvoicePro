@@ -1,0 +1,1668 @@
+/* =========================================
+ESTIMATES PAGE
+========================================= */
+
+.estimates-page{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:30px;
+
+}
+
+/* =========================================
+PAGE HEADER
+========================================= */
+
+.page-title-section{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:24px;
+
+}
+
+.page-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:20px;
+
+    flex-wrap:wrap;
+
+}
+
+.page-heading{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+}
+
+.page-title{
+
+    font-size:32px;
+
+    font-weight:700;
+
+    color:#111827;
+
+}
+
+.page-description{
+
+    font-size:18px;
+
+    color:#000;
+
+    line-height:1.8;
+
+    max-width:650px;
+
+}
+
+/* =========================================
+CREATE ESTIMATE BUTTON
+========================================= */
+
+.create-estimate-btn{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    background:#2563EB;
+
+    color:#FFFFFF;
+
+    border:none;
+
+    border-radius:12px;
+
+    padding:14px 22px;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:0.25s;
+
+}
+
+.create-estimate-btn:hover{
+
+    background:#1D4ED8;
+
+}
+
+#createEstimateIcon{
+
+    width:18px;
+
+    height:18px;
+
+}
+
+#createEstimateText{
+
+    white-space:nowrap;
+
+}
+
+/* =========================================
+STATISTICS
+========================================= */
+
+.stats-grid{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(4,1fr);
+
+    gap:20px;
+
+}
+
+.stat-card{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+    background:#FFFFFF;
+
+    border:1px solid #E5E7EB;
+
+    border-radius:16px;
+
+    padding:22px;
+
+    transition:0.25s;
+
+}
+
+.stat-card:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:
+    0 12px 28px
+    rgba(0,0,0,.08);
+
+}
+
+.stat-icon{
+
+    width:60px;
+
+    height:60px;
+
+    border-radius:14px;
+
+    background:#EFF6FF;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    flex-shrink:0;
+
+}
+
+.stat-icon img{
+
+    width:28px;
+
+    height:28px;
+
+}
+
+.stat-content{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:6px;
+
+}
+
+.stat-label{
+
+    font-size:14px;
+
+    color:#6B7280;
+
+}
+
+.stat-value{
+
+    font-size:28px;
+
+    font-weight:700;
+
+    color:#111827;
+
+}
+
+/* =========================================
+ESTIMATES TABLE SECTION
+========================================= */
+
+.estimates-table-section{
+
+    background:#FFFFFF;
+
+    border:1px solid #E5E7EB;
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+}
+
+/* =========================================
+TABLE TOOLBAR
+========================================= */
+
+.table-toolbar{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:20px;
+
+    padding:20px 24px;
+
+    border-bottom:1px solid #E5E7EB;
+
+    flex-wrap:wrap;
+
+}
+
+.toolbar-left{
+
+    flex:1;
+
+}
+
+.toolbar-right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    flex-wrap:wrap;
+
+}
+
+/* =========================================
+SEARCH
+========================================= */
+
+.table-search{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    width:100%;
+
+    max-width:360px;
+
+    height:48px;
+
+    padding:0 16px;
+
+    background:#F9FAFB;
+
+    border:1px solid #E5E7EB;
+
+    border-radius:12px;
+
+}
+
+#tableSearchIcon{
+
+    width:20px;
+
+    height:20px;
+
+    flex-shrink:0;
+
+}
+
+.table-search-input{
+
+    width:100%;
+
+    border:none;
+
+    outline:none;
+
+    background:transparent;
+
+    font-size:15px;
+
+    color:#111827;
+
+}
+
+.table-search-input::placeholder{
+
+    color:#9CA3AF;
+
+}
+
+/* =========================================
+SELECTS
+========================================= */
+
+.table-select{
+
+    height:48px;
+
+    padding:0 16px;
+
+    border:1px solid #E5E7EB;
+
+    border-radius:12px;
+
+    background:#FFFFFF;
+
+    font-size:14px;
+
+    cursor:pointer;
+
+    outline:none;
+
+}
+
+/* =========================================
+EXPORT BUTTON
+========================================= */
+
+.export-btn{
+
+    height:48px;
+
+    padding:0 22px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#2563EB;
+
+    color:#FFFFFF;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.export-btn:hover{
+
+    background:#1D4ED8;
+
+}
+
+/* =========================================
+TABLE
+========================================= */
+
+.table-wrapper{
+
+    width:100%;
+
+    overflow-x:auto;
+
+}
+
+.estimates-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    min-width:900px;
+
+}
+
+.estimates-table thead{
+
+    background:#F9FAFB;
+
+}
+
+.estimates-table th{
+
+    padding:18px 20px;
+
+    text-align:left;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    color:#6B7280;
+
+    white-space:nowrap;
+
+}
+
+.estimates-table td{
+
+    padding:18px 20px;
+
+    border-top:1px solid #F3F4F6;
+
+    font-size:14px;
+
+    color:#374151;
+
+    vertical-align:middle;
+
+}
+
+.estimates-table tbody tr{
+
+    transition:.2s;
+
+}
+
+.estimates-table tbody tr:hover{
+
+    background:#F9FAFB;
+
+}
+
+/* =========================================
+STATUS BADGES
+========================================= */
+
+.status-badge{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:6px 12px;
+
+    border-radius:999px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+
+.status-badge.draft{
+
+    background:#F3F4F6;
+
+    color:#6B7280;
+
+}
+
+.status-badge.sent{
+
+    background:#DBEAFE;
+
+    color:#2563EB;
+
+}
+
+.status-badge.approved{
+
+    background:#DCFCE7;
+
+    color:#15803D;
+
+}
+
+.status-badge.rejected{
+
+    background:#FEE2E2;
+
+    color:#DC2626;
+
+}
+
+.status-badge.expired{
+
+    background:#FEF3C7;
+
+    color:#D97706;
+
+}
+
+.status-badge.converted{
+
+    background:#E0E7FF;
+
+    color:#4338CA;
+
+}
+
+/* =========================================
+ACTION BUTTONS
+========================================= */
+
+.table-actions{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+}
+
+.action-btn{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    width:36px;
+
+    height:36px;
+
+    border:1px solid #E5E7EB;
+
+    border-radius:10px;
+
+    background:#FFFFFF;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.action-btn:hover{
+
+    background:#EFF6FF;
+
+    border-color:#2563EB;
+
+}
+
+.action-btn i{
+
+    width:18px;
+
+    height:18px;
+
+}
+
+@media(max-width:768px){
+
+    .table-toolbar{
+
+        flex-direction:column;
+
+        align-items:stretch;
+
+    }
+
+    .toolbar-left{
+
+        width:100%;
+
+    }
+
+    .toolbar-right{
+
+        width:100%;
+
+        display:grid;
+
+        grid-template-columns:1fr;
+
+    }
+
+    .table-search{
+
+        max-width:none;
+
+    }
+
+    .table-select{
+
+        width:100%;
+
+    }
+
+    .export-btn{
+
+        width:100%;
+
+    }
+
+}
+
+/* ==========================================
+   CREATE ESTIMATE OVERLAY
+========================================== */
+
+#createEstimateOverlay{
+
+    position: fixed;
+
+    top: 0;
+
+    left: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    background: rgba(15,23,42,0.55);
+
+    backdrop-filter: blur(4px);
+
+    -webkit-backdrop-filter: blur(4px);
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transition: all .25s ease;
+
+    z-index: 9998;
+
+}
+
+#createEstimateOverlay.show{
+
+    opacity: 1;
+
+    visibility: visible;
+
+}
+
+/* ==========================================
+   CREATE ESTIMATE MODAL
+========================================== */
+
+#createEstimateModal{
+
+    position: fixed;
+
+    top: 50%;
+
+    left: 50%;
+
+    transform: translate(-50%, -50%) scale(.95);
+
+    width: min(1100px, 92vw);
+
+    max-height: 92vh;
+
+    background: #FFFFFF;
+
+    border-radius: 20px;
+
+    box-shadow:
+    0 25px 80px rgba(15,23,42,.20);
+
+    display: flex;
+
+    flex-direction: column;
+
+    overflow: hidden;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transition:
+    opacity .25s ease,
+    transform .25s ease,
+    visibility .25s ease;
+
+    z-index: 9999;
+
+}
+
+/* Open State */
+
+#createEstimateModal.show{
+
+    opacity: 1;
+
+    visibility: visible;
+
+    transform: translate(-50%, -50%) scale(1);
+
+}
+
+@media (max-width:768px){
+
+    #createEstimateModal{
+
+        width: 96%;
+
+        max-height: 96vh;
+
+        border-radius: 18px;
+
+    }
+
+    .estimate-modal-body{
+
+        padding: 20px;
+
+    }
+
+}
+
+.estimate-modal-body{
+
+    flex: 1;
+
+    overflow-y: auto;
+
+    padding: 32px;
+
+}
+
+/* ==========================================
+   ESTIMATE MODAL HEADER
+========================================== */
+
+.estimate-modal-header{
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 24px 32px;
+
+    background: #FFFFFF;
+
+    border-bottom: 1px solid #E5E7EB;
+
+    flex-shrink: 0;
+
+}
+
+.estimate-modal-title{
+
+    font-size: 24px;
+
+    font-weight: 700;
+
+    color: #111827;
+
+    margin: 0;
+
+    line-height: 1.2;
+
+}
+
+.close-estimate-modal-btn{
+
+    width: 42px;
+
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #F8FAFC;
+
+    border: 1px solid #E5E7EB;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    transition: .25s;
+
+}
+
+.close-estimate-modal-btn:hover{
+
+    background: #EFF6FF;
+
+    border-color: #2563EB;
+
+}
+
+.close-estimate-modal-btn:active{
+
+    transform: scale(.95);
+
+}
+
+#closeEstimateModalIcon{
+
+    width: 18px;
+
+    height: 18px;
+
+    display: block;
+
+}
+
+@media (max-width:768px){
+
+    .estimate-modal-header{
+
+        padding:20px;
+
+    }
+
+    .estimate-modal-title{
+
+        font-size:20px;
+
+    }
+
+    .close-estimate-modal-btn{
+
+        width:40px;
+
+        height:40px;
+
+    }
+
+}
+
+/* ==========================================
+   ESTIMATE FORM SECTIONS
+========================================== */
+
+.estimate-form-section{
+
+    background: #FFFFFF;
+
+    border: 1px solid #E5E7EB;
+
+    border-radius: 16px;
+
+    padding: 24px;
+
+    margin-bottom: 24px;
+
+}
+
+.estimate-section-title{
+
+    font-size: 18px;
+
+    font-weight: 700;
+
+    color: #111827;
+
+    margin: 0 0 20px;
+
+    padding-bottom: 14px;
+
+    border-bottom: 1px solid #F1F5F9;
+
+}
+
+/* ==========================================
+   FORM GRID
+========================================== */
+
+.estimate-form-grid{
+
+    display: grid;
+
+    grid-template-columns: repeat(2,1fr);
+
+    gap: 20px;
+
+}
+
+.full-width{
+
+    grid-column: 1 / -1;
+
+}
+
+/* ==========================================
+   FORM GROUPS
+========================================== */
+
+.estimate-form-group{
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+}
+
+.estimate-form-group label{
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    color: #374151;
+
+}
+
+.estimate-form-group input,
+
+.estimate-form-group select,
+
+.estimate-form-group textarea{
+
+    width: 100%;
+
+    padding: 14px 16px;
+
+    font-size: 15px;
+
+    font-family: inherit;
+
+    color: #111827;
+
+    background: #FFFFFF;
+
+    border: 1px solid #D1D5DB;
+
+    border-radius: 12px;
+
+    outline: none;
+
+    transition: .25s;
+
+}
+
+.estimate-form-group input:focus,
+
+.estimate-form-group select:focus,
+
+.estimate-form-group textarea:focus{
+
+    border-color: #2563EB;
+
+    box-shadow:
+
+    0 0 0 4px rgba(37,99,235,.12);
+
+}
+
+.estimate-form-group textarea{
+
+    resize: vertical;
+
+    min-height: 120px;
+
+}
+
+.estimate-form-group input::placeholder,
+
+.estimate-form-group textarea::placeholder{
+
+    color: #9CA3AF;
+
+}
+
+@media (max-width:768px){
+
+    .estimate-form-section{
+
+        padding:20px;
+
+        margin-bottom:20px;
+
+    }
+
+    .estimate-form-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+/* ==========================================
+   ESTIMATE ITEMS
+========================================== */
+
+#estimateItemsContainer{
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+
+}
+
+.estimate-item{
+
+    display: grid;
+
+    grid-template-columns:
+    2.6fr
+    .8fr
+    1fr
+    1fr
+    48px;
+
+    gap: 16px;
+
+    align-items: end;
+
+    padding: 18px;
+
+    background: #F8FAFC;
+
+    border: 1px solid #E5E7EB;
+
+    border-radius: 14px;
+
+}
+
+.estimate-item-field{
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+}
+
+.estimate-item-field label{
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: #475569;
+
+}
+
+.estimate-export-mode {
+
+    box-shadow: none !important;
+
+    animation: none !important;
+
+}
+
+@media print {
+
+    body * {
+
+        visibility: hidden;
+
+    }
+
+    #estimatePaper,
+    #estimatePaper * {
+
+        visibility: visible;
+
+    }
+
+    #estimatePaper {
+
+        position: absolute;
+
+        left: 0;
+
+        top: 0;
+
+        width: 100%;
+
+        margin: 0;
+
+        box-shadow: none;
+
+        border: none;
+
+    }
+
+}
+
+.view-client-btn,
+.edit-client-btn,
+.delete-client-btn,
+.convert-client-btn{
+    width: 36px;
+    height: 36px;
+    border: 1px solid #dbeafe;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    color: #2563eb;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.view-btn i,
+.edit-btn i,
+.delete-btn,
+.convert-btn i {
+    font-size: 18px;
+}
+
+.view-btn:hover,
+.edit-btn:hover,
+.delete-btn:hover,
+.convert-btn:hover{
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
+}
+
+.export-select-wrapper {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.export-estimate-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    color: #333;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.export-estimate-select:focus {
+    border-color: #007bff;
+}
+
+.export-menu {
+    overflow: visible;
+}
+
+.export-menu .export-select-wrapper {
+    display: block;
+}
+
+.export-menu .export-estimate-select {
+    display: block;
+    visibility: visible;
+    opacity: 1;
+}
+
+
+/* =========================================================
+   ESTIMATE PREVIEW OVERLAY
+   Only controls the background overlay
+========================================================= */
+
+.estimate-preview-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease;
+
+    z-index: 9998;
+}
+
+.estimate-preview-overlay.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+
+.estimate-preview-panel {
+    position: fixed;
+
+    top: 50%;
+    left: 50%;
+
+    width: min(1100px, 94vw);
+    height: 95vh;
+
+    background: #ffffff;
+
+    border-radius: 18px;
+
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    transform: translate(-50%, -50%) scale(0.96);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition:
+        transform 0.3s ease,
+        opacity 0.3s ease,
+        visibility 0.3s ease;
+
+    z-index: 9999;
+}
+
+.estimate-preview-panel.show {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.estimate-preview-panel {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .estimate-preview-panel {
+        width: calc(100vw - 24px);
+        height: calc(100vh - 40px);
+
+        max-height: none;
+
+        border-radius: 16px;
+    }
+
+}
+
+
+@media (max-width: 480px) {
+
+    .estimate-preview-panel {
+        width: calc(100vw - 16px);
+        height: calc(100vh - 24px);
+
+        border-radius: 14px;
+    }
+
+}
+
+/* ==========================================
+   ESTIMATE PREVIEW — TOTALS / GRAND TOTAL
+========================================== */
+
+.estimate-preview-panel .preview-summary-section {
+    width: 52%;
+    margin-left: auto;
+    margin-right: 0;
+
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
+
+/* Each total row becomes a clean two-column layout */
+
+.estimate-preview-panel .summary-row {
+    display: grid;
+
+    grid-template-columns: 1fr auto;
+
+    align-items: center;
+
+    column-gap: 30px;
+
+    width: 100%;
+
+    margin-bottom: 10px;
+
+    font-size: 13px;
+}
+
+
+/* Label */
+
+.estimate-preview-panel .summary-row span {
+    text-align: left;
+    color: #6B7280;
+}
+
+
+/* Amount */
+
+.estimate-preview-panel .summary-row strong {
+    text-align: right;
+    color: #111827;
+
+    white-space: nowrap;
+}
+
+
+/* ==========================================
+   TOTAL DUE
+========================================== */
+
+.estimate-preview-panel .summary-row.grand-total,
+.estimate-preview-panel .grand-total {
+    display: grid;
+
+    grid-template-columns: 1fr auto;
+
+    align-items: center;
+
+    margin-top: 14px;
+    padding-top: 14px;
+
+    border-top: 1px solid #E5E7EB;
+
+    font-size: 16px;
+    font-weight: 700;
+}
+
+
+/* Total Due label */
+
+.estimate-preview-panel .grand-total span {
+    text-align: left;
+    color: #2563EB;
+}
+
+
+/* Total Due amount */
+
+.estimate-preview-panel .grand-total strong {
+    text-align: right;
+    color: #2563EB;
+    white-space: nowrap;
+}
+
+/* ==========================================
+   ESTIMATE SUMMARY — TARGET LAYOUT
+========================================== */
+
+.preview-summary-section {
+    width: 280px;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: auto;
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
+.summary-row {
+    display: grid;
+    grid-template-columns: 125px 1fr;
+    align-items: center;
+    column-gap: 15px;
+
+    margin-bottom: 10px;
+
+    font-size: 13px;
+}
+
+.summary-row span {
+    color: #6B7280;
+    text-align: left;
+}
+
+.summary-row strong {
+    color: #111827;
+    text-align: left;
+    font-weight: 600;
+}
+
+.summary-row:last-child {
+    margin-bottom: 0;
+}
+
+
+/* ==========================================
+   GRAND TOTAL
+========================================== */
+
+.grand-total {
+    display: grid;
+    grid-template-columns: 125px 1fr;
+    column-gap: 15px;
+
+    margin-top: 14px;
+    padding-top: 12px;
+
+    border-top: 1px solid #E5E7EB;
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.grand-total span {
+    color: #2563EB;
+    text-align: left;
+}
+
+.grand-total strong {
+    color: #2563EB;
+    text-align: left;
+    font-weight: 700;
+}
+
+/* ==========================================
+   ESTIMATE TOTALS
+========================================== */
+
+#previewSummarySection .invoice-totals-wrapper {
+
+    width: 360px;
+    max-width: 100%;
+
+    margin-left: auto;
+    margin-right: 0;
+
+}
+
+
+/* ==========================================
+   TOTAL ROW
+========================================== */
+
+#previewSummarySection .invoice-total-row {
+
+    display: grid;
+
+    grid-template-columns: 1fr auto;
+
+    align-items: center;
+
+    column-gap: 30px;
+
+    width: 100%;
+
+    margin-bottom: 10px;
+
+    font-size: 13px;
+
+}
+
+
+#previewSummarySection .invoice-total-row span {
+
+    text-align: left;
+
+    color: #6B7280;
+
+}
+
+
+#previewSummarySection .invoice-total-row strong {
+
+    text-align: right;
+
+    color: #111827;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+
+}
+
+
+/* ==========================================
+   GRAND TOTAL
+========================================== */
+
+#previewSummarySection .invoice-grand-total {
+
+    display: grid;
+
+    grid-template-columns: 1fr auto;
+
+    align-items: center;
+
+    column-gap: 30px;
+
+    width: 100%;
+
+    margin-top: 14px;
+
+    padding-top: 12px;
+
+    border-top: 1px solid #E5E7EB;
+
+}
+
+
+#previewSummarySection .invoice-grand-total span {
+
+    color: #2563EB;
+
+    text-align: left;
+
+    font-weight: 700;
+
+}
+
+
+#previewSummarySection .invoice-grand-total strong {
+
+    color: #2563EB;
+
+    text-align: right;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+}
+
+
+#previewClientAddress,
+#previewClientShipAddress{
+    white-space:pre-line;
+}
+
+#previewPaymentReference strong {
+    display:inline;
+}
+
+#previewPaymentReference {
+    display:block;
+    white-space:nowrap;
+}
+
+.estimate-result-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:99999;
+}
+
+.estimate-result-overlay.show{
+    display:flex;
+}
+
+.estimate-result-modal{
+    width:min(420px,90%);
+    background:#fff;
+    border-radius:16px;
+    padding:28px;
+    text-align:center;
+    box-shadow:0 20px 60px rgba(0,0,0,.2);
+}
+
+.estimate-result-modal h3{
+    margin:0 0 12px;
+}
+
+.estimate-result-modal p{
+    margin:0 0 22px;
+    line-height:1.6;
+}
+
+.estimate-result-modal button{
+    border:0;
+    border-radius:8px;
+    padding:11px 18px;
+    cursor:pointer;
+    margin:4px;
+}
+
+.estimate-client-name-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.estimate-client-image {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    display: none;
+}
+
+.estimate-client-name-row .invoice-party-name {
+    margin: 0;
+}
+
+.client-table-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.client-table-avatar {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.client-table-initials {
+    text-transform: uppercase;
+}
