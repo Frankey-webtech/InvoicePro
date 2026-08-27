@@ -11,7 +11,11 @@ content="width=device-width, initial-scale=1.0">
 <meta name="description"
 content="InvoicePro pricing plans for freelancers and businesses.">
 
-<title>InvoicePro | Pricing</title>
+<title>InvoicePro | Pricing</title
+
+<script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+
+<script src="api.js"></script>>
 
 <link rel="preconnect"
 href="https://fonts.googleapis.com">
@@ -28,113 +32,61 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
 <link rel="stylesheet"
 href="pricing.css">
-
+<link rel="stylesheet" href="navbar.css">
 </head>
 
 <body>
 
 <div class="pricing-page">
 
-<header class="pricing-header">
+ <header class="header" id="siteHeader">
 
-<div class="pricing-header-inner">
+        <a href="index.html" class="logo" id="siteLogo">
+            <img src="logo.png" alt="InvoicePro" class="logo-icon">
+            <h2>Invoice<span>Pro</span></h2>
+        </a>
 
-<a href="index.html"
-class="pricing-brand">
+        <nav class="main-navigation" id="mainNavigation" aria-label="Main navigation">
 
-<img src="logo.png"
-alt="InvoicePro"
-class="pricing-brand-logo">
+            <a href="features.html">Features</a>
 
-<div class="pricing-brand-name">
-Invoice<span>Pro</span>
-</div>
+            <a href="pricing.html" class="active" aria-current="page">Pricing</a>
 
-</a>
+            <a href="about.html">About</a>
 
-<nav class="pricing-navigation">
+            <a href="faq.html">FAQ</a>
 
-<a href="features.html">
-Features
-</a>
+            <a href="contact.html">
+                Contact
+            </a>
+            
+            <a href="cookies.html">Cookies</a>
 
-<a href="pricing.html"
-class="pricing-nav-active">
-Pricing
-</a>
+            <a href="privacy.html">Privacy Policy</a>
+            
+            <a href="refund.html">Refund Policy</a>
+            
+            <a href="learn.html">Learn more</a>
+            
+            <a href="terms.html">Terms</a>
+            
+            <a href="help.html">Help</a>
 
-<a href="about.html">
-About Us
-</a>
+        </nav>
 
-<a href="faq.html">
-FAQ
-</a>
+        <div class="header-buttons">
 
-<a href="contact.html">
-Contact
-</a>
+            <a href="login.html" class="login-btn" id="headerLoginBtn">
+                Login
+            </a>
 
-</nav>
+            <a href="signup.html" class="primary-btn" id="headerSignupBtn">
+                Get Started
+            </a>
 
-<div class="pricing-header-actions">
+        </div>
 
-<a href="login.html"
-class="pricing-login-button">
-Login
-</a>
-
-<a href="about.html"
-class="pricing-next-button">
-Next
-<i class="ri-arrow-right-line"></i>
-</a>
-
-</div>
-
-<button
-type="button"
-class="pricing-menu-button"
-id="pricingMenuButton"
-aria-label="Open navigation">
-
-<i class="ri-menu-line"></i>
-
-</button>
-
-</div>
-
-</header>
-
-<div class="pricing-mobile-navigation"
-id="pricingMobileNavigation">
-
-<a href="features.html">
-Features
-</a>
-
-<a href="pricing.html"
-class="pricing-nav-active">
-Pricing
-</a>
-
-<a href="about.html">
-About Us
-</a>
-
-<a href="faq.html">
-FAQ
-</a>
-
-<a href="contact.html">
-Contact
-</a>
-
-<a href="login.html">
-Login
-</a>
-
-</div>
+    </header>
 
 <main>
 
@@ -477,16 +429,6 @@ aria-label="Close notification">
 
 </div>
 
-<script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
-<script src="api.js"></script>
-<script src="pricing.js"></script>
-
-</body>
-
-</html>
-</div>
-    <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
-<script src="api.js"></script>
 <script src="pricing.js"></script>
 </body>
 
