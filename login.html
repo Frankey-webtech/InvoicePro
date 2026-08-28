@@ -9,13 +9,17 @@
 
     <title>InvoicePro | Login</title>
 
+    <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+
+    <script src="api.js"></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    
-    <link rel="stylesheet" href="signup.css">
 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="signup.css">
 
     <link rel="stylesheet" href="login.css">
 
@@ -27,13 +31,15 @@
 
 <div class="page">
 
-    <!-- ================= HEADER ================= -->
-
     <header class="topbar">
 
         <div class="logo">
 
-<img src="logo.png" alt="InvoicePro" class="logo-svg">
+            <div class="logo-icon">
+
+<img src="logo.png" alt="" />
+
+            </div>
 
             <h2>Invoice<span>Pro</span></h2>
 
@@ -49,132 +55,147 @@
 
     </header>
 
-    <!-- ================= MAIN ================= -->
-
     <main class="login-container">
-
-        <!-- LEFT PANEL -->
 
         <section class="left-panel">
 
-            <h1>
+            <div class="left-content">
 
-                Welcome Back!<br>
+                <div class="hero-badge">
 
-                Log in to <span>your account</span>
+                    <i class="ri-shield-check-line"></i>
 
-            </h1>
-            
+                    Secure Business Management
 
+                </div>
 
-            <p class="hero-text">
+                <h1>
 
-                Access your invoices, clients, payments and more.<br>
+                    Welcome Back!<br>
 
-                Manage your business in one place.
+                    Log in to <span>your account</span>
 
-            </p>
-                        <div class="dashboard-image">
+                </h1>
 
-                <img src="login-dashboard.png" alt="Dashboard">
+                <p class="hero-text">
 
+                    Access your invoices, clients, payments and more.<br>
 
-            </div>
+                    Manage your business in one place.
 
-            <div class="features">
-
-                <div class="feature">
-
-                    <div class="icon purple"><i class="ri-file-list-3-line feature-icon"></i></div>
-
-                    <div>
+                </p>
 
 
-                        <h3>Create Invoices</h3>
 
-                        <p>Create and send professional invoices in seconds.</p>
+                <div class="features">
+
+                    <div class="feature">
+
+                        <div class="icon purple">
+
+                            <i class="ri-file-list-3-line feature-icon"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h3>Create Invoices</h3>
+
+                            <p>Create and send professional invoices in seconds.</p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="feature">
+
+                        <div class="icon green">
+
+                            <i class="ri-group-line feature-icon"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h3>Manage Clients</h3>
+
+                            <p>Keep all your client information organized.</p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="feature">
+
+                        <div class="icon orange">
+
+                            <i class="ri-wallet-3-line feature-icon"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h3>Track Payments</h3>
+
+                            <p>Get paid faster with payment tracking.</p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="feature">
+
+                        <div class="icon blue">
+
+                            <i class="ri-bar-chart-box-line feature-icon"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h3>Powerful Reports</h3>
+
+                            <p>Monitor business performance and growth.</p>
+
+                        </div>
 
                     </div>
 
                 </div>
 
-                <div class="feature">
+                <div class="stats">
 
-                    <div class="icon green"><i class="ri-group-line feature-icon"></i></div>
+                    <div class="stat">
 
-                    <div>
+                        <h2>5,000+</h2>
 
-                        <h3>Manage Clients</h3>
-
-                        <p>Keep all your client information organized.</p>
+                        <p>Happy Businesses</p>
 
                     </div>
 
-                </div>
+                    <div class="stat">
 
-                <div class="feature">
+                        <h2>1M+</h2>
 
-                    <div class="icon orange"><i class="ri-wallet-3-line feature-icon"></i></div>
-
-                    <div>
-
-                        <h3>Track Payments</h3>
-
-                        <p>Get paid faster with payment tracking.</p>
+                        <p>Invoices Generated</p>
 
                     </div>
 
-                </div>
+                    <div class="stat">
 
-                <div class="feature">
+                        <h2>99.9%</h2>
 
-                    <div class="icon blue"><i class="ri-bar-chart-box-line feature-icon"></i></div>
-
-                    <div>
-
-                        <h3>Powerful Reports</h3>
-
-                        <p>Monitor business performance and growth.</p>
+                        <p>Uptime Guarantee</p>
 
                     </div>
 
-                </div>
+                    <div class="stat">
 
-            </div>
+                        <h2>24/7</h2>
 
-            
+                        <p>Customer Support</p>
 
-            <div class="stats">
-
-                <div class="stat">
-
-                    <h2>5,000+</h2>
-
-                    <p>Happy Businesses</p>
-
-                </div>
-
-                <div class="stat">
-
-                    <h2>1M+</h2>
-
-                    <p>Invoices Generated</p>
-
-                </div>
-
-                <div class="stat">
-
-                    <h2>99.9%</h2>
-
-                    <p>Uptime Guarantee</p>
-
-                </div>
-
-                <div class="stat">
-
-                    <h2>24/7</h2>
-
-                    <p>Customer Support</p>
+                    </div>
 
                 </div>
 
@@ -182,90 +203,103 @@
 
         </section>
 
-        <!-- RIGHT PANEL -->
-
         <section class="right-panel">
 
             <div class="login-card">
 
-                <h2>Log in to your account</h2>
+                <div class="login-header">
 
-                <p class="subtitle">
+                    <div class="login-icon">
 
-                    Enter your email and password to access your account.
-
-                </p>
-
-                <form id="loginForm">
-
-                    <label>Email Address</label>
-
-                    <div class="input-box">
-
-                        <span><i class="ri-mail-line input-icon"></i></span>
-
-                       <input
-    type="email"
-    id="email"
-    placeholder="Enter your email address">
+                        <i class="ri-lock-password-line"></i>
 
                     </div>
 
-    <!-- Password -->
+                    <h2>Log in to your account</h2>
 
-    <div class="input-group">
+                    <p class="subtitle">
 
-        <label>Password</label>
+                        Enter your email and password to access your account.
 
-        <div class="input-box">
+                    </p>
 
-            <i class="ri-lock-line"></i>
+                </div>
 
-            <input
-    type="password"
-    id="password"
-    placeholder="••••••••"
-    required>
+                <form id="loginForm">
 
-            <button
-                type="button"
-                class="toggle-password">
+                    <div class="input-group">
 
-                <i class="ri-eye-line"></i>
+                        <label for="email">Email Address</label>
 
-            </button>
+                        <div class="input-box">
 
-        </div>
+                            <i class="ri-mail-line input-icon"></i>
 
-    </div>
-<div class="login-options">
+                            <input
+                                type="email"
+                                id="email"
+                                placeholder="Enter your email address"
+                                autocomplete="email"
+                                required>
 
-    <label class="remember">
+                        </div>
 
-        <input type="checkbox">
+                    </div>
 
-        Remember me
+                    <div class="input-group">
 
-    </label>
+                        <label for="password">Password</label>
 
+                        <div class="input-box">
 
-    <a href="reset-password.html" class="forgot-password">
+                            <i class="ri-lock-line input-icon"></i>
 
-        Forgot Password?
+                            <input
+                                type="password"
+                                id="password"
+                                placeholder="••••••••"
+                                autocomplete="current-password"
+                                required>
 
-    </a>
+                            <button
+                                type="button"
+                                class="toggle-password"
+                                aria-label="Show password">
 
-</div>
+                                <i class="ri-eye-line"></i>
 
+                            </button>
 
-                 
+                        </div>
 
-<button
-    class="login-btn"
-    id="loginBtn"
-    type="submit">
-    Log In
-</button>
+                    </div>
+
+                    <div class="login-options">
+
+                        <label class="remember">
+
+                            <input type="checkbox">
+
+                            <span>Remember me</span>
+
+                        </label>
+
+                        <a href="reset-password.html" class="forgot-password">
+
+                            Forgot Password?
+
+                        </a>
+
+                    </div>
+
+                    <button
+                        class="login-btn"
+                        id="loginBtn"
+                        type="submit">
+
+                        <span>Log In</span>
+
+                    </button>
 
                 </form>
 
@@ -275,73 +309,39 @@
 
                 </div>
 
-<div class="social-login">
+                <div class="social-login">
 
-    <button class="social-btn">
+                    <button type="button" class="social-btn" id="googleBtn">
 
-        <i class="ri-google-fill"></i>
+                        <i class="ri-google-fill"></i>
 
-        Google
+                        <span>Google</span>
 
-    </button>
+                    </button>
 
-    <button class="social-btn">
+                    <button type="button" class="social-btn" id="appleBtn">
 
-        <i class="ri-apple-fill"></i>
+                        <i class="ri-apple-fill"></i>
 
-        Apple
+                        <span>Apple</span>
 
-    </button>
+                    </button>
 
-</div>
-</div>
+                </div>
 
-    </div>
+                <div class="login-security">
 
-</div>
-<script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+                    <i class="ri-shield-check-line"></i>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                    <span>Your information is securely protected.</span>
 
-
-<script src="api.js"></script>
-<script>
-    
-    const toggleButtons = document.querySelectorAll(".toggle-password");
-
-toggleButtons.forEach(button => {
-
-    button.addEventListener("click", () => {
-
-        const input = button.previousElementSibling;
-        const icon = button.querySelector("i");
-
-        if (input.type === "password") {
-
-            input.type = "text";
-            icon.classList.remove("ri-eye-line");
-            icon.classList.add("ri-eye-off-line");
-
-        } else {
-
-            input.type = "password";
-            icon.classList.remove("ri-eye-off-line");
-            icon.classList.add("ri-eye-line");
-
-        }
-
-    });
-
-});
-</script>
+                </div>
 
             </div>
 
         </section>
 
     </main>
-
-    <!-- ================= FOOTER ================= -->
 
     <footer>
 
@@ -355,80 +355,13 @@ toggleButtons.forEach(button => {
 
             <a href="terms.html">Terms of Service</a>
 
-        </div><br><br>
-                  <!--   <span>🌐 English ▼</span-->
+        </div>
 
     </footer>
 
 </div>
 
-<script>
-    const currentUser = Parse.User.current();
-
-if (currentUser) {
-
-    window.location.href = "dashboard.html";
-
-}
-
-// ===============================
-// LOGIN
-// ===============================
-
-const loginForm = document.getElementById("loginForm");
-const loginBtn = document.getElementById("loginBtn");
-
-loginForm.addEventListener("submit", async (e) => {
-
-    e.preventDefault();
-
-    const email = document.getElementById("email").value.trim().toLowerCase();
-    const password = document.getElementById("password").value;
-
-    if (!email || !password) {
-
-        alert("Please enter your email and password.");
-        return;
-
-    }
-
-    loginBtn.disabled = true;
-    loginBtn.textContent = "Logging In...";
-
-    try {
-
-        const user = await Parse.User.logIn(email, password);
-
-        // Save useful user info
-
-        localStorage.setItem("userId", user.id);
-        localStorage.setItem("fullName", user.get("fullName"));
-        localStorage.setItem("email", user.get("email"));
-        localStorage.setItem("country", user.get("country"));
-        localStorage.setItem("currencyCode", user.get("currencyCode"));
-        localStorage.setItem("currencySymbol", user.get("currencySymbol"));
-
-        localStorage.setItem("userPlan", JSON.stringify({
-
-            name: user.get("plan"),
-            price: user.get("planPrice"),
-            billing: user.get("planBilling")
-
-        }));
-
-        window.location.href = "dashboard.html";
-
-    } catch (error) {
-
-        alert(error.message);
-
-        loginBtn.disabled = false;
-        loginBtn.textContent = "Log In";
-
-    }
-
-});
-</script>
+<script src="login.js"></script>
 
 </body>
 

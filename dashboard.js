@@ -8,8 +8,6 @@ document.getElementById("dashboardError");
 const retryDashboardButton =
 document.getElementById("retryDashboardButton");
 
-
-
 const deleteModalOverlay =
 document.getElementById(
     "deleteModalOverlay"
@@ -125,8 +123,6 @@ deleteModalOverlay.addEventListener(
 );
 
 function showDashboardError(message) {
-
-    // Hide dashboard completely
     if (dashboardPage) {
 
         dashboardPage.style.display = "none";
@@ -137,8 +133,6 @@ function showDashboardError(message) {
         dashboardError.style.display = "none";
     }
 
-
-    // Show only error screen
     if (dashboardError) {
 
         const errorText =
@@ -163,6 +157,143 @@ function hideDashboardError() {
     if (!dashboardError) return;
 
     dashboardError.style.display = "none";
+
+}
+
+async function handleGoogleAuthentication() {
+
+    const auth0Client =
+        await auth0.createAuth0Client({
+
+            domain:
+                "dev-2tvu028qm4wmvd0l.us.auth0.com",
+
+            clientId:
+                "LpoyuFK4GqAA6gzsVzu2yxGarfb8mXs6",
+
+            authorizationParams: {
+
+                redirect_uri:
+                    window.location.origin +
+                    "/dashboard.html"
+
+            }
+
+        });
+
+
+    const hasAuth0Callback =
+        window.location.search.includes("code=") &&
+        window.location.search.includes("state=");
+
+
+    if (hasAuth0Callback) {
+
+        const callbackResult =
+            await auth0Client.handleRedirectCallback();
+
+
+        const auth0User =
+            await auth0Client.getUser();
+
+
+        if (
+            !auth0User ||
+            !auth0User.email
+        ) {
+
+            throw new Error(
+                "Unable to retrieve your Google account."
+            );
+
+        }
+
+
+        const appState =
+            callbackResult.appState || {};
+
+
+        if (appState.mode !== "signup") {
+
+            throw new Error(
+                "Invalid Google signup request."
+            );
+
+        }
+
+
+        const country =
+            appState.country;
+
+
+        if (!country) {
+
+            throw new Error(
+                "Country information was not provided."
+            );
+
+        }
+
+
+        const result =
+            await Parse.Cloud.run(
+                "createGoogleUser",
+                {
+
+                    email:
+                        auth0User.email,
+
+                    fullName:
+                        auth0User.name || "",
+
+                    country:
+                        country
+
+                }
+            );
+
+
+        if (
+            !result ||
+            !result.sessionToken
+        ) {
+
+            throw new Error(
+                "Unable to create your account."
+            );
+
+        }
+
+
+        await Parse.User.become(
+            result.sessionToken
+        );
+
+
+        window.history.replaceState(
+            {},
+            document.title,
+            "dashboard.html"
+        );
+
+    }
+
+
+    const currentUser =
+        await Parse.User.currentAsync();
+
+
+    if (!currentUser) {
+
+        window.location.href =
+            "login.html";
+
+        return false;
+
+    }
+
+
+    return true;
 
 }
 
@@ -254,7 +385,7 @@ async function loadNotificationCount() {
 notificationButton.addEventListener("click", () => {
 
     window.location.href =
-        "notifications.html";
+        "#";
 
 });
 
@@ -274,7 +405,7 @@ document.getElementById("createInvoiceButton");
 createInvoiceButton.addEventListener("click", () =>{
 
     window.location.href =
-    "create-invoice.html";
+    "invoice.html";
 
 });
 
@@ -317,7 +448,7 @@ document.getElementById("exportReportButton");
 exportReportButton.addEventListener("click", () =>{
 
     window.location.href =
-    "export-report.html";
+    "#";
 
 });
 
@@ -327,7 +458,7 @@ document.getElementById("viewAllInvoicesButton");
 viewAllInvoicesButton.addEventListener("click", () =>{
 
     window.location.href =
-    "invoices.html";
+    "invoice.html";
 
 });
 
@@ -346,16 +477,11 @@ viewAllEstimatesButton.addEventListener(
     }
 );
 
-
-// ================================
-// QUICK ACTIONS
-// ================================
-
 document.getElementById("quickCreateInvoice")
 .addEventListener("click", () =>{
 
     window.location.href =
-    "create-invoice.html";
+    "invoice.html";
 
 });
 
@@ -660,12 +786,6 @@ async function loadDashboard() {
     ]);
 
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    loadDashboard();
-
-});
 
 async function loadDashboardStatistics() {
 
@@ -1151,7 +1271,7 @@ async function loadUpcomingReminders() {
     try {
 
         const result = await Parse.Cloud.run(
-            "getUpcomingReminders"
+            "upcomingPaymentReminder"
         );
 
         const remindersList =
@@ -1159,26 +1279,42 @@ async function loadUpcomingReminders() {
                 "remindersList"
             );
 
+        if (!remindersList) {
+            return;
+        }
+
         remindersList.innerHTML = "";
 
-        if (result.reminders.length === 0) {
+        if (
+            !result ||
+            result.success !== true
+        ) {
+            throw new Error(
+                "Unable to load upcoming payment reminders."
+            );
+        }
+
+        const invoices =
+            Array.isArray(result.invoices)
+                ? result.invoices.slice(0, 5)
+                : [];
+
+        if (invoices.length === 0) {
 
             remindersList.innerHTML = `
 
                 <div class="reminderItem">
 
+                    <div class="reminderDot"></div>
+
                     <div>
 
                         <h4>
-
-                            No reminders
-
+                            No upcoming payments
                         </h4>
 
                         <p>
-
-                            You're all caught up.
-
+                            You have no pending payments due within the next ${result.reminderDays || 3} days.
                         </p>
 
                     </div>
@@ -1188,10 +1324,34 @@ async function loadUpcomingReminders() {
             `;
 
             return;
-
         }
 
-        result.reminders.forEach(reminder => {
+        invoices.forEach(invoice => {
+
+            const title =
+                invoice.invoiceTitle ||
+                invoice.invoiceNumber ||
+                "Upcoming payment";
+
+            const project =
+                invoice.projectName ||
+                invoice.companyName ||
+                "";
+
+            const message =
+                invoice.reminderMessage ||
+                "";
+
+            const amount =
+                invoice.totalAmount != null
+                    ? `${invoice.currencySymbol || invoice.currencyCode || ""}${Number(invoice.totalAmount).toLocaleString()}`
+                    : "";
+
+            const subtitleParts = [
+                project,
+                amount,
+                message
+            ].filter(Boolean);
 
             remindersList.innerHTML += `
 
@@ -1202,15 +1362,11 @@ async function loadUpcomingReminders() {
                     <div>
 
                         <h4>
-
-                            ${reminder.title}
-
+                            ${title}
                         </h4>
 
                         <p>
-
-                            ${reminder.subtitle}
-
+                            ${subtitleParts.join(" • ")}
                         </p>
 
                     </div>
@@ -1222,20 +1378,55 @@ async function loadUpcomingReminders() {
         });
 
     }
-
     catch (error) {
 
-    console.error(
-        "Upcoming Reminders Error:",
-        error
-    );
+        console.error(
+            "Upcoming Payment Reminders Error:",
+            error
+        );
 
-    showDashboardError(
-        error.message ||
-        "Unable to load reminders."
-    );
+        const remindersList =
+            document.getElementById(
+                "remindersList"
+            );
 
-}
+        if (remindersList) {
+
+            remindersList.innerHTML = `
+
+                <div class="reminderItem">
+
+                    <div>
+
+                        <h4>
+                            Unable to load reminders
+                        </h4>
+
+                        <p>
+                            ${error.message || "Please try again later."}
+                        </p>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+
+        if (
+            typeof showDashboardError ===
+            "function"
+        ) {
+
+            showDashboardError(
+                error.message ||
+                "Unable to load reminders."
+            );
+
+        }
+
+    }
 
 }
 
@@ -1437,3 +1628,31 @@ confirmDeleteButton.addEventListener(
     }
 );
 
+document.addEventListener("DOMContentLoaded", async () => {
+
+    try {
+
+        const authenticated =
+            await handleGoogleAuthentication();
+
+        if (authenticated) {
+
+            await loadDashboard();
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Authentication Error:",
+            error
+        );
+
+        showDashboardError(
+            error.message ||
+            "Unable to authenticate your account."
+        );
+
+    }
+
+});
