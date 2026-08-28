@@ -123,14 +123,14 @@
 }
 
 .primary-btn {
-    color: var(--navy-900);
-    background: var(--white);
-    border: 1px solid var(--white);
+    color: var(--white);
+    background: var(--navy-800);
+    border: 1px solid #1b4d82;
 }
 
 .primary-btn:hover {
     color: var(--white);
-    background: transparent;
+    background: #194774;
     transform: translateY(-1px);
 }
 
@@ -367,4 +367,12 @@
     background: rgba(255, 255, 255, 0.22);
     font-weight: 700;
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+.header-profile-image {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
 }
