@@ -413,8 +413,12 @@ const toastContainer =
 const googleBtn =
     document.getElementById("googleBtn");
 
-const auth0Client =
-    await auth0.createAuth0Client({
+let auth0Client;
+
+async function initializeAuth0() {
+
+    auth0Client = await auth0.createAuth0Client({
+
         domain:
             "dev-2tvu028qm4wmvd0l.us.auth0.com",
 
@@ -422,79 +426,90 @@ const auth0Client =
             "LpoyuFK4GqAA6gzsVzu2yxGarfb8mXs6",
 
         authorizationParams: {
+
             redirect_uri:
                 window.location.origin +
                 "/dashboard.html"
+
         }
+
     });
 
+    googleBtn.addEventListener(
+        "click",
+        async () => {
 
-googleBtn.addEventListener(
-    "click",
-    async () => {
+            const country =
+                countrySelect.value;
 
-        const country =
-            countrySelect.value;
+            if (!country) {
 
-        if (!country) {
+                showToast(
+                    "Please select your country before continuing with Google.",
+                    "info"
+                );
 
-            showToast(
-                "Please select your country before continuing with Google.",
-                "info"
-            );
+                alert(
+                    "Please select your country before continuing with Google.",
+                    "info"
+                );
 
-            return;
+                return;
+
+            }
+
+            try {
+
+                googleBtn.disabled = true;
+
+                googleBtn.textContent =
+                    "Connecting...";
+
+                await auth0Client.loginWithRedirect({
+
+                    authorizationParams: {
+
+                        connection:
+                            "google-oauth2"
+
+                    },
+
+                    appState: {
+
+                        mode:
+                            "signup",
+
+                        country:
+                            country
+
+                    }
+
+                });
+
+            } catch (error) {
+
+                console.error(error);
+
+                showToast(
+                    error.message,
+                    "error"
+                );
+
+                googleBtn.disabled = false;
+
+                googleBtn.innerHTML = `
+                    <img
+                        src="google.svg"
+                        alt="Google"
+                    >
+                    Google
+                `;
+
+            }
 
         }
+    );
 
-        try {
+}
 
-            googleBtn.disabled = true;
-
-            googleBtn.textContent =
-                "Connecting...";
-
-            await auth0Client.loginWithRedirect({
-
-                authorizationParams: {
-
-                    connection:
-                        "google-oauth2"
-
-                },
-
-                appState: {
-
-                    mode:
-                        "signup",
-
-                    country:
-                        country
-
-                }
-
-            });
-
-        } catch (error) {
-
-            console.error(error);
-
-            showToast(
-                error.message,
-                "error"
-            );
-
-            googleBtn.disabled = false;
-
-            googleBtn.innerHTML = `
-                <img
-                    src="google.svg"
-                    alt="Google"
-                >
-                Google
-            `;
-
-        }
-
-    }
-);
+initializeAuth0();
