@@ -1,3 +1,8 @@
+let invoiceStatusChart = null;
+
+let selectedInvoiceId = null;
+
+let revenueChart = null;
 
 const dashboardPage =
 document.getElementById("dashboardContent");
@@ -28,6 +33,105 @@ document.getElementById(
 
 const toastContainer =
 document.getElementById("toastContainer");
+
+const searchInput =
+document.getElementById("searchInput");
+
+const notificationButton =
+document.getElementById("notificationButton");
+
+const notificationBadge =
+document.getElementById("notificationBadge");
+
+const helpButton =
+document.getElementById("helpButton");
+
+helpButton.addEventListener("click", () =>{
+
+    window.location.href =
+    "help.html";
+
+});
+
+const createInvoiceButton =
+document.getElementById("createInvoiceButton");
+
+createInvoiceButton.addEventListener("click", () =>{
+
+    window.location.href =
+    "invoice.html";
+
+});
+
+const profileMenuButton =
+document.getElementById("profileMenuButton");
+
+const profileDropdown =
+document.getElementById(
+    "profileDropdown"
+);
+
+profileMenuButton.addEventListener(
+    "click",
+    function (event) {
+
+        event.stopPropagation();
+
+        profileDropdown.classList.toggle(
+            "show"
+        );
+
+    }
+);
+
+document.addEventListener(
+    "click",
+    function () {
+
+        profileDropdown.classList.remove(
+            "show"
+        );
+
+    }
+);
+
+const exportReportButton =
+document.getElementById("exportReportButton");
+
+exportReportButton.addEventListener("click", () =>{
+
+    window.location.href =
+    "#";
+
+});
+
+const viewAllInvoicesButton =
+document.getElementById("viewAllInvoicesButton");
+
+viewAllInvoicesButton.addEventListener("click", () =>{
+
+    window.location.href =
+    "invoice.html";
+
+});
+
+const viewAllEstimatesButton =
+document.getElementById(
+    "viewAllEstimatesButton"
+);
+
+const revenueFilter =
+document.getElementById("revenueFilter");
+
+if (revenueFilter) {
+
+    revenueFilter.addEventListener("change", function(){
+
+        loadRevenueOverview(this.value);
+
+    });
+
+}
 
 function showToast(
 
@@ -82,8 +186,6 @@ function showToast(
 
 }
 
-let selectedInvoiceId = null;
-
 function openDeleteModal(invoiceId){
 
     selectedInvoiceId = invoiceId;
@@ -104,59 +206,61 @@ function closeDeleteModal(){
 
 }
 
-cancelDeleteButton.addEventListener(
-    "click",
-    closeDeleteModal
-);
-
-deleteModalOverlay.addEventListener(
-    "click",
-    function(event){
-
-        if(event.target === deleteModalOverlay){
-
-            closeDeleteModal();
-
-        }
-
-    }
-);
-
 function showDashboardError(message) {
-    if (dashboardPage) {
 
-        dashboardPage.style.display = "none";
+if (dashboardPage) {
+
+    dashboardPage.style.display = "none";
+
+}
+
+if (dashboardError) {
+
+    const errorTitle =
+        document.getElementById(
+            "dashboardErrorTitle"
+        );
+
+    const errorText =
+        document.getElementById(
+            "dashboardErrorMessage"
+        );
+
+    if (errorTitle) {
+
+        errorTitle.textContent =
+            "Unable to Load Dashboard";
 
     }
-    
-    if(dashboardError) {
-        dashboardError.style.display = "none";
-    }
 
-    if (dashboardError) {
+    if (errorText) {
 
-        const errorText =
-        dashboardError.querySelector("p");
-
-        if (errorText) {
-
-            errorText.textContent =
+        errorText.textContent =
             message ||
-            "Please check your internet connection and try again.";
-
-        }
-
-        dashboardError.style.display = "flex";
+            "Something went wrong while loading your dashboard. Please check your internet connection and try again.";
 
     }
+
+    dashboardError.style.display =
+        "flex";
+
+}
 
 }
 
 function hideDashboardError() {
 
-    if (!dashboardError) return;
+if (dashboardError) {
 
     dashboardError.style.display = "none";
+
+}
+
+if (dashboardPage) {
+
+    dashboardPage.style.display = "";
+
+}
 
 }
 
@@ -297,47 +401,6 @@ async function handleGoogleAuthentication() {
 
 }
 
-const searchInput =
-document.getElementById("searchInput");
-
-searchInput.addEventListener("input", function () {
-
-    const searchText =
-        this.value.toLowerCase().trim();
-
-    const rows =
-        document.querySelectorAll(
-            "#recentInvoicesBody tr"
-        );
-
-    rows.forEach(row => {
-
-        const rowText =
-            row.textContent
-            .toLowerCase();
-
-        if (rowText.includes(searchText)) {
-
-            row.style.display = "";
-
-        }
-
-        else {
-
-            row.style.display = "none";
-
-        }
-
-    });
-
-});
-
-const notificationButton =
-document.getElementById("notificationButton");
-
-const notificationBadge =
-document.getElementById("notificationBadge");
-
 async function loadNotificationCount() {
 
     try {
@@ -381,133 +444,6 @@ async function loadNotificationCount() {
 }
 
 }
-
-notificationButton.addEventListener("click", () => {
-
-    window.location.href =
-        "#";
-
-});
-
-const helpButton =
-document.getElementById("helpButton");
-
-helpButton.addEventListener("click", () =>{
-
-    window.location.href =
-    "help.html";
-
-});
-
-const createInvoiceButton =
-document.getElementById("createInvoiceButton");
-
-createInvoiceButton.addEventListener("click", () =>{
-
-    window.location.href =
-    "invoice.html";
-
-});
-
-
-const profileMenuButton =
-document.getElementById("profileMenuButton");
-
-const profileDropdown =
-document.getElementById(
-    "profileDropdown"
-);
-
-profileMenuButton.addEventListener(
-    "click",
-    function (event) {
-
-        event.stopPropagation();
-
-        profileDropdown.classList.toggle(
-            "show"
-        );
-
-    }
-);
-
-document.addEventListener(
-    "click",
-    function () {
-
-        profileDropdown.classList.remove(
-            "show"
-        );
-
-    }
-);
-
-const exportReportButton =
-document.getElementById("exportReportButton");
-
-exportReportButton.addEventListener("click", () =>{
-
-    window.location.href =
-    "#";
-
-});
-
-const viewAllInvoicesButton =
-document.getElementById("viewAllInvoicesButton");
-
-viewAllInvoicesButton.addEventListener("click", () =>{
-
-    window.location.href =
-    "invoice.html";
-
-});
-
-const viewAllEstimatesButton =
-document.getElementById(
-    "viewAllEstimatesButton"
-);
-
-viewAllEstimatesButton.addEventListener(
-    "click",
-    () => {
-
-        window.location.href =
-            "estimates.html";
-
-    }
-);
-
-document.getElementById("quickCreateInvoice")
-.addEventListener("click", () =>{
-
-    window.location.href =
-    "invoice.html";
-
-});
-
-document.getElementById("quickAddClient")
-.addEventListener("click", () =>{
-
-    window.location.href =
-    "clients.html";
-
-});
-
-document.getElementById("quickRecordPayment")
-.addEventListener("click", () =>{
-
-    window.location.href =
-    "payments.html";
-
-});
-
-document.getElementById("quickCreateEstimate")
-.addEventListener("click", () =>{
-
-    window.location.href =
-    "estimates.html";
-
-});
 
 async function loadUserProfile() {
     
@@ -861,8 +797,6 @@ document.getElementById(
 
 }
 
-let revenueChart = null;
-
 async function loadRevenueOverview(period = "6months") {
 
     try {
@@ -963,21 +897,6 @@ async function loadRevenueOverview(period = "6months") {
 }
 
 }
-
-const revenueFilter =
-document.getElementById("revenueFilter");
-
-if (revenueFilter) {
-
-    revenueFilter.addEventListener("change", function(){
-
-        loadRevenueOverview(this.value);
-
-    });
-
-}
-
-let invoiceStatusChart = null;
 
 async function loadInvoiceStatus() {
 
@@ -1436,6 +1355,164 @@ retryDashboardButton.addEventListener("click", () => {
 
 });
 
+cancelDeleteButton.addEventListener(
+    "click",
+    closeDeleteModal
+);
+
+deleteModalOverlay.addEventListener(
+    "click",
+    function(event){
+
+        if(event.target === deleteModalOverlay){
+
+            closeDeleteModal();
+
+        }
+
+    }
+);
+
+searchInput.addEventListener("input", function () {
+
+    const searchText =
+        this.value.toLowerCase().trim();
+
+    const rows =
+        document.querySelectorAll(
+            "#recentInvoicesBody tr"
+        );
+
+    rows.forEach(row => {
+
+        const rowText =
+            row.textContent
+            .toLowerCase();
+
+        if (rowText.includes(searchText)) {
+
+            row.style.display = "";
+
+        }
+
+        else {
+
+            row.style.display = "none";
+
+        }
+
+    });
+
+});
+
+notificationButton.addEventListener("click", () => {
+
+    window.location.href =
+        "#";
+
+});
+
+viewAllEstimatesButton.addEventListener(
+    "click",
+    () => {
+
+        window.location.href =
+            "estimates.html";
+
+    }
+);
+
+document.getElementById("quickCreateInvoice")
+.addEventListener("click", () =>{
+
+    window.location.href =
+    "invoice.html";
+
+});
+
+document.getElementById("quickAddClient")
+.addEventListener("click", () =>{
+
+    window.location.href =
+    "clients.html";
+
+});
+
+document.getElementById("quickRecordPayment")
+.addEventListener("click", () =>{
+
+    window.location.href =
+    "payments.html";
+
+});
+
+document.getElementById("quickCreateEstimate")
+.addEventListener("click", () =>{
+
+    window.location.href =
+    "estimates.html";
+
+});
+
+confirmDeleteButton.addEventListener(
+    "click",
+    async function () {
+
+        if (!selectedInvoiceId) {
+
+            return;
+
+        }
+
+        try {
+
+            confirmDeleteButton.disabled = true;
+
+            confirmDeleteButton.textContent =
+                "Deleting...";
+
+            const result =
+            await Parse.Cloud.run(
+                "deleteInvoice",
+                {
+                    invoiceId:
+                    selectedInvoiceId
+                }
+            );
+
+            closeDeleteModal();
+
+            await loadDashboardStatistics();
+
+            await loadInvoiceStatus();
+
+            await loadRecentInvoices();
+
+            await loadUpcomingReminders();
+
+        }
+
+        catch (error) {
+
+            showToast(
+    error.message || "Unable to delete Invoice",
+    "error"
+);
+
+        }
+
+        finally {
+
+            confirmDeleteButton.disabled = false;
+
+            confirmDeleteButton.textContent =
+                "Delete";
+
+        }
+
+    }
+);
+
 document.addEventListener("click", function (event) {
 
     const view = event.target.closest(".dashboardView");
@@ -1569,65 +1646,6 @@ if (estimateConvert) {
 
 });
 
-confirmDeleteButton.addEventListener(
-    "click",
-    async function () {
-
-        if (!selectedInvoiceId) {
-
-            return;
-
-        }
-
-        try {
-
-            confirmDeleteButton.disabled = true;
-
-            confirmDeleteButton.textContent =
-                "Deleting...";
-
-            const result =
-            await Parse.Cloud.run(
-                "deleteInvoice",
-                {
-                    invoiceId:
-                    selectedInvoiceId
-                }
-            );
-
-            closeDeleteModal();
-
-            await loadDashboardStatistics();
-
-            await loadInvoiceStatus();
-
-            await loadRecentInvoices();
-
-            await loadUpcomingReminders();
-
-        }
-
-        catch (error) {
-
-            showToast(
-    error.message || "Unable to delete Invoice",
-    "error"
-);
-
-        }
-
-        finally {
-
-            confirmDeleteButton.disabled = false;
-
-            confirmDeleteButton.textContent =
-                "Delete";
-
-        }
-
-    }
-);
-
 document.addEventListener("DOMContentLoaded", async () => {
 
     try {
@@ -1643,16 +1661,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     } catch (error) {
 
-        console.error(
-            "Authentication Error:",
-            error
-        );
+const errorMessage =
+    error && error.message
+        ? error.message
+        : String(error);
 
-        showDashboardError(
-            error.message ||
-            "Unable to authenticate your account."
-        );
+showDashboardError(
+    `Authentication error: ${errorMessage}`
+);
 
-    }
+}
 
 });

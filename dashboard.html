@@ -378,28 +378,34 @@ Loading...
 
 </div>
 </header>
+
 <script src="navbar.js"></script>
 
+<div id="dashboardError"><div class="dashboardErrorCard">
 
-<main id="dashboardContent">
-<div id="dashboardError">
-
-    <div class="dashboardErrorCard">
-
-        <h2>Dashboard Error</h2>
-
-        <p>
-            Unable to load dashboard.
-            Check internet connection and try again.
-        </p>
-
-        <button id="retryDashboardButton">
-            Retry
-        </button>
-
+    <div class="dashboardErrorIcon">
+        <i class="ri-wifi-off-line"></i>
     </div>
 
+    <h2 id="dashboardErrorTitle">
+        Unable to Load Dashboard
+    </h2>
+
+    <p id="dashboardErrorMessage">
+        We couldn't load your dashboard right now.
+        Please check your internet connection and try again.
+    </p>
+
+    <button id="retryDashboardButton">
+        <i class="ri-refresh-line"></i>
+        <span>Try Again</span>
+    </button>
+
 </div>
+
+</div><main id="dashboardContent">
+
+<main id="dashboardContent">
 
 <section id="welcomeSection">
 
@@ -432,7 +438,6 @@ Here's what's happening with your business today.
 </div>
 
 </section>
-
 
 <section id="statisticsSection">
 
