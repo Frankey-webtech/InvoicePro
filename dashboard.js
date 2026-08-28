@@ -363,8 +363,8 @@ async function handleGoogleAuthentication() {
         ) {
 
             throw new Error(
-                "Unable to create your account."
-            );
+    "Unable to complete Google authentication."
+);
 
         }
 
