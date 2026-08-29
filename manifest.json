@@ -1,6 +1,7 @@
 {
     "name": "InvoicePro",
     "short_name": "InvoicePro",
+    "description": "InvoicePro is a professional invoicing platform that helps businesses create invoices and estimates, manage clients, track payments, and organize their billing with ease.",
     "start_url": "./index.html",
     "scope": "./",
     "display": "standalone",
