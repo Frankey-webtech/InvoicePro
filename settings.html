@@ -4,6 +4,10 @@
 <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+
+<script src="api.js"></script>
         <link rel="stylesheet" href="settings.css">
         <link rel="stylesheet" href="navbar.css">
         <link rel="stylesheet" href="profile.css">
@@ -23,13 +27,11 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
     class="sidebar"
     id="sidebar">
 
-    
-
     <div class="sidebar-logo">
 
         <div class="logo-icon">
 
-<img  src="logo.png" alt="">
+            <img src="logo.png" alt="">
 
         </div>
 
@@ -43,214 +45,274 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
     </div>
 
-    
+    <nav class="sidebar-nav">
 
-  <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">
 
+            <span class="nav-icon">
+                <i class="ri-home-3-line"></i>
+            </span>
 
+            <span class="nav-text">
+                Home
+            </span>
 
-    <a href="dashboard.html" class="nav-item">
+        </a>
 
-<span class="nav-icon">
-    <i class="ri-dashboard-3-line"></i>
-</span>
+        <a href="dashboard.html" class="nav-item">
 
-        <span class="nav-text">
+            <span class="nav-icon">
+                <i class="ri-dashboard-3-line"></i>
+            </span>
 
-            Dashboard
+            <span class="nav-text">
+                Dashboard
+            </span>
 
-        </span>
+        </a>
 
-    </a>
+        <a href="invoice.html" class="nav-item">
 
-    <a href="invoice.html" class="nav-item">
+            <span class="nav-icon">
+                <i class="ri-file-list-3-line"></i>
+            </span>
 
-<span class="nav-icon">
-    <i class="ri-file-list-3-line"></i>
-</span>
+            <span class="nav-text">
+                Invoices
+            </span>
 
-        <span class="nav-text">
+        </a>
 
-            Invoices
+        <a href="estimates.html" class="nav-item">
 
-        </span>
+            <span class="nav-icon">
+                <i class="ri-draft-line"></i>
+            </span>
 
-    </a>
+            <span class="nav-text">
+                Estimates
+            </span>
 
-    <a href="clients.html" class="nav-item">
+        </a>
 
-<span class="nav-icon">
-    <i class="ri-group-line"></i>
-</span>
+        <a href="clients.html" class="nav-item">
 
-        <span class="nav-text">
+            <span class="nav-icon">
+                <i class="ri-group-line"></i>
+            </span>
 
-            Clients
+            <span class="nav-text">
+                Clients
+            </span>
 
-        </span>
+        </a>
 
-    </a>
+        <a href="upcoming-payments.html" class="nav-item">
 
-    <a href="estimates.html" class="nav-item">
+            <span class="nav-icon">
+                <i class="ri-calendar-check-line"></i>
+            </span>
 
-<span class="nav-icon">
-    <i class="ri-draft-line"></i>
-</span>
+            <span class="nav-text">
+                Upcoming Payments
+            </span>
 
-        <span class="nav-text">
+        </a>
 
-            Estimates
+        <a href="paid-invoices.html" class="nav-item">
 
-        </span>
+            <span class="nav-icon">
+                <i class="ri-money-dollar-circle-line"></i>
+            </span>
 
-    </a>
-    <a href="subscription.html" class="nav-item">
+            <span class="nav-text">
+                Paid Invoices
+            </span>
 
-<span class="nav-icon">
-    <i class="ri-vip-crown-line"></i>
-</span>
+        </a>
 
-        <span class="nav-text">
+        <a href="recurring-invoices.html" class="nav-item">
 
-            Subscription
+            <span class="nav-icon">
+                <i class="ri-repeat-2-line"></i>
+            </span>
 
-        </span>
+            <span class="nav-text">
+                Recurring Invoices
+            </span>
 
-    </a>
-        <a href="payment-history.html" class="nav-item">
+        </a>
+        
+         <a href="expenses.html" class="nav-item">
 
-<span class="nav-icon">
-    <i class="ri-history-line"></i>
-</span>
+            <span class="nav-icon">
+               <i class="ri-wallet-3-line"></i>
+            </span>
 
-        <span class="nav-text">
+            <span class="nav-text">
+                Expenses
+            </span>
 
-            Subscription History
+        </a>
 
-        </span>
+        <a href="reports.html" class="nav-item">
 
-    </a>
-    
-    <div
-        class="nav-dropdown "
-        id="settingsDropdown">
+            <span class="nav-icon">
+                <i class="ri-bar-chart-box-line"></i>
+            </span>
 
-        <button
-            class="nav-dropdown-btn"
-            id="settingsToggle">
+            <span class="nav-text">
+                Reports
+            </span>
 
-            <div class="nav-dropdown-left">
+        </a>
 
-<span class="nav-icon">
-    <i class="ri-layout-4-line"></i>
-</span>
+        <a href="subscription.html" class="nav-item">
 
-                <span>
+            <span class="nav-icon">
+                <i class="ri-vip-crown-line"></i>
+            </span>
 
-                    Templates
+            <span class="nav-text">
+                Subscription
+            </span>
 
-                </span>
+        </a>
+
+        <a href="subscription-history.html" class="nav-item">
+
+            <span class="nav-icon">
+                <i class="ri-history-line"></i>
+            </span>
+
+            <span class="nav-text">
+                Subscription History
+            </span>
+
+        </a>
+
+        <div
+            class="nav-dropdown"
+            id="settingsDropdown">
+
+            <button
+                class="nav-dropdown-btn"
+                id="settingsToggle">
+
+                <div class="nav-dropdown-left">
+
+                    <span class="nav-icon">
+                        <i class="ri-layout-4-line"></i>
+                    </span>
+
+                    <span>
+                        Templates
+                    </span>
+
+                </div>
+
+                <i
+                    id="settingsArrow"
+                    class="ri-arrow-down-s-line dropdown-arrow"></i>
+
+            </button>
+
+            <div
+                class="dropdown-menu"
+                id="settingsMenu">
+
+                <a
+                    href="invoices-design.html"
+                    class="dropdown-item">
+
+                    <span class="nav-icon">
+                        <i class="ri-file-text-line"></i>
+                    </span>
+
+                    Invoice Template
+
+                </a>
+
+                <a
+                    href="estimates-design.html"
+                    class="dropdown-item">
+
+                    <span class="nav-icon">
+                        <i class="ri-draft-line"></i>
+                    </span>
+
+                    Estimate Template
+
+                </a>
 
             </div>
 
-           <i
-    id="settingsArrow"
-    class="ri-arrow-down-s-line dropdown-arrow"></i>
-
-        </button>
-
-        <div
-            class="dropdown-menu"
-            id="settingsMenu">
-
-            <a
-                href="invoices-design.html"
-                class="dropdown-item">
-                <span class="nav-icon">
-    <i class="ri-file-text-line"></i>
-</span>
-
-                Invoice Template
-
-            </a>
-
-            <a
-                href="estimates-design.html"
-                class="dropdown-item">
-                <span class="nav-icon">
-    <i class="ri-draft-line"></i>
-</span>
-
-
-
-                Estimate Template
-
-            </a>
-
-            
-
         </div>
 
-    </div>
+        <a href="settings.html" class="nav-item active">
 
-    <a href="settings.html" class="nav-item active">
+            <span class="nav-icon">
+                <i class="ri-settings-3-line"></i>
+            </span>
 
-<span class="nav-icon">
-    <i class="ri-settings-3-line"></i>
-</span>
+            <span class="nav-text">
+                Settings
+            </span>
 
-        <span class="nav-text">
+        </a>
 
-            Settings
+        <a href="profile.html" class="nav-item">
 
-        </span>
+            <span class="nav-icon">
+                <i class="ri-user-3-line"></i>
+            </span>
 
-    </a>
-    <a href="profile.html" class="nav-item">
+            <span class="nav-text">
+                Profile
+            </span>
 
-<span class="nav-icon">
-    <i class="ri-user-3-line"></i>
-</span>
-        <span class="nav-text">
+        </a>
 
-            Profile 
-
-        </span>
-
-    </a>
-    
         <a href="business-profile.html" class="nav-item">
 
-<span class="nav-icon">
-    <i class="ri-building-2-line"></i>
-</span>
+            <span class="nav-icon">
+                <i class="ri-building-2-line"></i>
+            </span>
 
-        <span class="nav-text">
+            <span class="nav-text">
+                Business Profile
+            </span>
 
-            Business Profile 
+        </a>
 
-        </span>
+        <a href="live-chat.html" class="nav-item">
 
-    </a>
+            <span class="nav-icon">
+                <i class="ri-chat-3-line"></i>
+            </span>
 
-    <a
-        href="account-mgt.html"
-        class="nav-item logout-item"
-        id="logoutBtn">
+            <span class="nav-text">
+                Live Chat
+            </span>
 
-<span class="nav-icon">
-    <i class="ri-logout-box-r-line"></i>
-</span>
+        </a>
 
-        <span class="nav-text">
+        <a
+            href="account-mgt.html"
+            class="nav-item logout-item"
+            id="logoutBtn">
 
-            Logout
+            <span class="nav-icon">
+                <i class="ri-logout-box-r-line"></i>
+            </span>
 
-        </span>
+            <span class="nav-text">
+                Logout
+            </span>
 
-    </a>
+        </a>
 
-</nav>
+    </nav>
 
 </aside>
 <div class="page-wrapper">
@@ -283,22 +345,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
         <div class="header-right">
 
             <button
-                class="notification-btn"
-                id="notificationBtn" style="display: none;">
-
-                <i class="ri-notification-3-line"></i>
-
-                <span
-                    class="notification-badge"
-                    id="notificationBadge">
-
-                    
-
-                </span>
-
-            </button>
-
-            <button
                 class="header-avatar"
                 id="profileMenuBtn">
 
@@ -306,16 +352,14 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
                     src="
                     profile.png"
                     alt="Profile"
-                    id="profileImage">
-                    
-                    <img src="" alt="" id="headerProfileImage" />
+                    id="headerProfileImage">
 
             </button>
 
         </div>
 
     </header>
-    
+
 <div id="toastContainer"></div>
 
 <section class="settings-section" id="accountSettings">
@@ -328,8 +372,7 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
     </div>
 
     <div class="settings-card">
-
-        <!-- Full Name -->
+        
         <div class="settings-row account-row">
 
             <div class="settings-row-info">
@@ -350,8 +393,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
         </div>
 
-
-        <!-- Email -->
         <div class="settings-row account-row">
 
             <div class="settings-row-info">
@@ -371,8 +412,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
         </div>
 
-
-        <!-- Password -->
         <div class="settings-row account-row">
 
             <div class="settings-row-info">
@@ -399,8 +438,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
         </div>
 
-
-        <!-- Account ID -->
         <div class="settings-row account-row" style="display: none;">
 
             <div class="settings-row-info">
@@ -435,7 +472,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
     <div class="settings-card">
 
-        <!-- Business Name -->
         <div class="settings-row business-row">
 
             <div class="settings-row-info">
@@ -461,9 +497,7 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
             </button>
 
         </div>
-
-
-        <!-- Business Email -->
+        
         <div class="settings-row business-row">
 
             <div class="settings-row-info">
@@ -490,8 +524,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
         </div>
 
-
-        <!-- Phone -->
         <div class="settings-row business-row">
 
             <div class="settings-row-info">
@@ -518,8 +550,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
         </div>
 
-
-        <!-- Address -->
         <div class="settings-row business-row">
 
             <div class="settings-row-info">
@@ -546,8 +576,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
         </div>
 
-
-        <!-- Website -->
         <div class="settings-row business-row">
 
             <div class="settings-row-info">
@@ -573,9 +601,7 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
             </button>
 
         </div>
-
-
-        <!-- Business Identification -->
+        
         <div class="settings-row business-row">
 
             <div class="settings-row-info">
@@ -602,8 +628,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
         </div>
 
-
-        <!-- Business Logo -->
         <div class="settings-row business-row">
 
             <div class="settings-row-info">
@@ -634,201 +658,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
 </section>
 
-<section class="settings-section" id="notificationSettings">
-
-    <div class="settings-section-header">
-        <div>
-            <h2>Notifications</h2>
-            <p>Choose which notifications you want to receive.</p>
-        </div>
-    </div>
-
-    <div class="settings-card">
-
-        <!-- Invoice Paid -->
-        <div class="settings-row notification-row">
-
-            <div class="settings-row-info">
-
-                <div class="settings-icon">
-                    <i class="ri-checkbox-circle-line"></i>
-                </div>
-
-                <div>
-                    <h3>Invoice Paid</h3>
-                    <p>
-                        Get notified when a client pays an invoice.
-                    </p>
-                </div>
-
-            </div>
-
-            <label class="settings-switch">
-                <input
-                    type="checkbox"
-                    id="invoicePaidNotification"
-                    checked
-                >
-                <span class="settings-slider"></span>
-            </label>
-
-        </div>
-
-
-        <!-- Invoice Overdue -->
-        <div class="settings-row notification-row">
-
-            <div class="settings-row-info">
-
-                <div class="settings-icon">
-                    <i class="ri-alarm-warning-line"></i>
-                </div>
-
-                <div>
-                    <h3>Invoice Overdue</h3>
-                    <p>
-                        Get notified when an invoice becomes overdue.
-                    </p>
-                </div>
-
-            </div>
-
-            <label class="settings-switch">
-                <input
-                    type="checkbox"
-                    id="invoiceOverdueNotification"
-                    checked
-                >
-                <span class="settings-slider"></span>
-            </label>
-
-        </div>
-
-
-        <!-- Invoice Viewed -->
-        <div class="settings-row notification-row">
-
-            <div class="settings-row-info">
-
-                <div class="settings-icon">
-                    <i class="ri-eye-line"></i>
-                </div>
-
-                <div>
-                    <h3>Invoice Viewed</h3>
-                    <p>
-                        Get notified when a client views an invoice.
-                    </p>
-                </div>
-
-            </div>
-
-            <label class="settings-switch">
-                <input
-                    type="checkbox"
-                    id="invoiceViewedNotification"
-                    checked
-                >
-                <span class="settings-slider"></span>
-            </label>
-
-        </div>
-
-
-        <!-- Estimate Accepted -->
-        <div class="settings-row notification-row">
-
-            <div class="settings-row-info">
-
-                <div class="settings-icon">
-                    <i class="ri-check-double-line"></i>
-                </div>
-
-                <div>
-                    <h3>Estimate Accepted</h3>
-                    <p>
-                        Get notified when a client accepts an estimate.
-                    </p>
-                </div>
-
-            </div>
-
-            <label class="settings-switch">
-                <input
-                    type="checkbox"
-                    id="estimateAcceptedNotification"
-                    checked
-                >
-                <span class="settings-slider"></span>
-            </label>
-
-        </div>
-
-
-        <!-- Estimate Rejected -->
-        <div class="settings-row notification-row">
-
-            <div class="settings-row-info">
-
-                <div class="settings-icon">
-                    <i class="ri-close-circle-line"></i>
-                </div>
-
-                <div>
-                    <h3>Estimate Rejected</h3>
-                    <p>
-                        Get notified when a client rejects an estimate.
-                    </p>
-                </div>
-
-            </div>
-
-            <label class="settings-switch">
-                <input
-                    type="checkbox"
-                    id="estimateRejectedNotification"
-                    checked
-                >
-                <span class="settings-slider"></span>
-            </label>
-
-        </div>
-
-
-        <!-- Subscription -->
-        <div class="settings-row notification-row">
-
-            <div class="settings-row-info">
-
-                <div class="settings-icon">
-                    <i class="ri-bank-card-line"></i>
-                </div>
-
-                <div>
-                    <h3>Subscription Updates</h3>
-                    <p>
-                        Get notified about renewals, payments,
-                        and subscription changes.
-                    </p>
-                </div>
-
-            </div>
-
-            <label class="settings-switch">
-                <input
-                    type="checkbox"
-                    id="subscriptionNotification"
-                    checked
-                >
-                <span class="settings-slider"></span>
-            </label>
-
-        </div>
-
-    </div>
-
-</section>
-
 <section class="settings-section" id="subscriptionSettings">
 
     <div class="settings-section-header">
@@ -840,7 +669,7 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
     <div class="settings-card">
 
-        <!-- Current Plan -->
+        
         <div class="settings-row subscription-row">
 
             <div class="settings-row-info">
@@ -866,8 +695,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
         </div>
 
-
-        <!-- Renewal Date -->
         <div class="settings-row subscription-row">
 
             <div class="settings-row-info">
@@ -888,7 +715,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
         </div>
 
 
-        <!-- Auto Renew -->
         <div class="settings-row subscription-row">
 
             <div class="settings-row-info">
@@ -918,7 +744,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
         </div>
 
 
-        <!-- Manage Subscription -->
         <div class="settings-row subscription-row">
 
             <div class="settings-row-info">
@@ -961,7 +786,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
     <div class="settings-card">
 
-        <!-- Change Password -->
         <div class="settings-row security-row">
 
             <div class="settings-row-info">
@@ -987,9 +811,7 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
             </button>
 
         </div>
-
-
-        <!-- Login Activity -->
+        
         <div class="settings-row security-row">
 
             <div class="settings-row-info">
@@ -1016,8 +838,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
         </div>
 
-
-        <!-- Two-Factor Authentication -->
         <div class="settings-row security-row">
 
             <div class="settings-row-info">
@@ -1056,7 +876,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
     <div class="settings-card">
 
-        <!-- Export Data -->
         <div class="settings-row privacy-row">
 
             <div class="settings-row-info">
@@ -1084,8 +903,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
         </div>
 
-
-        <!-- Privacy -->
         <div class="settings-row privacy-row">
 
             <div class="settings-row-info">
@@ -1113,8 +930,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
         </div>
 
-
-        <!-- Delete Account -->
         <div class="settings-row privacy-row danger-row">
 
             <div class="settings-row-info">
@@ -1187,7 +1002,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
         <form id="changePasswordForm">
 
-            <!-- Current Password -->
             <div class="settings-form-group">
 
                 <label for="currentPassword">
@@ -1216,8 +1030,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
             </div>
 
-
-            <!-- New Password -->
             <div class="settings-form-group">
 
                 <label for="newPassword">
@@ -1247,8 +1059,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
             </div>
 
-
-            <!-- Confirm Password -->
             <div class="settings-form-group">
 
                 <label for="confirmPassword">
@@ -1439,9 +1249,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
     </div>
 
 </div>
-<script src="navbar.js"></script>
-<script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
-<script src="api.js"></script>
 
 <script src="settings.js"></script>
 

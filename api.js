@@ -12,6 +12,7 @@ Parse.serverURL = "https://parseapi.back4app.com/";
 console.log("Parse ready:", typeof Parse);
 }
 
+
 (function () {
 
     function getStoredUser() {
@@ -482,3 +483,231 @@ console.log("Parse ready:", typeof Parse);
     }
 
 })();
+
+(function () {
+
+    const theme =
+        localStorage.getItem("invoiceProTheme");
+
+    if (theme === "dark") {
+
+        document.documentElement.setAttribute(
+            "data-theme",
+            "dark"
+        );
+
+    }
+
+})();
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+        
+        const sidebar =
+            document.getElementById("sidebar");
+        
+        const sidebarOverlay =
+            document.getElementById("sidebarOverlay");
+        
+        const menuToggle =
+            document.getElementById("menuToggle");
+        
+        const settingsToggle =
+            document.getElementById("settingsToggle");
+        
+        const settingsDropdown =
+            document.getElementById("settingsDropdown");
+        
+        if (!sidebar) {
+            return;
+        }
+        
+        function updateSidebarLayout() {
+            
+            if (window.innerWidth > 992) {
+                
+                sidebar.classList.add("show");
+                
+                if (sidebarOverlay) {
+                    sidebarOverlay.classList.remove("show");
+                }
+                
+                if (menuToggle) {
+                    menuToggle.style.display = "none";
+                }
+                
+            } else {
+                
+                sidebar.classList.remove("show");
+                
+                if (sidebarOverlay) {
+                    sidebarOverlay.classList.remove("show");
+                }
+                
+                if (menuToggle) {
+                    menuToggle.style.display = "";
+                }
+                
+            }
+            
+        }
+        
+        if (menuToggle) {
+            
+            menuToggle.addEventListener(
+                "click",
+                function() {
+                    
+                    sidebar.classList.add("show");
+                    
+                    if (sidebarOverlay) {
+                        sidebarOverlay.classList.add("show");
+                    }
+                    
+                }
+            );
+            
+        }
+        
+        if (sidebarOverlay) {
+            
+            sidebarOverlay.addEventListener(
+                "click",
+                function() {
+                    
+                    sidebar.classList.remove("show");
+                    
+                    sidebarOverlay.classList.remove("show");
+                    
+                }
+            );
+            
+        }
+        
+        if (
+            settingsToggle &&
+            settingsDropdown
+        ) {
+            
+            settingsToggle.addEventListener(
+                "click",
+                function() {
+                    
+                    settingsDropdown.classList.toggle(
+                        "active"
+                    );
+                    
+                }
+            );
+            
+        }
+        
+        const activeDropdownItem =
+            document.querySelector(
+                ".dropdown-item.active"
+            );
+        
+        if (
+            activeDropdownItem &&
+            settingsDropdown
+        ) {
+            
+            settingsDropdown.classList.add(
+                "active"
+            );
+            
+        }
+        
+        const navLinks =
+            document.querySelectorAll(
+                ".nav-item, .dropdown-item"
+            );
+        
+        navLinks.forEach(
+            function(link) {
+                
+                link.addEventListener(
+                    "click",
+                    function() {
+                        
+                        if (
+                            window.innerWidth <= 992
+                        ) {
+                            
+                            sidebar.classList.remove(
+                                "show"
+                            );
+                            
+                            if (sidebarOverlay) {
+                                sidebarOverlay.classList.remove(
+                                    "show"
+                                );
+                            }
+                            
+                        }
+                        
+                    }
+                );
+                
+            }
+        );
+        
+        window.addEventListener(
+            "resize",
+            updateSidebarLayout
+        );
+        
+        updateSidebarLayout();
+        
+    }
+);
+
+document.addEventListener("DOMContentLoaded", async function () {
+
+    try {
+
+        const user = Parse.User.current();
+
+        if (!user) {
+            return;
+        }
+
+        const profileImage =
+            user.get("profileImage");
+
+        if (
+            !profileImage ||
+            typeof profileImage.url !== "function"
+        ) {
+            return;
+        }
+
+        const imageUrl =
+            profileImage.url();
+
+        if (!imageUrl) {
+            return;
+        }
+
+        const profileImages =
+            document.querySelectorAll(
+                ".profile-avatar, .header-avatar img"
+            );
+
+        profileImages.forEach(function (image) {
+
+            image.src = imageUrl;
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Profile image load error:",
+            error
+        );
+
+    }
+
+});

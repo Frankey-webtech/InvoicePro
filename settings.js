@@ -8,8 +8,6 @@
 
     const $ = (id) => document.getElementById(id);
 
-    const DEFAULT_PROFILE_IMAGE = "profile.png";
-
     const notificationSettingIds = [
         "invoicePaidNotification",
         "invoiceOverdueNotification",
@@ -1222,7 +1220,7 @@
         }
     }
 
-    function loadNotificationSettings() {
+  /*  function loadNotificationSettings() {
 
         try {
 
@@ -1340,7 +1338,7 @@
 
             }
         );
-    }
+    }*/
 
     async function loadSubscriptionSettings() {
 
@@ -1428,6 +1426,8 @@
 
                 }
             }
+            
+updateExportButtonState();
 
             const autoRenew =
                 $("subscriptionAutoRenew");
@@ -1457,6 +1457,10 @@
                 }
 
             }
+            
+            updateExportButtonState();
+            
+            return result;
 
         } catch (error) {
 
@@ -1688,7 +1692,7 @@
 
 }
 
-async function handleDeleteAccount() {
+    async function handleDeleteAccount() {
 
     const password =
         $("deleteAccountPassword");
@@ -1773,171 +1777,810 @@ async function handleDeleteAccount() {
 
     async function exportAccountData() {
 
-        const button =
-            $("exportAccountDataButton");
+    const button =
+        $("exportAccountDataButton");
 
-        setButtonLoading(
-            button,
-            true,
-            "Exporting..."
-        );
+    setButtonLoading(
+        button,
+        true,
+        "Exporting..."
+    );
 
-        try {
+    try {
+        
+        const subscription =
+    currentSubscriptionSettings ||
+    await loadSubscriptionSettings();
 
-            const profile =
-                settingsUserProfile ||
-                await loadSettingsUserProfile();
+const exportUsage =
+    subscription?.usage?.exports;
 
-            let business =
-                settingsBusinessProfile;
+if (!exportUsage) {
 
-            if (!business) {
+    throw new Error(
+        "Unable to verify your PDF export limit."
+    );
 
-                business =
-                    await loadSettingsBusinessProfile();
+}
 
-            }
+if (
+    exportUsage.maximum === undefined ||
+    exportUsage.maximum === null
+) {
 
-            const exportData = {
+    throw new Error(
+        "PDF exports are not available on your current plan."
+    );
 
-                exportedAt:
-                    new Date().toISOString(),
+}
 
-                account: {
+if (
+    exportUsage.maximum !== -1 &&
+    Number(exportUsage.remaining) <= 0
+) {
 
-                    id:
-                        profile?.id || "",
+    throw new Error(
+        `You have reached the PDF export limit for your current plan.`
+    );
 
-                    fullName:
-                        profile?.fullName || "",
+}
 
-                    email:
-                        profile?.email || "",
+        const profile =
+            settingsUserProfile ||
+            await loadSettingsUserProfile();
 
-                    country:
-                        profile?.country || "",
+        let business =
+            settingsBusinessProfile;
 
-                    currencyCode:
-                        profile?.currencyCode || "",
+        if (!business) {
 
-                    currencySymbol:
-                        profile?.currencySymbol || "",
+            business =
+                await loadSettingsBusinessProfile();
 
-                    plan:
-                        profile?.plan || "",
+        }
+        
+        if (!profile) {
 
-                    planPrice:
-                        profile?.planPrice ?? "",
+            throw new Error(
+                "Unable to load your account information."
+            );
 
-                    planBilling:
-                        profile?.planBilling || "",
+        }
 
-                    subscriptionStatus:
-                        profile?.subscriptionStatus || ""
+        const value =
+            (item) => {
 
-                },
+                if (
+                    item === null ||
+                    item === undefined ||
+                    item === ""
+                ) {
+                    return "Not available";
+                }
 
-                business:
-                    business || {},
-
-                notifications:
-                    getStoredNotificationSettings(),
-
-                subscription:
-                    currentSubscriptionSettings || null
+                return String(item);
 
             };
 
-            const blob =
-                new Blob(
-                    [
-                        JSON.stringify(
-                            exportData,
-                            null,
-                            2
-                        )
-                    ],
+        const formatPrice =
+            (price) => {
+
+                if (
+                    price === null ||
+                    price === undefined ||
+                    price === ""
+                ) {
+                    return "Not available";
+                }
+
+                const number =
+                    Number(price);
+
+                if (
+                    Number.isNaN(number)
+                ) {
+                    return String(price);
+                }
+
+                return new Intl.NumberFormat(
+                    undefined,
                     {
-                        type:
-                            "application/json"
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 2
+                    }
+                ).format(number);
+
+            };
+
+        const formatDate =
+            (dateValue) => {
+
+                if (!dateValue) {
+                    return "Not available";
+                }
+
+                const date =
+                    new Date(dateValue);
+
+                if (
+                    Number.isNaN(
+                        date.getTime()
+                    )
+                ) {
+                    return String(dateValue);
+                }
+
+                return date.toLocaleDateString(
+                    undefined,
+                    {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric"
                     }
                 );
 
-            const url =
-                URL.createObjectURL(blob);
+            };
 
-            const anchor =
-                document.createElement("a");
+        const escapeHtml =
+            (text) => {
 
-            anchor.href =
-                url;
+                return String(text)
+                    .replace(
+                        /&/g,
+                        "&amp;"
+                    )
+                    .replace(
+                        /</g,
+                        "&lt;"
+                    )
+                    .replace(
+                        />/g,
+                        "&gt;"
+                    )
+                    .replace(
+                        /"/g,
+                        "&quot;"
+                    )
+                    .replace(
+                        /'/g,
+                        "&#039;"
+                    );
 
-            anchor.download =
-                `invoicepro-account-data-${new Date()
-                    .toISOString()
-                    .slice(0, 10)}.json`;
+            };
 
-            document.body.appendChild(
-                anchor
+        const currencyCode =
+            value(
+                profile.currencyCode
             );
 
-            anchor.click();
+        const currencySymbol =
+            profile.currencySymbol || "";
 
-            anchor.remove();
+        const currency =
+            currencySymbol
+                ? `${currencyCode} (${currencySymbol})`
+                : currencyCode;
 
-            URL.revokeObjectURL(url);
+        const accountPlan =
+            profile.plan ||
+            subscription?.plan ||
+            "Free Plan";
 
-            showToast(
-                "Your account data has been exported.",
-                "success"
-            );
+        const accountPrice =
+            profile.planPrice !== undefined &&
+            profile.planPrice !== null &&
+            profile.planPrice !== ""
+                ? `${currencySymbol}${formatPrice(profile.planPrice)}`
+                : subscription?.planPrice !== undefined &&
+                  subscription?.planPrice !== null &&
+                  subscription?.planPrice !== ""
+                    ? `${currencySymbol}${formatPrice(subscription.planPrice)}`
+                    : "Not available";
 
-        } catch (error) {
+        const accountBilling =
+            profile.planBilling ||
+            subscription?.planBilling ||
+            "Not available";
 
-            console.error(
-                "Account data export failed:",
-                error
-            );
+        const accountStatus =
+            profile.subscriptionStatus ||
+            subscription?.subscriptionStatus ||
+            "Not available";
 
-            showToast(
-                getErrorMessage(
-                    error,
-                    "Unable to export your account data."
-                ),
-                "error"
-            );
+        const renewalDate =
+            subscription?.renewalDate
+                ? formatDate(
+                    subscription.renewalDate
+                )
+                : "Not available";
 
-        } finally {
-
-            setButtonLoading(
-                button,
-                false
-            );
-        }
-    }
-
-    function getStoredNotificationSettings() {
-
-        try {
-
-            const saved =
-                localStorage.getItem(
-                    "invoiceProNotificationSettings"
+        const autoRenew =
+            typeof subscription?.autoRenew ===
+            "boolean"
+                ? subscription.autoRenew
+                    ? "Enabled"
+                    : "Disabled"
+                : (
+                    localStorage.getItem(
+                        "invoiceProAutoRenew"
+                    ) === "true"
+                        ? "Enabled"
+                        : "Not available"
                 );
 
-            return saved
-                ? JSON.parse(saved)
-                : {
-                    ...defaultNotificationSettings
-                };
+        const reportDate =
+            new Date().toLocaleDateString(
+                undefined,
+                {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric"
+                }
+            );
 
-        } catch (error) {
+        const businessRows = [
 
-            return {
-                ...defaultNotificationSettings
+            [
+                "Business Name",
+                business?.businessName
+            ],
+
+            [
+                "Business Email",
+                business?.businessEmail
+            ],
+
+            [
+                "Business Phone",
+                business?.businessPhone
+            ],
+
+            [
+                "Business Website",
+                business?.businessWebsite
+            ],
+
+            [
+                "Business Address",
+                business?.businessAddress
+            ],
+
+            [
+                "Business Tax ID",
+                business?.businessTaxId
+            ],
+
+            [
+                "Registration Number",
+                business?.registrationNumber
+            ],
+
+            [
+                "Invoice Prefix",
+                business?.invoicePrefix
+            ],
+
+            [
+                "Estimate Prefix",
+                business?.estimatePrefix
+            ]
+
+        ];
+
+        const accountRows = [
+
+            [
+                "Full Name",
+                profile.fullName
+            ],
+
+            [
+                "Email",
+                profile.email
+            ],
+
+            [
+                "Country",
+                profile.country
+            ],
+
+            [
+                "Currency",
+                currency
+            ],
+
+            [
+                "Plan",
+                accountPlan
+            ],
+
+            [
+                "Plan Price",
+                accountPrice
+            ],
+
+            [
+                "Billing",
+                accountBilling
+            ],
+
+            [
+                "Subscription Status",
+                accountStatus
+            ],
+
+            [
+                "Account ID",
+                profile.id
+            ]
+
+        ];
+
+        const subscriptionRows = [
+
+            [
+                "Plan",
+                subscription?.plan ||
+                accountPlan
+            ],
+
+            [
+                "Price",
+                subscription?.planPrice !== undefined &&
+                subscription?.planPrice !== null &&
+                subscription?.planPrice !== ""
+                    ? `${currencySymbol}${formatPrice(subscription.planPrice)}`
+                    : accountPrice
+            ],
+
+            [
+                "Billing",
+                subscription?.planBilling ||
+                accountBilling
+            ],
+
+            [
+                "Status",
+                subscription?.subscriptionStatus ||
+                accountStatus
+            ],
+
+            [
+                "Renewal Date",
+                renewalDate
+            ],
+
+            [
+                "Auto Renew",
+                autoRenew
+            ]
+
+        ];
+
+        const createRows =
+            (rows) => {
+
+                return rows
+                    .map(
+                        ([label, data]) => {
+
+                            return `
+                                <div class="data-row">
+                                    <div class="data-label">
+                                        ${escapeHtml(label)}
+                                    </div>
+                                    <div class="data-value">
+                                        ${escapeHtml(
+                                            value(data)
+                                        )}
+                                    </div>
+                                </div>
+                            `;
+
+                        }
+                    )
+                    .join("");
+
             };
+
+        const report =
+            `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>InvoicePro Account Data</title>
+
+                <style>
+
+                    * {
+                        box-sizing: border-box;
+                    }
+
+                    body {
+                        margin: 0;
+                        padding: 40px;
+                        background: #f5f5f5;
+                        color: #1f2937;
+                        font-family: Arial, Helvetica, sans-serif;
+                    }
+
+                    .report {
+                        width: 100%;
+                        max-width: 850px;
+                        margin: 0 auto;
+                        background: #ffffff;
+                        padding: 45px;
+                        border-radius: 10px;
+                    }
+
+                    .report-header {
+                        padding-bottom: 25px;
+                        margin-bottom: 30px;
+                        border-bottom: 1px solid #e5e7eb;
+                    }
+
+                    .brand {
+                        font-size: 28px;
+                        font-weight: 700;
+                        margin-bottom: 8px;
+                    }
+
+                    .report-title {
+                        font-size: 18px;
+                        font-weight: 600;
+                        margin: 0;
+                    }
+
+                    .report-date {
+                        margin-top: 8px;
+                        font-size: 13px;
+                        color: #6b7280;
+                    }
+
+                    .section {
+                        margin-bottom: 32px;
+                    }
+
+                    .section h3 {
+                        margin: 0 0 15px;
+                        font-size: 18px;
+                        font-weight: 700;
+                        color: #111827;
+                    }
+
+                    .data-container {
+                        border: 1px solid #e5e7eb;
+                        border-radius: 8px;
+                        overflow: hidden;
+                    }
+
+                    .data-row {
+                        display: grid;
+                        grid-template-columns: 35% 65%;
+                        min-height: 48px;
+                        border-bottom: 1px solid #e5e7eb;
+                    }
+
+                    .data-row:last-child {
+                        border-bottom: none;
+                    }
+
+                    .data-label {
+                        padding: 14px 16px;
+                        background: #f9fafb;
+                        font-size: 13px;
+                        font-weight: 600;
+                        color: #374151;
+                    }
+
+                    .data-value {
+                        padding: 14px 16px;
+                        font-size: 13px;
+                        color: #111827;
+                        word-break: break-word;
+                    }
+
+                    .report-footer {
+                        padding-top: 20px;
+                        margin-top: 10px;
+                        border-top: 1px solid #e5e7eb;
+                        text-align: center;
+                        font-size: 12px;
+                        color: #6b7280;
+                    }
+
+                    @media print {
+
+                        @page {
+                            size: A4;
+                            margin: 15mm;
+                        }
+
+                        body {
+                            padding: 0;
+                            background: #ffffff;
+                        }
+
+                        .report {
+                            max-width: none;
+                            padding: 0;
+                            border-radius: 0;
+                        }
+
+                        .section {
+                            break-inside: avoid;
+                        }
+
+                        .data-container {
+                            break-inside: avoid;
+                        }
+
+                    }
+
+                    @media screen and (max-width: 600px) {
+
+                        body {
+                            padding: 15px;
+                        }
+
+                        .report {
+                            padding: 25px 18px;
+                        }
+
+                        .data-row {
+                            grid-template-columns: 42% 58%;
+                        }
+
+                    }
+
+                </style>
+            </head>
+
+            <body>
+
+                <div class="report">
+
+                    <div class="report-header">
+
+                        <div class="brand">
+                            InvoicePro
+                        </div>
+
+                        <h1 class="report-title">
+                            Account Data
+                        </h1>
+
+                        <div class="report-date">
+                            Exported on ${escapeHtml(reportDate)}
+                        </div>
+
+                    </div>
+
+                    <section class="section">
+
+                        <h3>
+                            Account Information
+                        </h3>
+
+                        <div class="data-container">
+
+                            ${createRows(accountRows)}
+
+                        </div>
+
+                    </section>
+
+                    <section class="section">
+
+                        <h3>
+                            Business Information
+                        </h3>
+
+                        <div class="data-container">
+
+                            ${createRows(businessRows)}
+
+                        </div>
+
+                    </section>
+
+                    <section class="section">
+
+                        <h3>
+                            Subscription Information
+                        </h3>
+
+                        <div class="data-container">
+
+                            ${createRows(subscriptionRows)}
+
+                        </div>
+
+                    </section>
+
+                    <div class="report-footer">
+                        InvoicePro Account Data Export
+                    </div>
+
+                </div>
+
+                <script>
+
+                    window.onload = function () {
+
+                        setTimeout(
+                            function () {
+
+                                window.print();
+
+                            },
+                            300
+                        );
+
+                    };
+
+                </script>
+
+            </body>
+            </html>
+            `;
+
+        const exportWindow =
+            window.open(
+                "",
+                "_blank",
+                "width=900,height=900"
+            );
+
+        if (!exportWindow) {
+
+            throw new Error(
+                "Unable to open the export page. Please allow pop-ups for InvoicePro."
+            );
+
         }
+
+exportWindow.document.open();
+
+exportWindow.document.write(
+    report
+);
+
+exportWindow.document.close();
+
+const exportResult =
+    await Parse.Cloud.run(
+        "recordPdfExport"
+    );
+
+if (!exportResult?.success) {
+
+    exportWindow.close();
+
+    throw new Error(
+        "Unable to record your PDF export."
+    );
+
+}
+
+if (
+    currentSubscriptionSettings?.usage?.exports
+) {
+
+    currentSubscriptionSettings.usage.exports.used =
+        exportResult.used;
+
+    currentSubscriptionSettings.usage.exports.maximum =
+        exportResult.maximum;
+
+    currentSubscriptionSettings.usage.exports.remaining =
+        exportResult.remaining;
+        
+    updateExportButtonState();
+
+}
+
+showToast(
+    "Your account data is ready to export.",
+    "success"
+);
+
+    } catch (error) {
+
+        console.error(
+            "Account data export failed:",
+            error
+        );
+
+        showToast(
+            getErrorMessage(
+                error,
+                "Unable to export your account data."
+            ),
+            "error"
+        );
+
+    } finally {
+
+        setButtonLoading(
+            button,
+            false
+        );
+
     }
+
+}
+
+    function updateExportButtonState() {
+
+    const button =
+        $("exportAccountDataButton");
+
+    const exportUsage =
+        currentSubscriptionSettings?.usage?.exports;
+
+    if (!button || !exportUsage) {
+        return;
+    }
+
+    const maximum =
+        exportUsage.maximum;
+
+    if (maximum === -1) {
+
+        button.disabled = false;
+
+        button.textContent =
+            "Export";
+
+        button.title =
+            "Unlimited PDF exports";
+
+        return;
+    }
+
+    if (
+        maximum === undefined ||
+        maximum === null
+    ) {
+
+        button.disabled = true;
+
+        button.textContent =
+            "Unavailable";
+
+        button.title =
+            "PDF exports are not available on your current plan.";
+
+        return;
+    }
+
+    const remaining =
+        Number(exportUsage.remaining);
+
+    if (remaining <= 0) {
+
+        button.disabled = true;
+
+        button.textContent =
+            "Limit Reached";
+
+        button.title =
+            `You have used all ${maximum} PDF exports included in your plan.`;
+
+        return;
+    }
+
+    button.disabled = false;
+
+    button.textContent =
+        `Export (${remaining} left)`;
+
+    button.title =
+        `${remaining} PDF exports remaining`;
+}
 
     function initializeExportData() {
 
@@ -2087,9 +2730,9 @@ async function handleDeleteAccount() {
 
             await loadSettingsBusinessProfile();
 
-            loadNotificationSettings();
+           /* loadNotificationSettings();
 
-            initializeNotificationSettings();
+            initializeNotificationSettings();*/
 
             await loadSubscriptionSettings();
 
