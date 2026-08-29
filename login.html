@@ -2,10 +2,12 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon-192.png">
+
 
     <title>InvoicePro | Login</title>
 
@@ -313,21 +315,36 @@
 
                 <div class="social-login">
 
-                    <button type="button" class="social-btn" id="googleBtn">
+                            <button
+                            type="button"
+                            class="social-btn"
+                            id="googleBtn"
+                        >
 
-                        <i class="ri-google-fill"></i>
+                            <img
+                                src="google.svg"
+                                alt="Google"
+                            >
 
-                        <span>Google</span>
+                            Google
 
-                    </button>
+                        </button>
 
-                    <button type="button" class="social-btn" id="appleBtn">
 
-                        <i class="ri-apple-fill"></i>
+                        <button
+                            type="button"
+                            class="social-btn"
+                            id="appleBtn"
+                        >
 
-                        <span>Apple</span>
+                            <img
+                                src="apple.svg"
+                                alt="Apple"
+                            >
 
-                    </button>
+                            Apple
+
+                        </button>
 
                 </div>
 
@@ -364,7 +381,6 @@
 </div>
 <script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js"></script>
 <script src="login.js"></script>
-
 </body>
 
 </html>
