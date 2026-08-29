@@ -1,3 +1,7 @@
+document.addEventListener(
+    "DOMContentLoaded",
+    async () => {
+
 const currentUser = Parse.User.current();
 
 if (!currentUser) {
@@ -5,32 +9,19 @@ if (!currentUser) {
 }
 
 const subscriptionState = {
-
-    // Current subscription from backend
+    plans: {},
     currentPlan: "Free",
     currentPrice: 0,
     currentBilling: "",
     currentStatus: "",
-
-    // Selected plan before payment
     selectedPlan: null,
     selectedPrice: 0,
     selectedBilling: "",
-
-    // Payment
     paymentMethod: "Card",
-
-    // Auto renewal
     autoRenew: false,
-
-    // Currency
     currencyCode: "",
     currencySymbol: "",
-
-    // Payment Reference
     paymentReference: "",
-
-    // Prevent duplicate clicks
     processing: false
 
 };
@@ -61,6 +52,9 @@ const maxEstimates =
 
 const maxClients =
     document.getElementById("maxClients");
+    
+const maxExports =
+    document.getElementById("maxExports");
 
 const freePlanCard =
     document.getElementById("freePlanCard");
@@ -127,6 +121,42 @@ const summaryTotalPrice =
 
 const subscribeButton =
     document.getElementById("subscribeButton");
+    
+const freePlanName =
+    freePlanCard.querySelector(".plan-name");
+
+const starterPlanName =
+    starterPlanCard.querySelector(".plan-name");
+
+const businessPlanName =
+    businessPlanCard.querySelector(".plan-name");
+
+const enterprisePlanName =
+    enterprisePlanCard.querySelector(".plan-name");
+
+const freePlanDescription =
+    freePlanCard.querySelector(".plan-description");
+
+const starterPlanDescription =
+    starterPlanCard.querySelector(".plan-description");
+
+const businessPlanDescription =
+    businessPlanCard.querySelector(".plan-description");
+
+const enterprisePlanDescription =
+    enterprisePlanCard.querySelector(".plan-description");
+
+const freePlanIncludes =
+    freePlanCard.querySelector(".plan-includes");
+
+const starterPlanIncludes =
+    starterPlanCard.querySelector(".plan-includes");
+
+const businessPlanIncludes =
+    businessPlanCard.querySelector(".plan-includes");
+
+const enterprisePlanIncludes =
+    enterprisePlanCard.querySelector(".plan-includes");
 
 async function loadCurrentSubscription() {
 
@@ -158,10 +188,31 @@ async function loadCurrentSubscription() {
             response.subscriptionStatus;
 
         subscriptionState.currencyCode =
-            response.currencyCode;
+    response.currency?.code || "";
 
-        subscriptionState.currencySymbol =
-            response.currencySymbol;
+subscriptionState.currencySymbol =
+    response.currency?.symbol || "";
+            
+        subscriptionState.plans =
+    response.plans || {};
+    
+updatePlanFeatures();
+
+updatePlanCardDetails();
+
+updatePlanFeatureLists();
+    
+    freePlanPrice.textContent =
+    formatMoney(subscriptionState.plans.Free.price);
+
+starterPlanPrice.textContent =
+    formatMoney(subscriptionState.plans.Starter.price);
+
+businessPlanPrice.textContent =
+    formatMoney(subscriptionState.plans.Business.price);
+
+enterprisePlanPrice.textContent =
+    formatMoney(subscriptionState.plans.Enterprise.price);
 
         subscriptionState.selectedPlan =
             response.plan;
@@ -171,6 +222,10 @@ async function loadCurrentSubscription() {
 
         subscriptionState.selectedBilling =
             response.planBilling;
+            
+        updateSelectedPlanUI(
+    response.plan
+);
 
         subscriptionState.autoRenew =
             false;
@@ -188,19 +243,24 @@ async function loadCurrentSubscription() {
             response.subscriptionStatus;
 
         maxInvoices.textContent =
-            response.maxInvoices === -1
-                ? "Unlimited"
-                : response.maxInvoices;
+    response.usage.invoices.maximum === -1
+        ? "Unlimited"
+        : response.usage.invoices.maximum;
 
-        maxEstimates.textContent =
-            response.maxEstimates === -1
-                ? "Unlimited"
-                : response.maxEstimates;
+maxEstimates.textContent =
+    response.usage.estimates.maximum === -1
+        ? "Unlimited"
+        : response.usage.estimates.maximum;
 
-        maxClients.textContent =
-            response.maxClients === -1
-                ? "Unlimited"
-                : response.maxClients;
+maxClients.textContent =
+    response.usage.clients.maximum === -1
+        ? "Unlimited"
+        : response.usage.clients.maximum;
+        
+maxExports.textContent =
+    response.usage.exports.maximum === -1
+        ? "Unlimited"
+        : response.usage.exports.maximum;
 
         summaryPlanName.textContent =
             response.plan;
@@ -564,6 +624,85 @@ function formatMoney(amount) {
 
 }
 
+function updatePlanFeatures() {
+
+    const plans =
+        subscriptionState.plans || {};
+
+    const formatLimit = (value, label) => {
+
+        return value === -1
+            ? "Unlimited " + label
+            : value + " " + label;
+
+    };
+
+    if (plans.Free) {
+
+        document.getElementById("freeMaxInvoices").textContent =
+            formatLimit(plans.Free.maxInvoices, "Invoices");
+
+        document.getElementById("freeMaxEstimates").textContent =
+            formatLimit(plans.Free.maxEstimates, "Estimates");
+
+        document.getElementById("freeMaxClients").textContent =
+            formatLimit(plans.Free.maxClients, "Clients");
+
+        document.getElementById("freeMaxExports").textContent =
+            formatLimit(plans.Free.maxExports, "PDF Exports");
+
+    }
+
+    if (plans.Starter) {
+
+        document.getElementById("starterMaxInvoices").textContent =
+            formatLimit(plans.Starter.maxInvoices, "Invoices");
+
+        document.getElementById("starterMaxEstimates").textContent =
+            formatLimit(plans.Starter.maxEstimates, "Estimates");
+
+        document.getElementById("starterMaxClients").textContent =
+            formatLimit(plans.Starter.maxClients, "Clients");
+
+        document.getElementById("starterMaxExports").textContent =
+            formatLimit(plans.Starter.maxExports, "PDF Exports");
+
+    }
+
+    if (plans.Business) {
+
+        document.getElementById("businessMaxInvoices").textContent =
+            formatLimit(plans.Business.maxInvoices, "Invoices");
+
+        document.getElementById("businessMaxEstimates").textContent =
+            formatLimit(plans.Business.maxEstimates, "Estimates");
+
+        document.getElementById("businessMaxClients").textContent =
+            formatLimit(plans.Business.maxClients, "Clients");
+
+        document.getElementById("businessMaxExports").textContent =
+            formatLimit(plans.Business.maxExports, "PDF Exports");
+
+    }
+
+    if (plans.Enterprise) {
+
+        document.getElementById("enterpriseMaxInvoices").textContent =
+            formatLimit(plans.Enterprise.maxInvoices, "Invoices");
+
+        document.getElementById("enterpriseMaxEstimates").textContent =
+            formatLimit(plans.Enterprise.maxEstimates, "Estimates");
+
+        document.getElementById("enterpriseMaxClients").textContent =
+            formatLimit(plans.Enterprise.maxClients, "Clients");
+
+        document.getElementById("enterpriseMaxExports").textContent =
+            formatLimit(plans.Enterprise.maxExports, "PDF Exports");
+
+    }
+
+}
+
 function setLoading(button, loading, text = "Processing...") {
 
     if (!button) return;
@@ -725,78 +864,47 @@ function updateCurrentPlanUI(currentPlan) {
 
 function getPlanDetails() {
 
-    const isNigeria =
-        subscriptionState.currencyCode === "NGN";
-
-    return {
-
-        Free: {
-            price: 0,
-            billing: "Forever"
-        },
-
-        Starter: {
-            price: isNigeria ? 2500 : 10,
-            billing: "Monthly"
-        },
-
-        Business: {
-            price: isNigeria ? 5000 : 20,
-            billing: "Monthly"
-        },
-
-        Enterprise: {
-            price: isNigeria ? 10000 : 30,
-            billing: "Monthly"
-        }
-
-    };
+    return subscriptionState.plans || {};
 
 }
 
 function selectPlan(planName) {
 
     if (planName === subscriptionState.currentPlan) {
-
         return;
-
     }
 
     const plan =
-    getPlanDetails()[planName];
+        getPlanDetails()[planName];
 
     if (!plan) {
-
         return;
-
     }
 
-    // Save state
+    subscriptionState.selectedPlan =
+        planName;
 
-    subscriptionState.selectedPlan = planName;
+    subscriptionState.selectedPrice =
+        plan.price;
 
-    subscriptionState.selectedPrice = plan.price;
-
-    subscriptionState.selectedBilling = plan.billing;
+    subscriptionState.selectedBilling =
+        plan.billing;
 
     summaryPlanName.textContent =
-
         planName;
 
     summaryBillingCycle.textContent =
-
         plan.billing;
 
     summaryPlanPrice.textContent =
-
         formatMoney(plan.price);
 
     summaryTotalPrice.textContent =
-
         formatMoney(plan.price);
 
-
-    updateSelectedPlanUI(planName);
+    updateSelectedPlanUI(
+        planName
+    );
 
 }
 
@@ -869,6 +977,119 @@ function updateSelectedPlanUI(selectedPlan) {
         );
 
     }
+
+}
+
+function updatePlanCardDetails() {
+
+    const plans =
+        subscriptionState.plans || {};
+
+    const cardElements = {
+        Free: {
+            name: freePlanName,
+            description: freePlanDescription,
+            includes: freePlanIncludes
+        },
+        Starter: {
+            name: starterPlanName,
+            description: starterPlanDescription,
+            includes: starterPlanIncludes
+        },
+        Business: {
+            name: businessPlanName,
+            description: businessPlanDescription,
+            includes: businessPlanIncludes
+        },
+        Enterprise: {
+            name: enterprisePlanName,
+            description: enterprisePlanDescription,
+            includes: enterprisePlanIncludes
+        }
+    };
+
+    Object.entries(cardElements).forEach(
+        ([planName, elements]) => {
+
+            const plan =
+                plans[planName];
+
+            if (!plan) {
+                return;
+            }
+
+            elements.name.textContent =
+                plan.name;
+
+            elements.description.textContent =
+                plan.description;
+
+            elements.includes.textContent =
+                plan.includes;
+
+        }
+    );
+
+}
+
+function updatePlanFeatureLists() {
+
+    const plans =
+        subscriptionState.plans || {};
+
+    const cards = {
+        Free: freePlanCard,
+        Starter: starterPlanCard,
+        Business: businessPlanCard,
+        Enterprise: enterprisePlanCard
+    };
+
+    Object.entries(cards).forEach(
+        ([planName, card]) => {
+
+            const plan =
+                plans[planName];
+
+            if (!plan || !Array.isArray(plan.features)) {
+                return;
+            }
+
+            const featureList =
+                card.querySelector(".plan-features");
+
+            if (!featureList) {
+                return;
+            }
+
+            featureList.innerHTML = "";
+
+            plan.features.forEach(feature => {
+
+                const li =
+                    document.createElement("li");
+
+                const icon =
+                    document.createElement("i");
+
+                const span =
+                    document.createElement("span");
+
+                icon.className =
+                    "ri-checkbox-circle-fill";
+
+                span.textContent =
+                    feature;
+
+                li.appendChild(icon);
+
+                li.appendChild(span);
+
+                featureList.appendChild(li);
+
+            });
+
+        }
+    );
 
 }
 
@@ -968,73 +1189,69 @@ subscribeButton.addEventListener(
 
         }
 
-        if (
+        const selectedPlan =
+    subscriptionState.plans[
+        subscriptionState.selectedPlan
+    ];
 
-            !subscriptionState.selectedPlan ||
+if (
+    !subscriptionState.selectedPlan ||
+    !selectedPlan ||
+    subscriptionState.selectedPlan === "Free"
+) {
 
-            subscriptionState.selectedPlan === "Free"
+    showError(
+        "Please select a paid subscription plan."
+    );
 
-        ) {
+    return;
 
-            showError(
+}
 
-                "Please select a paid subscription plan."
+subscriptionState.selectedPrice =
+    selectedPlan.price;
 
-            );
+subscriptionState.selectedBilling =
+    selectedPlan.billing;
 
-            return;
+if (
+    subscriptionState.paymentMethod !== "Card" &&
+    subscriptionState.paymentMethod !== "PayPal"
+) {
 
-        }
+    showError(
+        "Please select a payment method."
+    );
 
-        subscriptionState.processing = true;
+    return;
 
-        setLoading(
+}
 
-            subscribeButton,
+subscriptionState.processing = true;
 
-            true,
+setLoading(
+    subscribeButton,
+    true,
+    "Redirecting..."
+);
 
-            "Redirecting..."
+try {
 
-        );
+    if (
+        subscriptionState.paymentMethod ===
+        "Card"
+    ) {
 
-        try {
+        await startCardSubscription();
 
-            if (
+    }
 
-                subscriptionState.paymentMethod ===
+    else {
 
-                "Card"
+        await startPayPalSubscription();
 
-            ) {
-
-                await startCardSubscription();
-
-            }
-
-            else if (
-
-                subscriptionState.paymentMethod ===
-
-                "PayPal"
-
-            ) {
-
-                await startPayPalSubscription();
-
-            }
-
-            else {
-
-                throw new Error(
-
-                    "Please select a payment method."
-
-                );
-
-            }
-
-        }
+    }
+}
 
         catch (error) {
 
@@ -1122,19 +1339,30 @@ faqQuestions.forEach(question => {
 
 });
 
-document.addEventListener(
-
-    "DOMContentLoaded",
-
-    async () => {
-
         await loadCurrentSubscription();
 
         selectPaymentMethod("Card");
 
-        await verifyPaystackPayment();
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
 
-        await verifyPayPalPayment();
+        const orderId =
+            params.get("token");
+
+        const reference =
+            params.get("reference");
+
+        if (orderId && reference) {
+
+            await verifyPayPalPayment();
+
+        } else if (reference) {
+
+            await verifyPaystackPayment();
+
+        }
 
     }
 

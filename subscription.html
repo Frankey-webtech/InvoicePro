@@ -4,7 +4,12 @@
 <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="navbar.css">
+        <link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon-192.png">
+
+        <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+
+<script src="api.js"></script>
         <link rel="stylesheet" href="profile.css">
         <link rel="stylesheet" href="subscription.css">
         <title>InvoicePro | Subscription Page</title>
@@ -14,22 +19,19 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 </head>
 
 <body>
-        <div
+<div
     class="sidebar-overlay"
     id="sidebarOverlay">
 </div>
-
 <aside
     class="sidebar"
     id="sidebar">
-
-    
 
     <div class="sidebar-logo">
 
         <div class="logo-icon">
 
-<img  src="logo.png" alt="">
+            <img src="logo.png" alt="">
 
         </div>
 
@@ -43,256 +45,298 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
     </div>
 
-    
+    <nav class="sidebar-nav">
 
-  <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">
 
+            <span class="nav-icon">
+                <i class="ri-home-3-line"></i>
+            </span>
 
+            <span class="nav-text">
+                Home
+            </span>
 
-    <a href="dashboard.html" class="nav-item">
+        </a>
 
-<span class="nav-icon">
-    <i class="ri-dashboard-3-line"></i>
-</span>
+        <a href="dashboard.html" class="nav-item">
 
-        <span class="nav-text">
+            <span class="nav-icon">
+                <i class="ri-dashboard-3-line"></i>
+            </span>
 
-            Dashboard
+            <span class="nav-text">
+                Dashboard
+            </span>
 
-        </span>
+        </a>
 
-    </a>
+        <a href="invoice.html" class="nav-item">
 
-    <a href="invoice.html" class="nav-item">
+            <span class="nav-icon">
+                <i class="ri-file-list-3-line"></i>
+            </span>
 
-<span class="nav-icon">
-    <i class="ri-file-list-3-line"></i>
-</span>
+            <span class="nav-text">
+                Invoices
+            </span>
 
-        <span class="nav-text">
+        </a>
 
-            Invoices
+        <a href="estimates.html" class="nav-item">
 
-        </span>
+            <span class="nav-icon">
+                <i class="ri-draft-line"></i>
+            </span>
 
-    </a>
+            <span class="nav-text">
+                Estimates
+            </span>
 
-    <a href="clients.html" class="nav-item">
+        </a>
 
-<span class="nav-icon">
-    <i class="ri-group-line"></i>
-</span>
+        <a href="clients.html" class="nav-item">
 
-        <span class="nav-text">
+            <span class="nav-icon">
+                <i class="ri-group-line"></i>
+            </span>
 
-            Clients
+            <span class="nav-text">
+                Clients
+            </span>
 
-        </span>
+        </a>
 
-    </a>
+        <a href="upcoming-payments.html" class="nav-item">
 
-    <a href="estimates.html" class="nav-item">
+            <span class="nav-icon">
+                <i class="ri-calendar-check-line"></i>
+            </span>
 
-<span class="nav-icon">
-    <i class="ri-draft-line"></i>
-</span>
+            <span class="nav-text">
+                Upcoming Payments
+            </span>
 
-        <span class="nav-text">
+        </a>
 
-            Estimates
+        <a href="paid-invoices.html" class="nav-item">
 
-        </span>
+            <span class="nav-icon">
+                <i class="ri-money-dollar-circle-line"></i>
+            </span>
 
-    </a>
-    <a href="subscription.html" class="nav-item active">
+            <span class="nav-text">
+                Paid Invoices
+            </span>
 
-<span class="nav-icon">
-    <i class="ri-vip-crown-line"></i>
-</span>
+        </a>
 
-        <span class="nav-text">
+        <a href="recurring-invoices.html" class="nav-item">
 
-            Subscription
+            <span class="nav-icon">
+                <i class="ri-repeat-2-line"></i>
+            </span>
 
-        </span>
+            <span class="nav-text">
+                Recurring Invoices
+            </span>
 
-    </a>
-        <a href="payment-history.html" class="nav-item">
+        </a>
+        
+         <a href="expenses.html" class="nav-item">
 
-<span class="nav-icon">
-    <i class="ri-history-line"></i>
-</span>
+            <span class="nav-icon">
+               <i class="ri-wallet-3-line"></i>
+            </span>
 
-        <span class="nav-text">
+            <span class="nav-text">
+                Expenses
+            </span>
 
-            Subscription History
+        </a>
 
-        </span>
+        <a href="reports.html" class="nav-item">
 
-    </a>
-    
-    <div
-        class="nav-dropdown "
-        id="settingsDropdown">
+            <span class="nav-icon">
+                <i class="ri-bar-chart-box-line"></i>
+            </span>
 
-        <button
-            class="nav-dropdown-btn"
-            id="settingsToggle">
+            <span class="nav-text">
+                Reports
+            </span>
 
-            <div class="nav-dropdown-left">
+        </a>
 
-<span class="nav-icon">
-    <i class="ri-layout-4-line"></i>
-</span>
+        <a href="subscription.html" class="nav-item active">
 
-                <span>
+            <span class="nav-icon">
+                <i class="ri-vip-crown-line"></i>
+            </span>
 
-                    Templates
+            <span class="nav-text">
+                Subscription
+            </span>
 
-                </span>
+        </a>
+
+        <a href="subscription-history.html" class="nav-item">
+
+            <span class="nav-icon">
+                <i class="ri-history-line"></i>
+            </span>
+
+            <span class="nav-text">
+                Subscription History
+            </span>
+
+        </a>
+
+        <div
+            class="nav-dropdown"
+            id="settingsDropdown">
+
+            <button
+                class="nav-dropdown-btn"
+                id="settingsToggle">
+
+                <div class="nav-dropdown-left">
+
+                    <span class="nav-icon">
+                        <i class="ri-layout-4-line"></i>
+                    </span>
+
+                    <span>
+                        Templates
+                    </span>
+
+                </div>
+
+                <i
+                    id="settingsArrow"
+                    class="ri-arrow-down-s-line dropdown-arrow"></i>
+
+            </button>
+
+            <div
+                class="dropdown-menu"
+                id="settingsMenu">
+
+                <a
+                    href="invoices-design.html"
+                    class="dropdown-item">
+
+                    <span class="nav-icon">
+                        <i class="ri-file-text-line"></i>
+                    </span>
+
+                    Invoice Template
+
+                </a>
+
+                <a
+                    href="estimates-design.html"
+                    class="dropdown-item">
+
+                    <span class="nav-icon">
+                        <i class="ri-draft-line"></i>
+                    </span>
+
+                    Estimate Template
+
+                </a>
 
             </div>
 
-           <i
-    id="settingsArrow"
-    class="ri-arrow-down-s-line dropdown-arrow"></i>
-
-        </button>
-
-        <div
-            class="dropdown-menu"
-            id="settingsMenu">
-
-            <a
-                href="invoices-design.html"
-                class="dropdown-item">
-                <span class="nav-icon">
-    <i class="ri-file-text-line"></i>
-</span>
-
-                Invoice Template
-
-            </a>
-
-            <a
-                href="estimates-design.html"
-                class="dropdown-item">
-                <span class="nav-icon">
-    <i class="ri-draft-line"></i>
-</span>
-
-
-
-                Estimate Template
-
-            </a>
-
-            
-
         </div>
 
-    </div>
+        <a href="settings.html" class="nav-item">
 
-    <a href="settings.html" class="nav-item">
+            <span class="nav-icon">
+                <i class="ri-settings-3-line"></i>
+            </span>
 
-<span class="nav-icon">
-    <i class="ri-settings-3-line"></i>
-</span>
+            <span class="nav-text">
+                Settings
+            </span>
 
-        <span class="nav-text">
+        </a>
 
-            Settings
+        <a href="profile.html" class="nav-item">
 
-        </span>
+            <span class="nav-icon">
+                <i class="ri-user-3-line"></i>
+            </span>
 
-    </a>
-    <a href="profile.html" class="nav-item">
+            <span class="nav-text">
+                Profile
+            </span>
 
-<span class="nav-icon">
-    <i class="ri-user-3-line"></i>
-</span>
-        <span class="nav-text">
+        </a>
 
-            Profile 
-
-        </span>
-
-    </a>
-    
         <a href="business-profile.html" class="nav-item">
 
-<span class="nav-icon">
-    <i class="ri-building-2-line"></i>
-</span>
+            <span class="nav-icon">
+                <i class="ri-building-2-line"></i>
+            </span>
 
-        <span class="nav-text">
+            <span class="nav-text">
+                Business Profile
+            </span>
 
-            Business Profile 
+        </a>
 
-        </span>
+        <a href="live-chat.html" class="nav-item">
 
-    </a>
+            <span class="nav-icon">
+                <i class="ri-chat-3-line"></i>
+            </span>
 
-    <a
-        href="account-mgt.html"
-        class="nav-item logout-item"
-        id="logoutBtn">
+            <span class="nav-text">
+                Live Chat
+            </span>
 
-<span class="nav-icon">
-    <i class="ri-logout-box-r-line"></i>
-</span>
+        </a>
 
-        <span class="nav-text">
+        <a
+            href="account-mgt.html"
+            class="nav-item logout-item"
+            id="logoutBtn">
 
-            Logout
+            <span class="nav-icon">
+                <i class="ri-logout-box-r-line"></i>
+            </span>
 
-        </span>
+            <span class="nav-text">
+                Logout
+            </span>
 
-    </a>
+        </a>
 
-</nav>
+    </nav>
 
 </aside>
 <div class="page-wrapper">
-        
-<div class="page-wrapper">
-
-    <header class="page-header">
+<header class="page-header">
 
         <div class="header-left">
 
-
-           <button
+            <button
                 class="menu-toggle"
                 id="menuToggle">
 
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-
-                    <path d="M3 6H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-
-                    <path d="M3 12H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-
-                    <path d="M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-
-                </svg>
+               <i class="ri-menu-line"></i>
 
             </button>
 
             <div class="page-title">
 
+              
 
+                <h1>
 
-                <h1 id="businessProfileTitle">
-
-                    Subscription 
+                    Subscription
 
                 </h1>
-
-                <p id="businessProfileSubtitle">
-
-                    Manage your subscription information and plans.
-
-                </p>
 
             </div>
 
@@ -300,13 +344,11 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
         <div class="header-right">
 
-            <!-- Notifications -->
-
             <button
                 class="notification-btn"
                 id="notificationBtn" style="display: none;">
 
-                <!-- Bell SVG -->
+                <i class="ri-notification-3-line"></i>
 
                 <span
                     class="notification-badge"
@@ -318,26 +360,15 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
             </button>
 
-            <!-- Help -->
-
-            <button
-                class="header-help-btn"
-                id="helpBtn">
-
-                <!-- Help SVG -->
-
-            </button>
-
-            <!-- User -->
-
             <button
                 class="header-avatar"
                 id="profileMenuBtn">
 
                 <img
-                    id="headerProfileImage"
-                    src="images/default-avatar.png"
-                    alt="Profile">
+                    src="
+                    profile.png"
+                    alt="Profile"
+                    id="headerProfileImage">
 
             </button>
 
@@ -439,7 +470,7 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
                     <h3
                         class="subscription-value"
                         id="currentPlanPrice">
-                        ₦0
+                        $0
                     </h3>
                 </div>
 
@@ -522,8 +553,28 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
                         0
                     </h3>
                 </div>
-
+                
             </div>
+            
+                <div class="subscription-info-item">
+
+    <div class="subscription-info-icon">
+        <i class="ri-file-download-line"></i>
+    </div>
+
+    <div>
+        <span class="subscription-label">
+            Maximum PDF Exports
+        </span>
+
+        <h3
+            class="subscription-value"
+            id="maxExports">
+            0
+        </h3>
+    </div>
+
+</div>
 
         </div>
 
@@ -578,7 +629,7 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
                     <h1
                         class="plan-price"
                         id="freePlanPrice">
-                        ₦0
+                        $0
                         <span>/forever</span>
                     </h1>
 
@@ -594,18 +645,23 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
                     <li>
                         <i class="ri-checkbox-circle-fill"></i>
-                        <span>0 Invoices</span>
+                        <span id="freeMaxInvoices">0 Invoices</span>
                     </li>
 
                     <li>
                         <i class="ri-checkbox-circle-fill"></i>
-                        <span>0 Estimates</span>
+                        <span id="freeMaxEstimates">0 Estimates</span>
                     </li>
 
                     <li>
                         <i class="ri-checkbox-circle-fill"></i>
-                        <span>0 Clients</span>
+                       <span id="freeMaxClients">0 Clients</span>
                     </li>
+                    
+                    <li>
+    <i class="ri-checkbox-circle-fill"></i>
+    <span id="freeMaxExports">0 PDF Exports</span>
+</li>
 
                     <li>
                         <i class="ri-checkbox-circle-fill"></i>
@@ -649,7 +705,7 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
                     <h1
                         class="plan-price"
                         id="starterPlanPrice">
-                        ₦0
+                        $0
                         <span>/month</span>
                     </h1>
 
@@ -665,27 +721,27 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
                     <li>
                         <i class="ri-checkbox-circle-fill"></i>
-                        <span>0 Invoices</span>
+                        <span id="starterMaxInvoices">0 Invoices</span>
                     </li>
 
                     <li>
                         <i class="ri-checkbox-circle-fill"></i>
-                        <span>0 Estimates</span>
+                        <span id="starterMaxEstimates">0 Estimates</span>
                     </li>
 
                     <li>
                         <i class="ri-checkbox-circle-fill"></i>
-                        <span>0 Clients</span>
+                       <span id="starterMaxClients">0 Clients</span>
+                    </li>
+                    
+                    <li>
+                        <i class="ri-checkbox-circle-fill"></i>
+                        <span id="starterMaxExports">0 PDF Exports</span>
                     </li>
 
                     <li>
                         <i class="ri-checkbox-circle-fill"></i>
                         <span>Custom Templates</span>
-                    </li>
-
-                    <li>
-                        <i class="ri-checkbox-circle-fill"></i>
-                        <span>PDF Export</span>
                     </li>
 
                     <li>
@@ -745,7 +801,7 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
                     <h1
                         class="plan-price"
                         id="businessPlanPrice">
-                        ₦0
+                        $0
                         <span>/month</span>
                     </h1>
 
@@ -761,17 +817,22 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
                     <li>
                         <i class="ri-checkbox-circle-fill"></i>
-                        <span>0 Invoices</span>
+                        <span id="businessMaxInvoices">0 Invoices</span>
                     </li>
 
                     <li>
                         <i class="ri-checkbox-circle-fill"></i>
-                        <span>0 Estimates</span>
+                        <span id="businessMaxEstimates">0 Estimates</span>
                     </li>
 
                     <li>
                         <i class="ri-checkbox-circle-fill"></i>
-                        <span>0 Clients</span>
+                        <span id="businessMaxClients">0 Clients</span>
+                    </li>
+                    
+                    <li>
+                        <i class="ri-checkbox-circle-fill"></i>
+                        <span id="businessMaxExports">0 PDF Exports</span>
                     </li>
 
                     <li>
@@ -792,11 +853,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
                     <li>
                         <i class="ri-checkbox-circle-fill"></i>
                         <span>Recurring Invoices</span>
-                    </li>
-
-                    <li>
-                        <i class="ri-checkbox-circle-fill"></i>
-                        <span>PDF Export</span>
                     </li>
 
                     <li>
@@ -843,7 +899,7 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
                     <h1
                         class="plan-price"
                         id="enterprisePlanPrice">
-                        ₦0
+                        $0
                         <span>/month</span>
                     </h1>
 
@@ -859,17 +915,22 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
                     <li>
                         <i class="ri-checkbox-circle-fill"></i>
-                        <span>Unlimited Invoices</span>
+                        <span id="enterpriseMaxInvoices">Unlimited Invoices</span>
                     </li>
 
                     <li>
                         <i class="ri-checkbox-circle-fill"></i>
-                        <span>Unlimited Estimates</span>
+                        <span id="enterpriseMaxEstimates">Unlimited Estimates</span>
                     </li>
 
                     <li>
                         <i class="ri-checkbox-circle-fill"></i>
-                        <span>Unlimited Clients</span>
+                        <span id="enterpriseMaxClients">Unlimited Clients</span>
+                    </li>
+                    
+                    <li>
+                        <i class="ri-checkbox-circle-fill"></i>
+                        <span id="enterpriseMaxExports">Unlimited PDF Exports</span>
                     </li>
 
                     <li>
@@ -885,11 +946,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
                     <li>
                         <i class="ri-checkbox-circle-fill"></i>
                         <span>Recurring Invoices</span>
-                    </li>
-
-                    <li>
-                        <i class="ri-checkbox-circle-fill"></i>
-                        <span>PDF Export</span>
                     </li>
 
                     <li>
@@ -1090,10 +1146,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
                         class="summary-value"
                         id="summaryBillingCycle">
           
-
-<script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
-<script src="api.js"></script>
-<script src="navbar.js"></script>
 <script src="subscription.js"></script>
 </body>
 
