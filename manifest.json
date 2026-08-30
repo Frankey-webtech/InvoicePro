@@ -1,12 +1,49 @@
 {
+    "id": "./",
     "name": "InvoicePro",
     "short_name": "InvoicePro",
     "description": "InvoicePro is a professional invoicing platform that helps businesses create invoices and estimates, manage clients, track payments, and organize their billing with ease.",
+    "lang": "en",
+    "dir": "ltr",
     "start_url": "./index.html",
     "scope": "./",
     "display": "standalone",
+    "display_override": [
+        "window-controls-overlay",
+        "standalone",
+        "browser"
+    ],
+    "orientation": "portrait",
     "background_color": "#ffffff",
     "theme_color": "#ffffff",
+    "categories": [
+        "business",
+        "finance",
+        "productivity"
+    ],
+    "screenshots": [
+        {
+            "src": "./screenshot_1.jpeg",
+            "sizes": "720×1320",
+            "type": "image/jpeg",
+            "form_factor": "narrow",
+            "label": "InvoicePro dashboard"
+        },
+        {
+            "src": "./screenshot_2.jpeg",
+            "sizes": "716×1330",
+            "type": "image/jpeg",
+            "form_factor": "narrow",
+            "label": "InvoicePro about"
+        },
+        {
+            "src": "./screenshot_3.jpeg",
+            "sizes": "720×1320",
+            "type": "image/jpeg",
+            "form_factor": "narrow",
+            "label": "InvoicePro guide"
+        }
+    ],
     "icons": [
         {
             "src": "./icon-192.png",
@@ -20,5 +57,7 @@
             "type": "image/png",
             "purpose": "any"
         }
-    ]
+    ],
+    "prefer_related_applications": false,
+    "related_applications": []
 }
