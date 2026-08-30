@@ -15,35 +15,35 @@
     ],
     "orientation": "portrait",
     "background_color": "#ffffff",
-    "theme_color": "#ffffff",
+    "theme_color": "#0B1F3A",
     "categories": [
         "business",
         "finance",
         "productivity"
     ],
     "screenshots": [
-        {
-            "src": "./screenshot_1.jpeg",
-            "sizes": "720×1320",
-            "type": "image/jpeg",
-            "form_factor": "narrow",
-            "label": "InvoicePro dashboard"
-        },
-        {
-            "src": "./screenshot_2.jpeg",
-            "sizes": "716×1330",
-            "type": "image/jpeg",
-            "form_factor": "narrow",
-            "label": "InvoicePro about"
-        },
-        {
-            "src": "./screenshot_3.jpeg",
-            "sizes": "720×1320",
-            "type": "image/jpeg",
-            "form_factor": "narrow",
-            "label": "InvoicePro guide"
-        }
-    ],
+    {
+        "src": "./screenshot_1.jpg",
+        "sizes": "720x1320",
+        "type": "image/jpeg",
+        "form_factor": "narrow",
+        "label": "InvoicePro dashboard"
+    },
+    {
+        "src": "./screenshot_2.jpg",
+        "sizes": "716x1330",
+        "type": "image/jpeg",
+        "form_factor": "narrow",
+        "label": "InvoicePro about"
+    },
+    {
+        "src": "./screenshot_3.jpg",
+        "sizes": "720x1320",
+        "type": "image/jpeg",
+        "form_factor": "narrow",
+        "label": "InvoicePro guide"
+    }
+],
     "icons": [
         {
             "src": "./icon-192.png",
