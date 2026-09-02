@@ -22,7 +22,8 @@ const subscriptionState = {
     currencyCode: "",
     currencySymbol: "",
     paymentReference: "",
-    processing: false
+    processing: false,
+    billingCycle: "monthly"
 
 };
 
@@ -31,6 +32,12 @@ const faqQuestions = document.querySelectorAll(
         ".faq-question"
 
     );
+    
+const monthlyBilling =
+    document.getElementById("monthlyBilling");
+
+const yearlyBilling =
+    document.getElementById("yearlyBilling");
 
 const subscriptionStatus =
     document.getElementById("subscriptionStatus");
@@ -201,6 +208,8 @@ updatePlanFeatures();
 updatePlanCardDetails();
 
 updatePlanFeatureLists();
+
+updatePlanPrices();
     
     freePlanPrice.textContent =
     formatMoney(subscriptionState.plans.Free.price);
@@ -300,25 +309,24 @@ maxExports.textContent =
 
 async function startCardSubscription() {
 
-    const response =
+    const billing =
+    subscriptionState.billingCycle === "monthly"
+        ? "Monthly"
+        : "Yearly";
 
-        await Parse.Cloud.run(
+const response =
+    await Parse.Cloud.run(
+        "initializeCardSubscription",
+        {
+            plan:
+                subscriptionState.selectedPlan,
 
-            "initializeCardSubscription",
+            billing,
 
-            {
-
-                plan:
-
-                    subscriptionState.selectedPlan,
-
-                autoRenew:
-
-                    saveCard.checked
-
-            }
-
-        );
+            autoRenew:
+                saveCard.checked
+        }
+    );
 
     if (!response.success) {
 
@@ -1093,6 +1101,84 @@ function updatePlanFeatureLists() {
 
 }
 
+function selectBillingCycle(cycle) {
+
+    subscriptionState.billingCycle = cycle;
+
+    monthlyBilling.classList.toggle(
+        "active",
+        cycle === "monthly"
+    );
+
+    yearlyBilling.classList.toggle(
+        "active",
+        cycle === "yearly"
+    );
+
+    updatePlanPrices();
+
+    if (subscriptionState.selectedPlan) {
+        selectPlan(subscriptionState.selectedPlan);
+    }
+
+}
+
+function updatePlanPrices() {
+
+    const plans =
+        subscriptionState.plans || {};
+
+    const billing =
+        subscriptionState.billingCycle;
+
+    Object.entries(plans).forEach(
+        ([planName, plan]) => {
+
+            const card =
+                document.querySelector(
+                    `[data-plan="${planName}"]`
+                );
+
+            if (!card) {
+                return;
+            }
+
+            const priceElement =
+                card.querySelector(
+                    "[data-plan-price]"
+                );
+
+            if (!priceElement) {
+                return;
+            }
+
+            const price =
+                billing === "yearly"
+                    ? plan.yearlyPrice
+                    : plan.monthlyPrice;
+
+            priceElement.textContent =
+                formatMoney(price);
+
+        }
+    );
+
+}
+
+monthlyBilling.addEventListener(
+    "click",
+    () => {
+        selectBillingCycle("monthly");
+    }
+);
+
+yearlyBilling.addEventListener(
+    "click",
+    () => {
+        selectBillingCycle("yearly");
+    }
+);
+
 starterPlanButton.addEventListener(
 
     "click",
@@ -1211,8 +1297,6 @@ if (
 subscriptionState.selectedPrice =
     selectedPlan.price;
 
-subscriptionState.selectedBilling =
-    selectedPlan.billing;
 
 if (
     subscriptionState.paymentMethod !== "Card" &&

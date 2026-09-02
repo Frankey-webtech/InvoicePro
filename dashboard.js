@@ -1,11 +1,15 @@
 let invoiceStatusChart = null;
 
+let showClientImage = true;
+
 let selectedInvoiceId = null;
 
 let revenueChart = null;
 
 const dashboardPage =
 document.getElementById("dashboardContent");
+
+const dashboardClientImageStyle = document.createElement("style");
 
 const dashboardError =
 document.getElementById("dashboardError");
@@ -94,16 +98,6 @@ document.addEventListener(
 
     }
 );
-
-const exportReportButton =
-document.getElementById("exportReportButton");
-
-exportReportButton.addEventListener("click", () =>{
-
-    window.location.href =
-    "#";
-
-});
 
 const viewAllInvoicesButton =
 document.getElementById("viewAllInvoicesButton");
@@ -285,21 +279,17 @@ async function handleGoogleAuthentication() {
 
         });
 
-
     const hasAuth0Callback =
         window.location.search.includes("code=") &&
         window.location.search.includes("state=");
-
 
     if (hasAuth0Callback) {
 
         const callbackResult =
             await auth0Client.handleRedirectCallback();
 
-
         const auth0User =
             await auth0Client.getUser();
-
 
         if (
             !auth0User ||
@@ -312,23 +302,11 @@ async function handleGoogleAuthentication() {
 
         }
 
-
         const appState =
             callbackResult.appState || {};
 
-
-        if (appState.mode !== "signup") {
-
-            throw new Error(
-                "Invalid Google signup request."
-            );
-
-        }
-
-
         const country =
             appState.country;
-
 
         if (!country) {
 
@@ -337,7 +315,6 @@ async function handleGoogleAuthentication() {
             );
 
         }
-
 
         const result =
             await Parse.Cloud.run(
@@ -356,23 +333,40 @@ async function handleGoogleAuthentication() {
                 }
             );
 
-
         if (
             !result ||
             !result.sessionToken
         ) {
 
             throw new Error(
-    "Unable to complete Google authentication."
-);
+                "Unable to complete Google authentication."
+            );
 
         }
 
+        const loggedInUser =
+            await Parse.User.become(
+                result.sessionToken
+            );
 
-        await Parse.User.become(
-            result.sessionToken
-        );
+        if (!loggedInUser) {
 
+            throw new Error(
+                "Google authentication succeeded, but the InvoicePro session could not be created."
+            );
+
+        }
+
+        const currentUser =
+            await Parse.User.currentAsync();
+
+        if (!currentUser) {
+
+            throw new Error(
+                "Google authentication succeeded, but you are not logged in to InvoicePro."
+            );
+
+        }
 
         window.history.replaceState(
             {},
@@ -382,10 +376,8 @@ async function handleGoogleAuthentication() {
 
     }
 
-
     const currentUser =
         await Parse.User.currentAsync();
-
 
     if (!currentUser) {
 
@@ -395,7 +387,6 @@ async function handleGoogleAuthentication() {
         return false;
 
     }
-
 
     return true;
 
@@ -446,54 +437,54 @@ async function loadNotificationCount() {
 }
 
 async function loadUserProfile() {
-    
+
     try {
-        
+
          const response = await Parse.Cloud.run(
             "getUserProfile"
         );
-        
+
         const result = await Parse.Cloud.run("getDashboardProfile");
-        
-       
-        
+
+
+
         document.getElementById("profileName").textContent =
             result.fullName || "User";
-        
+
         document.getElementById("businessName").textContent =
             response.businessName || "Business Owner";
-        
+
         const firstName = (result.fullName || "User").split(" ")[0];
-        
+
         document.getElementById("welcomeHeading").textContent =
             `Welcome back, ${firstName} 👋`;
-        
+
         const profileImage =
             document.getElementById("profileImage");
-        
+
         if (result.profileImage) {
-            
+
             profileImage.src = result.profileImage;
-            
+
         } else {
-            
+
             profileImage.src = "profile.png";
-            
+
         }
-        
+
     }
-    
+
     catch (error) {
-        
+
         console.error("Dashboard Profile Error:", error);
-        
+
         showDashboardError(
             error.message ||
             "Unable to load your profile."
         );
-        
+
     }
-    
+
 }
 
 async function loadRecentEstimates() {
@@ -583,6 +574,28 @@ async function loadRecentEstimates() {
 
                 }
 
+                const estimateClientName =
+                    estimate.clientName || "-";
+
+                const estimateClientImage =
+                    estimate.clientImageUrl || "";
+
+                const estimateClientInitials =
+                    estimateClientName
+                        .split(/\s+/)
+                        .filter(Boolean)
+                        .slice(0, 2)
+                        .map(name => name.charAt(0).toUpperCase())
+                        .join("") || "?";
+
+const estimateClientDisplay =
+    showClientImage
+        ? (
+            estimateClientImage
+                ? `<img src="${estimateClientImage}" alt="${estimateClientName}" class="dashboardClientImage">`
+                : `<span class="dashboardClientInitials">${estimateClientInitials}</span>`
+        )
+        : "";
 
                 tableBody.innerHTML += `
 
@@ -594,7 +607,10 @@ async function loadRecentEstimates() {
 
 
                         <td>
-                            ${estimate.clientName || "-"}
+                            <div class="dashboardClientCell">
+                                ${estimateClientDisplay}
+                                <span>${estimateClientName}</span>
+                            </div>
                         </td>
 
 
@@ -700,6 +716,8 @@ async function loadRecentEstimates() {
 async function loadDashboard() {
 
     hideDashboardError();
+    
+    await loadBusinessProfileSettings();
 
     await Promise.allSettled([
 
@@ -712,7 +730,7 @@ async function loadDashboard() {
         loadInvoiceStatus(),
 
         loadRecentInvoices(),
-        
+
         loadRecentEstimates(),
 
         loadUpcomingReminders(),
@@ -730,9 +748,9 @@ async function loadDashboardStatistics() {
         const result = await Parse.Cloud.run(
             "getDashboardStatistics"
         );
-        
-        
-        
+
+
+
         const growth =
 await Parse.Cloud.run(
     "getInvoiceStatistics"
@@ -758,7 +776,7 @@ await Parse.Cloud.run(
             "clientsValue"
         ).textContent =
             result.clientCount;
-            
+
             document.getElementById(
     "totalRevenueGrowth"
 ).textContent =
@@ -773,7 +791,7 @@ document.getElementById(
     "pendingInvoicesGrowth"
 ).textContent =
     growth.pendingGrowth;
-    
+
     document.getElementById(
     "clientsGrowth"
 ).textContent =
@@ -933,7 +951,7 @@ async function loadInvoiceStatus() {
             invoiceStatusChart.destroy();
 
         }
-        
+
         const totalInvoices =
     result.paidInvoices +
     result.pendingInvoices +
@@ -965,8 +983,8 @@ if (totalInvoices === 0) {
 chartContainer.style.display = "block";
 legend.style.display = "block";
 emptyState.style.display = "none";
-        
-        
+
+
 
         invoiceStatusChart = new Chart(ctx, {
 
@@ -1033,8 +1051,8 @@ emptyState.style.display = "none";
             }
 
         });
-        
-        
+
+
 
     }
 
@@ -1111,13 +1129,40 @@ async function loadRecentInvoices() {
 
             }
 
+            const invoiceClientName =
+                invoice.contactPerson || "-";
+
+            const invoiceClientImage =
+                invoice.clientImageUrl || "";
+
+            const invoiceClientInitials =
+                invoiceClientName
+                    .split(/\s+/)
+                    .filter(Boolean)
+                    .slice(0, 2)
+                    .map(name => name.charAt(0).toUpperCase())
+                    .join("") || "?";
+
+            const invoiceClientDisplay =
+    showClientImage
+        ? (
+            invoiceClientImage
+                ? `<img src="${invoiceClientImage}" alt="${invoiceClientName}" class="dashboardClientImage">`
+                : `<span class="dashboardClientInitials">${invoiceClientInitials}</span>`
+        )
+        : "";
             tableBody.innerHTML += `
 
                 <tr>
 
                     <td>${invoice.invoiceNumber}</td>
 
-                   <td>${invoice.contactPerson}</td>
+                   <td>
+                        <div class="dashboardClientCell">
+                            ${invoiceClientDisplay}
+                            <span>${invoiceClientName}</span>
+                        </div>
+                    </td>
 
                     <td>${invoice.currencySymbol}${Number(invoice.totalAmount).toLocaleString()}</td>
 
@@ -1349,6 +1394,35 @@ async function loadUpcomingReminders() {
 
 }
 
+async function loadBusinessProfileSettings() {
+
+    try {
+
+        const result =
+            await Parse.Cloud.run(
+                "getBusinessProfile"
+            );
+
+        showClientImage =
+            result &&
+            result.profile &&
+            result.profile.showClientImage !== false;
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Business Profile Settings Error:",
+            error
+        );
+
+        showClientImage = true;
+
+    }
+
+}
+
 retryDashboardButton.addEventListener("click", () => {
 
     loadDashboard();
@@ -1549,7 +1623,7 @@ document.addEventListener("click", function (event) {
     }
 
     const del = event.target.closest(".dashboardDelete");
-    
+
     if (del) {
 
     openDeleteModal(
@@ -1673,3 +1747,35 @@ showDashboardError(
 }
 
 });
+
+dashboardClientImageStyle.textContent = `
+.dashboardClientCell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dashboardClientImage,
+.dashboardClientInitials {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dashboardClientImage {
+    object-fit: cover;
+}
+
+.dashboardClientInitials {
+    background: #DCE6F5;
+    color: #102A56;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+`;
+document.head.appendChild(dashboardClientImageStyle);
