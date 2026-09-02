@@ -4,6 +4,9 @@
 <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon-192.png">
+
         
         <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
 
@@ -645,12 +648,42 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
             </div>
 
+            
+
             <button
                 type="button"
                 class="settings-action-btn"
                 id="manageBusinessLogoButton">
                 Manage
             </button>
+
+        </div>
+        
+                            <div class="settings-row business-row">
+
+            <div class="settings-row-info">
+
+                <div class="settings-icon">
+                    <i class="ri-user-smile-line"></i>
+                </div>
+
+                <div>
+                    <h3>Client Image</h3>
+                    <p>
+                        Show client profile images throughout InvoicePro.
+                    </p>
+                </div>
+
+            </div>
+
+            <label class="settings-switch">
+                <input
+                    type="checkbox"
+                    id="showClientImageToggle"
+                    checked
+                >
+                <span class="settings-slider"></span>
+            </label>
 
         </div>
 
