@@ -4,20 +4,17 @@
 <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon-192.png">
+
         
-        <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+<script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
 
 <script src="api.js"></script>
         <link rel="stylesheet" href="invoice.css">
-        <link rel="stylesheet" href="profile.css">
-        <link rel="stylesheet" href="navbar.css">
-        <link rel="stylesheet" href="invoices-templates.css">
+        <link rel="stylesheet" href="invoices-design.css">
         <link rel="stylesheet" href="invoice2.css">
-        <link rel="stylesheet" href="invoices-templates2.css">
-        <link rel="stylesheet" href="invoice3.css">
-
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+        <link rel="stylesheet" href="profile.css">
         <link
 rel="stylesheet"
 href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
@@ -25,6 +22,7 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 </head>
 
 <body>
+
 <div
     class="sidebar-overlay"
     id="sidebarOverlay">
@@ -33,13 +31,11 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
     class="sidebar"
     id="sidebar">
 
-    <!-- Logo -->
-
     <div class="sidebar-logo">
 
         <div class="logo-icon">
 
-<img  src="logo.png" alt="">
+            <img src="logo.png" alt="">
 
         </div>
 
@@ -53,221 +49,274 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
     </div>
 
-    <!-- Navigation -->
+    <nav class="sidebar-nav">
 
-  <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">
 
-    <!-- Dashboard -->
+            <span class="nav-icon">
+                <i class="ri-home-3-line"></i>
+            </span>
 
-    <a href="dashboard.html" class="nav-item">
+            <span class="nav-text">
+                Home
+            </span>
 
-<span class="nav-icon">
-    <i class="ri-dashboard-3-line"></i>
-</span>
+        </a>
 
-        <span class="nav-text">
+        <a href="dashboard.html" class="nav-item">
 
-            Dashboard
+            <span class="nav-icon">
+                <i class="ri-dashboard-3-line"></i>
+            </span>
 
-        </span>
+            <span class="nav-text">
+                Dashboard
+            </span>
 
-    </a>
+        </a>
 
-    <!-- Invoices -->
+        <a href="invoice.html" class="nav-item active">
 
-    <a href="#" class="nav-item active">
+            <span class="nav-icon">
+                <i class="ri-file-list-3-line"></i>
+            </span>
 
-<span class="nav-icon">
-    <i class="ri-file-list-3-line"></i>
-</span>
+            <span class="nav-text">
+                Invoices
+            </span>
 
-        <span class="nav-text">
+        </a>
 
-            Invoices
+        <a href="estimates.html" class="nav-item">
 
-        </span>
+            <span class="nav-icon">
+                <i class="ri-draft-line"></i>
+            </span>
 
-    </a>
+            <span class="nav-text">
+                Estimates
+            </span>
 
-    <!-- Clients -->
+        </a>
 
-    <a href="clients.html" class="nav-item">
+        <a href="clients.html" class="nav-item">
 
-<span class="nav-icon">
-    <i class="ri-group-line"></i>
-</span>
+            <span class="nav-icon">
+                <i class="ri-group-line"></i>
+            </span>
 
-        <span class="nav-text">
+            <span class="nav-text">
+                Clients
+            </span>
 
-            Clients
+        </a>
 
-        </span>
+        <a href="upcoming-payments.html" class="nav-item">
 
-    </a>
+            <span class="nav-icon">
+                <i class="ri-calendar-check-line"></i>
+            </span>
 
-    <!-- Estimates -->
+            <span class="nav-text">
+                Upcoming Payments
+            </span>
 
-    <a href="estimates.html" class="nav-item">
+        </a>
 
-<span class="nav-icon">
-    <i class="ri-draft-line"></i>
-</span>
+        <a href="paid-invoices.html" class="nav-item">
 
-        <span class="nav-text">
+            <span class="nav-icon">
+                <i class="ri-money-dollar-circle-line"></i>
+            </span>
 
-            Estimates
+            <span class="nav-text">
+                Paid Invoices
+            </span>
 
-        </span>
+        </a>
 
-    </a>
-    <a href="subscription.html" class="nav-item">
+        <a href="recurring-invoices.html" class="nav-item">
 
-<span class="nav-icon">
-    <i class="ri-vip-crown-line"></i>
-</span>
+            <span class="nav-icon">
+                <i class="ri-repeat-2-line"></i>
+            </span>
 
-        <span class="nav-text">
+            <span class="nav-text">
+                Recurring Invoices
+            </span>
 
-            Subscription
+        </a>
+        
+         <a href="expenses.html" class="nav-item">
 
-        </span>
+            <span class="nav-icon">
+               <i class="ri-wallet-3-line"></i>
+            </span>
 
-    </a>
-        <a href="payment-history.html" class="nav-item">
+            <span class="nav-text">
+                Expenses
+            </span>
 
-<span class="nav-icon">
-    <i class="ri-history-line"></i>
-</span>
+        </a>
 
-        <span class="nav-text">
+        <a href="reports.html" class="nav-item">
 
-            Subscription History
+            <span class="nav-icon">
+                <i class="ri-bar-chart-box-line"></i>
+            </span>
 
-        </span>
+            <span class="nav-text">
+                Reports
+            </span>
 
-    </a>
-    
-    <div
-        class="nav-dropdown "
-        id="settingsDropdown">
+        </a>
 
-        <button
-            class="nav-dropdown-btn"
-            id="settingsToggle">
+        <a href="subscription.html" class="nav-item">
 
-            <div class="nav-dropdown-left">
+            <span class="nav-icon">
+                <i class="ri-vip-crown-line"></i>
+            </span>
 
-<span class="nav-icon">
-    <i class="ri-layout-4-line"></i>
-</span>
+            <span class="nav-text">
+                Subscription
+            </span>
 
-                <span>
+        </a>
 
-                    Templates
+        <a href="subscription-history.html" class="nav-item">
 
-                </span>
+            <span class="nav-icon">
+                <i class="ri-history-line"></i>
+            </span>
+
+            <span class="nav-text">
+                Subscription History
+            </span>
+
+        </a>
+
+        <div
+            class="nav-dropdown"
+            id="settingsDropdown">
+
+            <button
+                class="nav-dropdown-btn"
+                id="settingsToggle">
+
+                <div class="nav-dropdown-left">
+
+                    <span class="nav-icon">
+                        <i class="ri-layout-4-line"></i>
+                    </span>
+
+                    <span>
+                        Templates
+                    </span>
+
+                </div>
+
+                <i
+                    id="settingsArrow"
+                    class="ri-arrow-down-s-line dropdown-arrow"></i>
+
+            </button>
+
+            <div
+                class="dropdown-menu"
+                id="settingsMenu">
+
+                <a
+                    href="invoices-design.html"
+                    class="dropdown-item">
+
+                    <span class="nav-icon">
+                        <i class="ri-file-text-line"></i>
+                    </span>
+
+                    Invoice Template
+
+                </a>
+
+                <a
+                    href="estimates-design.html"
+                    class="dropdown-item">
+
+                    <span class="nav-icon">
+                        <i class="ri-draft-line"></i>
+                    </span>
+
+                    Estimate Template
+
+                </a>
 
             </div>
 
-           <i
-    id="settingsArrow"
-    class="ri-arrow-down-s-line dropdown-arrow"></i>
-
-        </button>
-
-        <div
-            class="dropdown-menu"
-            id="settingsMenu">
-
-            <a
-                href="invoices-design.html"
-                class="dropdown-item">
-                <span class="nav-icon">
-    <i class="ri-file-text-line"></i>
-</span>
-
-                Invoice Template
-
-            </a>
-
-            <a
-                href="estimates-design.html"
-                class="dropdown-item">
-                <span class="nav-icon">
-    <i class="ri-draft-line"></i>
-</span>
-
-
-
-                Estimate Template
-
-            </a>
-
-            
-
         </div>
 
-    </div>
+        <a href="settings.html" class="nav-item">
 
-    <a href="settings.html" class="nav-item">
+            <span class="nav-icon">
+                <i class="ri-settings-3-line"></i>
+            </span>
 
-<span class="nav-icon">
-    <i class="ri-settings-3-line"></i>
-</span>
+            <span class="nav-text">
+                Settings
+            </span>
 
-        <span class="nav-text">
+        </a>
 
-            Settings
+        <a href="profile.html" class="nav-item">
 
-        </span>
+            <span class="nav-icon">
+                <i class="ri-user-3-line"></i>
+            </span>
 
-    </a>
-    <a href="profile.html" class="nav-item">
+            <span class="nav-text">
+                Profile
+            </span>
 
-<span class="nav-icon">
-    <i class="ri-user-3-line"></i>
-</span>
-        <span class="nav-text">
+        </a>
 
-            Profile 
-
-        </span>
-
-    </a>
-    
         <a href="business-profile.html" class="nav-item">
 
-<span class="nav-icon">
-    <i class="ri-building-2-line"></i>
-</span>
+            <span class="nav-icon">
+                <i class="ri-building-2-line"></i>
+            </span>
 
-        <span class="nav-text">
+            <span class="nav-text">
+                Business Profile
+            </span>
 
-            Business Profile 
+        </a>
 
-        </span>
+        <a href="live-chat.html" class="nav-item">
 
-    </a>
-    <!-- Logout -->
+            <span class="nav-icon">
+                <i class="ri-chat-3-line"></i>
+            </span>
 
-    <a
-        href="account-mgt.html"
-        class="nav-item logout-item"
-        id="logoutBtn">
+            <span class="nav-text">
+                Live Chat
+            </span>
 
-<span class="nav-icon">
-    <i class="ri-logout-box-r-line"></i>
-</span>
+        </a>
 
-        <span class="nav-text">
+        <a
+            href="account-mgt.html"
+            class="nav-item logout-item"
+            id="logoutBtn">
 
-            Logout
+            <span class="nav-icon">
+                <i class="ri-logout-box-r-line"></i>
+            </span>
 
-        </span>
+            <span class="nav-text">
+                Logout
+            </span>
 
-    </a>
+        </a>
 
-</nav>
+    </nav>
 
 </aside>
 <div class="page-wrapper">
@@ -284,9 +333,13 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
             </button>
 
             <div class="page-title">
+
               
+
                 <h1>
-                    Invoices 
+
+                    Invoices
+
                 </h1>
 
             </div>
@@ -295,9 +348,9 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
         <div class="header-right">
 
-            <button style="display: none;"
+            <button
                 class="notification-btn"
-                id="notificationBtn">
+                id="notificationBtn" style="display: none;">
 
                 <i class="ri-notification-3-line"></i>
 
@@ -311,59 +364,17 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
             </button>
 
-            <link rel="stylesheet" href="dashboard.css">
-<div id="profileSection">
+            <button
+                class="header-avatar"
+                id="profileMenuBtn">
 
-<img
-id="profileImage"
-src="profile.png"
-alt="Profile">
+                <img
+                    src="
+                    profile.png"
+                    alt="Profile"
+                    id="headerProfileImage">
 
-
-<div id="profileInfo">
-
-<h4 id="profileName">
-
-Loading...
-
-</h4>
-
-<p id="businessName">
-
-
-
-</p>
-
-</div>
-
-
-<button id="profileMenuButton">
-
-<i class="ri-arrow-down-s-line"></i>
-</button>
-
-
-<div id="profileDropdown">
-
-    <a href="profile.html">
-        My Profile
-    </a>
-
-    <a href="settings.html">
-        Settings
-    </a>
-
-    <a href="subscription.html">
-        Subscription
-    </a>
-
-    <a href="logout.html">
-        Logout
-    </a>
-
-</div>
-</div>
-       
+            </button>
 
         </div>
 
@@ -677,28 +688,7 @@ Loading...
             <span>Export as PDF</span>
 
         </button>
-
-        <button
-            type="button"
-            id="exportInvoicesExcelBtn">
-
-            <i class="ri-file-excel-2-line"></i>
-
-            <span>Export as Excel</span>
-
-        </button>
-
-        <button
-            type="button"
-            id="exportInvoicesCsvBtn">
-
-            <i class="ri-file-text-line"></i>
-
-            <span>Export as CSV</span>
-
-        </button>
-
-    </div>
+</div>
 
 </div>
         
@@ -930,8 +920,6 @@ Loading...
 
 </section>
 
-<img src="profile.png" alt="profile.png" id="sendInvoiceClientImageFallback" style="display: none;">
-
 <div
     class="modal-overlay"
     id="createInvoiceOverlay">
@@ -1099,11 +1087,62 @@ Loading...
                         Client
                     </label>
 
-                    <select
-                        id="invoiceClientInput"
-                        class="form-control">
+<div
+    class="client-picker"
+    id="invoiceClientPicker">
 
-                    </select>
+    <input
+        type="hidden"
+        id="invoiceClientInput"
+        value="">
+
+    <button
+        type="button"
+        class="client-picker-trigger"
+        id="invoiceClientPickerTrigger">
+
+        <span
+            class="client-picker-selected"
+            id="invoiceClientPickerSelected">
+
+            Select Client
+
+        </span>
+
+        <i
+            class="ri-arrow-down-s-line"
+            id="invoiceClientPickerArrow">
+        </i>
+
+    </button>
+
+    <div
+        class="client-picker-dropdown"
+        id="invoiceClientPickerDropdown">
+
+        <div
+            class="client-picker-search-wrapper">
+
+            <i class="ri-search-line"></i>
+
+            <input
+                type="search"
+                class="client-picker-search"
+                id="invoiceClientPickerSearch"
+                placeholder="Search clients..."
+                autocomplete="off">
+
+        </div>
+
+        <div
+            class="client-picker-options"
+            id="invoiceClientPickerOptions">
+
+        </div>
+
+    </div>
+
+</div>
 
                 </div>
 
@@ -1685,22 +1724,22 @@ Loading...
 
                     </button>
 
-                    <button
-                        type="button"
-                        class="preview-tool-btn"
-                        id="printPreviewBtn"
-                        title="Print Preview">
+<button
+    type="button"
+    class="preview-tool-btn"
+    id="printPreviewBtn"
+    title="Download PDF">
 
-                        <i class="ri-printer-line"></i>
+    <i class="ri-download-2-line"></i>
 
-                    </button>
+</button>
 
                     <button
                         type="button"
                         class="preview-tool-btn"
                         id="fullscreenPreviewBtn"
                         title="Fullscreen"
-                        style="display: none;">
+                        >
 
                         <i class="ri-fullscreen-line"></i>
 
@@ -2731,7 +2770,7 @@ Loading...
         alt="Client">
 
     <i
-        id="sendInvoiceClientImageFallback"
+        id="sendInvoiceClientImageFallbackIcon"
         class="ri-user-3-line">
     </i>
 
@@ -3195,14 +3234,13 @@ Loading...
     </div>
 </div>
 
-<script src="navbar.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <script src="currency-map.js"></script>
 <script src="invoice.js"></script>
+<script src="invoice2.js"></script>
 </body>
 
 </html>
