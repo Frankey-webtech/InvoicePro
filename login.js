@@ -238,21 +238,77 @@ async function initializeGoogleLogin() {
 
                 }
 
-                await Parse.User.become(
-                    result.sessionToken
-                );
+                const loggedInUser =
+    await Parse.User.become(
+        result.sessionToken
+    );
 
-                window.history.replaceState(
-                    {},
-                    document.title,
-                    "dashboard.html"
-                );
+if (!loggedInUser) {
 
-                window.location.replace(
-                    "dashboard.html"
-                );
+    throw new Error(
+        "Google login succeeded, but the InvoicePro session could not be created."
+    );
 
-                return;
+}
+
+const currentUser =
+    await Parse.User.currentAsync();
+
+if (!currentUser) {
+
+    throw new Error(
+        "Google login succeeded, but your session could not be restored."
+    );
+
+}
+
+localStorage.setItem(
+    "userId",
+    currentUser.id
+);
+
+localStorage.setItem(
+    "fullName",
+    currentUser.get("fullName") || ""
+);
+
+localStorage.setItem(
+    "email",
+    currentUser.get("email") || ""
+);
+
+localStorage.setItem(
+    "country",
+    currentUser.get("country") || ""
+);
+
+localStorage.setItem(
+    "currencyCode",
+    currentUser.get("currencyCode") || ""
+);
+
+localStorage.setItem(
+    "currencySymbol",
+    currentUser.get("currencySymbol") || ""
+);
+
+localStorage.setItem(
+    "userPlan",
+    JSON.stringify({
+        name:
+            currentUser.get("plan") || "",
+        price:
+            currentUser.get("planPrice") || 0,
+        billing:
+            currentUser.get("planBilling") || ""
+    })
+);
+
+window.location.replace(
+    "/dashboard.html"
+);
+
+return;
 
             } catch (error) {
 
