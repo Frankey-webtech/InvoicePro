@@ -14,10 +14,50 @@ let searchTimeout;
 
 let clientToDelete = null;
 
+let showClientImage = true; async function loadClientImageSetting() {
+    
+    try {
+        
+        const result =
+            await Parse.Cloud.run(
+                "getBusinessProfile"
+            );
+        
+        showClientImage =
+            result &&
+            result.profile &&
+            result.profile.showClientImage !== false;
+        
+    }
+    catch (error) {
+        
+        console.error(
+            "Client Image Setting Error:",
+            error
+        );
+        
+        showClientImage = true;
+        
+    }
+    
+}
+
 const rowsPerPage = 10;
 
 const clientSearchInput =
 document.getElementById("clientSearchInput");
+
+const viewAllClientEstimatesButton =
+    document.getElementById(
+        "viewAllClientEstimatesButton"
+    );
+
+const viewAllClientInvoicesButton =
+    document.getElementById(
+        "viewAllClientInvoicesButton"
+    );
+
+let currentlyViewedClientId = null;
 
 let selectedClientForEstimateSend = null;
 
@@ -280,18 +320,6 @@ document.getElementById("endRecord");
 const totalRecords =
 document.getElementById("totalRecords");
 
-const exportClientsButton =
-document.getElementById("exportClientsButton");
-
-const exportMenu =
-document.getElementById("exportMenu");
-
-const exportCsvButton =
-document.getElementById("exportCsvButton");
-
-const exportExcelButton =
-document.getElementById("exportExcelButton");
-
 const sendEstimateSummary = 
 document.getElementById("sendEstimateSummary");
 
@@ -309,9 +337,6 @@ document.getElementById("sendEstimateStatus");
 
 const sendEstimateMessage = 
 document.getElementById("sendEstimateMessage");
-
-const exportPdfButton =
-document.getElementById("exportPdfButton");
 
 const notificationButton =
 document.getElementById("notificationButton");
@@ -451,6 +476,36 @@ const sendInvoiceMessage =
     document.getElementById(
         "sendInvoiceMessage"
     );
+    
+const profileDropdown =
+document.getElementById("profileDropdown");
+
+const profileMenuButton =
+document.getElementById("profileMenBtn");
+
+if(profileMenuButton){
+profileMenuButton.addEventListener(
+    "click",
+    function (event) {
+
+        event.stopPropagation();
+
+        profileDropdown.classList.toggle(
+            "show"
+        );
+
+    }
+);
+}
+
+if (sendEstimateSelect) {
+    
+    sendEstimateSelect.addEventListener(
+        "change",
+        updateSelectedEstimateForSending
+    );
+    
+}
 
 function showLoader(){
 
@@ -935,30 +990,33 @@ function renderClientEstimates(
     }
 
     if (totalElement) {
-
         totalElement.textContent =
             estimates.length;
-
     }
 
     if (estimates.length === 0) {
 
         container.innerHTML =
-            '<div class="client-empty-estimates">' +
+            `
+            <div class="client-empty-estimates">
 
-                '<i class="ri-file-list-3-line"></i>' +
+                <i class="ri-file-list-3-line"></i>
 
-                '<p>' +
-                    'No estimates for this client.' +
-                '</p>' +
+                <p>
+                    No estimates for this client.
+                </p>
 
-            '</div>';
+            </div>
+            `;
 
         return;
     }
 
+    const previewEstimates =
+        estimates.slice(0, 2);
+
     container.innerHTML =
-        estimates.map(
+        previewEstimates.map(
             function (estimate) {
 
                 const amount =
@@ -976,118 +1034,51 @@ function renderClientEstimates(
                     estimate.status ||
                     "Draft";
 
-                const sent =
-                    !!estimate.sentAt;
+                const statusClass =
+                    status
+                        .toLowerCase()
+                        .replace(/\s+/g, "-");
 
-                let sendArea = "";
+                return `
+                    <div
+                        class="client-estimate-card"
+                        data-id="${estimate.objectId || ""}">
 
-                if (sent) {
+                        <div class="client-estimate-info">
 
-                    sendArea =
-                        '<span class="estimate-sent-label">' +
-                            'Sent' +
-                        '</span>';
+                            <strong>
+                                ${estimate.estimateNumber || "-"}
+                            </strong>
 
-                } else {
-
-                    sendArea =
-                        '<button ' +
-                            'type="button" ' +
-                            'class="send-client-estimate-button" ' +
-                            'data-id="' +
-                                (estimate.objectId || "") +
-                            '">' +
-
-                            '<i class="ri-send-plane-line"></i>' +
-
-                            'Send Estimate' +
-
-                        '</button>';
-
-                }
-
-                return (
-
-                    '<div ' +
-                        'class="client-estimate-card" ' +
-                        'data-id="' +
-                            (estimate.objectId || "") +
-                        '">' +
-
-                        '<div class="client-estimate-info">' +
-
-                            '<strong>' +
-                                (
-                                    estimate.estimateNumber ||
-                                    "-"
-                                ) +
-                            '</strong>' +
-
-                            '<span>' +
-                                (
+                            <span>
+                                ${
                                     estimate.title ||
                                     estimate.projectName ||
                                     "Estimate"
-                                ) +
-                            '</span>' +
+                                }
+                            </span>
 
-                        '</div>' +
+                        </div>
 
-                        '<div class="client-estimate-amount">' +
+                        <div class="client-estimate-amount">
 
-                            (currencySymbol || "") +
-                            amount +
+                            ${currencySymbol || ""}
+                            ${amount}
 
-                        '</div>' +
+                        </div>
 
-                        '<span ' +
-                            'class="status-badge ' +
-                                status
-                                    .toLowerCase()
-                                    .replace(/\s+/g, "-") +
-                            '">' +
+                        <span
+                            class="status-badge ${statusClass}">
 
-                            status +
+                            ${status}
 
-                        '</span>' +
+                        </span>
 
-                        sendArea +
-
-                    '</div>'
-
-                );
+                    </div>
+                `;
 
             }
         ).join("");
-
-    const sendButtons =
-        container.querySelectorAll(
-            ".send-client-estimate-button"
-        );
-
-    sendButtons.forEach(
-        function (button) {
-
-            button.addEventListener(
-                "click",
-                function () {
-
-                    const estimateId =
-                        button.dataset.id;
-
-                    if (!estimateId) {
-                        return;
-                    }
-
-                    openSendEstimateModal(
-                        estimateId
-                    );
-
-                }
-            );
-
-        }
-    );
 
 }
 
@@ -1115,30 +1106,33 @@ function renderClientInvoices(
     }
 
     if (totalElement) {
-
         totalElement.textContent =
             invoices.length;
-
     }
 
     if (invoices.length === 0) {
 
         container.innerHTML =
-            '<div class="client-empty-invoices">' +
+            `
+            <div class="client-empty-invoices">
 
-                '<i class="ri-file-text-line"></i>' +
+                <i class="ri-file-text-line"></i>
 
-                '<p>' +
-                    'No invoices for this client.' +
-                '</p>' +
+                <p>
+                    No invoices for this client.
+                </p>
 
-            '</div>';
+            </div>
+            `;
 
         return;
     }
 
+    const previewInvoices =
+        invoices.slice(0, 2);
+
     container.innerHTML =
-        invoices.map(
+        previewInvoices.map(
             function (invoice) {
 
                 const amount =
@@ -1156,71 +1150,48 @@ function renderClientInvoices(
                     invoice.status ||
                     "Draft";
 
-                return (
+                const statusClass =
+                    status
+                        .toLowerCase()
+                        .replace(/\s+/g, "-");
 
-                    '<div ' +
-                        'class="client-invoice-card" ' +
-                        'data-id="' +
-                            (invoice.objectId || "") +
-                        '">' +
+                return `
+                    <div
+                        class="client-invoice-card"
+                        data-id="${invoice.objectId || ""}">
 
-                        '<div class="client-invoice-info">' +
+                        <div class="client-invoice-info">
 
-                            '<strong>' +
-                                (
-                                    invoice.invoiceNumber ||
-                                    "-"
-                                ) +
-                            '</strong>' +
+                            <strong>
+                                ${invoice.invoiceNumber || "-"}
+                            </strong>
 
-                            '<span>' +
-                                (
+                            <span>
+                                ${
                                     invoice.invoiceTitle ||
                                     invoice.projectName ||
                                     "Invoice"
-                                ) +
-                            '</span>' +
+                                }
+                            </span>
 
-                        '</div>' +
+                        </div>
 
-                        '<div class="client-invoice-amount">' +
+                        <div class="client-invoice-amount">
 
-                            (currencySymbol || "") +
-                            amount +
+                            ${currencySymbol || ""}
+                            ${amount}
 
-                        '</div>' +
+                        </div>
 
-                       '<span ' +
-    'class="status-badge ' +
-        status
-            .toLowerCase()
-            .replace(/\s+/g, "-") +
-    '">' +
+                        <span
+                            class="status-badge ${statusClass}">
 
-    status +
+                            ${status}
 
-'</span>' +
+                        </span>
 
-(
-    invoice.sentAt
-        ? '<span class="invoice-sent-label">Sent</span>'
-        : '<button ' +
-            'type="button" ' +
-            'class="send-client-invoice-button" ' +
-            'data-id="' +
-                (invoice.objectId || "") +
-            '">' +
-
-            '<i class="ri-send-plane-line"></i>' +
-
-            'Send Invoice' +
-
-          '</button>'
-) +
-
-'</div>'
-
-                );
+                    </div>
+                `;
 
             }
         ).join("");
@@ -1304,6 +1275,365 @@ function registerSendEstimateListeners() {
         
     }
     
+}
+
+function setSendInvoiceText(
+    id,
+    value
+){
+
+    const element =
+        document.getElementById(
+            id
+        );
+
+    if(!element){
+        return;
+    }
+
+    element.textContent =
+        value === null ||
+        value === undefined ||
+        value === ""
+            ? "-"
+            : value;
+
+}
+
+function formatInvoiceDate(
+    value
+){
+
+    if(!value){
+        return "-";
+    }
+
+    const date =
+        new Date(
+            value
+        );
+
+    if(
+        Number.isNaN(
+            date.getTime()
+        )
+    ){
+
+        return "-";
+
+    }
+
+    return date.toLocaleDateString(
+        undefined,
+        {
+            year:
+                "numeric",
+            month:
+                "short",
+            day:
+                "numeric"
+        }
+    );
+
+}
+
+function formatInvoiceMoney(
+    value,
+    currencySymbol
+){
+
+    const amount =
+        Number(
+            value || 0
+        );
+
+    return (
+        currencySymbol || ""
+    ) +
+    amount.toLocaleString(
+        undefined,
+        {
+            minimumFractionDigits:
+                2,
+            maximumFractionDigits:
+                2
+        }
+    );
+
+}
+
+function renderSendInvoiceItems(
+    items,
+    currencySymbol
+){
+
+    const container =
+        document.getElementById(
+            "sendInvoiceItems"
+        );
+
+    if(!container){
+        return;
+    }
+
+    if(
+        !Array.isArray(items) ||
+        !items.length
+    ){
+
+        container.innerHTML =
+            `
+            <div class="send-invoice-empty-items">
+                No invoice items available.
+            </div>
+            `;
+
+        return;
+
+    }
+
+    container.innerHTML =
+        items.map(
+            function(item, index){
+
+                const description =
+                    item.description ||
+                    "Item";
+
+                const quantity =
+                    Number(
+                        item.quantity || 0
+                    );
+
+                const unitPrice =
+                    Number(
+                        item.unitPrice || 0
+                    );
+
+                const total =
+                    Number(
+                        item.total ||
+                        quantity * unitPrice
+                    );
+
+                return `
+                    <div class="send-invoice-item-row">
+
+                        <div class="send-invoice-item-number">
+                            ${index + 1}
+                        </div>
+
+                        <div class="send-invoice-item-description">
+                            ${escapeSendInvoiceHtml(
+                                description
+                            )}
+                        </div>
+
+                        <div class="send-invoice-item-quantity">
+                            ${quantity}
+                        </div>
+
+                        <div class="send-invoice-item-price">
+                            ${formatInvoiceMoney(
+                                unitPrice,
+                                currencySymbol
+                            )}
+                        </div>
+
+                        <div class="send-invoice-item-total">
+                            ${formatInvoiceMoney(
+                                total,
+                                currencySymbol
+                            )}
+                        </div>
+
+                    </div>
+                `;
+
+            }
+        ).join("");
+
+}
+
+function populateSendInvoicePayment(
+    paymentDetails
+){
+
+    setSendInvoiceText(
+        "sendInvoicePaymentAccountName",
+        paymentDetails.accountName ||
+        paymentDetails.account_name ||
+        "-"
+    );
+
+    setSendInvoiceText(
+        "sendInvoicePaymentBankName",
+        paymentDetails.bankName ||
+        paymentDetails.bank_name ||
+        "-"
+    );
+
+    setSendInvoiceText(
+        "sendInvoicePaymentProvider",
+        paymentDetails.paymentProvider ||
+        paymentDetails.provider ||
+        "-"
+    );
+
+    setSendInvoiceText(
+        "sendInvoicePaymentMethod",
+        paymentDetails.paymentMethod ||
+        paymentDetails.method ||
+        "-"
+    );
+
+    setSendInvoiceText(
+        "sendInvoicePaymentAccountNumber",
+        paymentDetails.accountNumber ||
+        paymentDetails.account_number ||
+        "-"
+    );
+
+    setSendInvoiceText(
+        "sendInvoicePaymentReference",
+        paymentDetails.paymentReference ||
+        paymentDetails.reference ||
+        "-"
+    );
+
+    setSendInvoiceText(
+        "sendInvoicePaymentDueDays",
+        paymentDetails.paymentDueDays ||
+        paymentDetails.dueDays ||
+        "-"
+    );
+
+    setSendInvoiceText(
+        "sendInvoicePaymentInstructions",
+        paymentDetails.paymentInstructions ||
+        paymentDetails.instructions ||
+        "-"
+    );
+
+}
+
+function hasPaymentDetails(
+    paymentDetails
+){
+
+    if(
+        !paymentDetails ||
+        typeof paymentDetails !==
+            "object"
+    ){
+
+        return false;
+
+    }
+
+    return Object.values(
+        paymentDetails
+    ).some(
+        function(value){
+
+            return (
+                value !== null &&
+                value !== undefined &&
+                String(
+                    value
+                ).trim() !== ""
+            );
+
+        }
+    );
+
+}
+
+function updateSendInvoiceSectionVisibility(
+    id,
+    visible
+){
+
+    const section =
+        document.getElementById(
+            id
+        );
+
+    if(!section){
+        return;
+    }
+
+    section.style.display =
+        visible
+            ? ""
+            : "none";
+
+}
+
+function escapeSendInvoiceHtml(
+    value
+){
+
+    return String(
+        value || ""
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+function closeSendInvoiceModal(){
+
+    const modal =
+        document.getElementById(
+            "sendInvoiceModal"
+        );
+
+    const overlay =
+        document.getElementById(
+            "sendInvoiceOverlay"
+        );
+
+    if(modal){
+
+        modal.classList.remove(
+            "show"
+        );
+
+        delete modal.dataset.invoiceId;
+
+    }
+
+    if(overlay){
+
+        overlay.classList.remove(
+            "show"
+        );
+
+    }
+
+    document.body.classList.remove(
+        "send-invoice-modal-open"
+    );
+
 }
 
 async function openSendEstimateModal(estimateId) {
@@ -1500,19 +1830,6 @@ async function openSendEstimateModal(estimateId) {
             }
             
         }
-        
-        /*if (sendEstimateMessage) {
-            
-            sendEstimateMessage.value =
-                `Hello ${
-                    client.contactPerson ||
-                    client.companyName ||
-                    "there"
-                },
-
-Thank you.`;
-            
-        }*/
         
         if (sendEstimateOverlay) {
             
@@ -1826,13 +2143,13 @@ async function confirmSendEstimate() {
     
 }
 
-async function openViewClientModal(clientId){
+async function openViewClientModal(clientId) {
 
-    try{
+    currentlyViewedClientId = clientId;
+
+    try {
 
         showLoader();
-
-        
 
         const result =
             await Parse.Cloud.run(
@@ -1841,11 +2158,6 @@ async function openViewClientModal(clientId){
                     clientId: clientId
                 }
             );
-
-        console.log(
-            "getClientDetails result:",
-            result
-        );
 
         if(!result){
 
@@ -1890,11 +2202,6 @@ async function openViewClientModal(clientId){
     "flex";
 
 }
-
-        console.log(
-            "Client:",
-            client
-        );
 
         viewContactPerson.textContent =
             client.contactPerson || "-";
@@ -2098,401 +2405,6 @@ client.billingCountry || "";
 
 }
 
-async function exportClients(){
-
-    exportClientsButton.disabled = true;
-
-    exportClientsButton.textContent =
-    "Exporting...";
-
-    try{
-        
-        showLoader();
-
-        const result =
-        await Parse.Cloud.run(
-        "getClients",
-        {
-
-            search:
-            clientSearchInput.value.trim(),
-
-            status:
-            statusFilter.value || "all",
-
-            sort:
-            sortClients.value,
-
-            page: 1,
-
-            limit: 100000
-
-        });
-
-        if(result.clients.length === 0){
-
-            showToast("No clients to export.");
-
-            return;
-
-        }
-
-        let csv =
-"Contact Person,Company,Email,Phone,Invoices,Outstanding,Status\n";
-
-        result.clients.forEach(client=>{
-
-            csv += `"${client.contactPerson || ""}",`;
-
-            csv += `"${client.companyName || ""}",`;
-
-            csv += `"${client.clientEmail || ""}",`;
-
-            csv += `"${client.clientPhone || ""}",`;
-
-            csv += `"${client.totalInvoices}",`;
-
-            csv += `"${client.outstandingBalance}",`;
-
-            csv += `"${client.status}"\n`;
-
-        });
-
-        const blob =
-        new Blob(
-        [csv],
-        {
-
-            type:
-            "text/csv"
-
-        });
-
-        const url =
-        URL.createObjectURL(blob);
-
-        const link =
-        document.createElement("a");
-
-        link.href = url;
-
-        link.download =
-        "clients.csv";
-
-        document.body.appendChild(
-            link
-        );
-
-        link.click();
-
-        document.body.removeChild(
-            link
-        );
-
-        URL.revokeObjectURL(url);
-        
-        exportMenu.classList.remove(
-    "show"
-);
-
-    }
-
-    catch(error){
-        
-        showLoader();
-
-        showToast(
-    error.message,
-    "error"
-);
-
-    }
-
-    finally{
-        
-        hideLoader();
-
-        exportClientsButton.disabled =
-        false;
-
-        exportClientsButton.textContent =
-        "Export";
-
-    }
-
-}
-
-async function exportClientsToExcel(){
-
-    try{
-        
-        showLoader();
-
-        exportExcelButton.disabled = true;
-
-        exportExcelButton.textContent =
-        "Exporting...";
-
-        const result =
-        await Parse.Cloud.run(
-        "getClients",
-        {
-
-            page: 1,
-
-            limit: 100000,
-
-            search:
-            clientSearchInput.value.trim(),
-
-            status:
-            statusFilter.value || "all",
-
-            sort:
-            sortClients.value
-
-        });
-
-        const data = [];
-
-        result.clients.forEach(client=>{
-
-            data.push({
-
-                "Contact Person":
-                client.contactPerson,
-
-                "Company":
-                client.companyName,
-
-                "Email":
-                client.clientEmail,
-
-                "Phone":
-                client.clientPhone,
-
-                "Invoices":
-                client.totalInvoices,
-
-                "Outstanding":
-                client.outstandingBalance,
-
-                "Status":
-                client.status
-
-            });
-
-        });
-
-        const worksheet =
-        XLSX.utils.json_to_sheet(
-            data
-        );
-
-        const workbook =
-        XLSX.utils.book_new();
-
-        XLSX.utils.book_append_sheet(
-
-            workbook,
-
-            worksheet,
-
-            "Clients"
-
-        );
-
-        XLSX.writeFile(
-
-            workbook,
-
-            "InvoicePro Clients.xlsx"
-
-        );
-        
-        exportMenu.classList.remove("show");
-
-    }
-
-    catch(error){
-        
-        showLoader();
-
-        showToast(
-    error.message,
-    "error"
-);
-
-    }
-
-    finally{
-        
-        hideLoader();
-
-        exportExcelButton.disabled =
-        false;
-
-        exportExcelButton.textContent =
-        "Export Excel";
-
-    }
-
-}
-
-async function exportClientsToPDF(){
-
-    try{
-        
-        showLoader();
-
-        exportPdfButton.disabled = true;
-
-        exportPdfButton.textContent =
-        "Exporting...";
-
-        const result =
-        await Parse.Cloud.run(
-            "getClients",
-            {
-
-                page:1,
-
-                limit:100000,
-
-                search:
-                clientSearchInput.value.trim(),
-
-                status:
-                statusFilter.value || "all",
-
-                sort:
-                sortClients.value
-
-            }
-        );
-
-        const { jsPDF } = window.jspdf;
-
-        const doc =
-        new jsPDF();
-
-        doc.setFontSize(20);
-
-        doc.text(
-            "InvoicePro Clients",
-            14,
-            18
-        );
-
-        doc.setFontSize(10);
-
-        doc.text(
-
-            "Generated: " +
-
-            new Date().toLocaleString(),
-
-            14,
-
-            26
-
-        );
-
-        const rows = [];
-
-        result.clients.forEach(client=>{
-
-            rows.push([
-
-                client.contactPerson,
-
-                client.companyName || "-",
-
-                client.clientEmail || "-",
-
-                client.clientPhone || "-",
-
-                client.totalInvoices,
-
-                result.currencySymbol +
-
-                Number(
-
-                    client.outstandingBalance
-
-                ).toLocaleString(),
-
-                client.status
-
-            ]);
-
-        });
-
-        doc.autoTable({
-
-            startY:35,
-
-            head:[[
-                "Contact",
-                "Company",
-                "Email",
-                "Phone",
-                "Invoices",
-                "Outstanding",
-                "Status"
-            ]],
-
-            body:rows,
-
-            styles:{
-
-                fontSize:9
-
-            },
-
-            headStyles:{
-
-                fillColor:[37,99,235]
-
-            }
-
-        });
-
-        doc.save(
-            "InvoicePro Clients.pdf"
-        );
-
-        exportMenu.classList.remove(
-            "show"
-        );
-
-    }
-
-    catch(error){
-        
-        showLoader();
-
-        showToast(
-    error.message,
-    "error"
-);
-
-    }
-
-    finally{
-        
-        hideLoader();
-
-        exportPdfButton.disabled =
-        false;
-
-        exportPdfButton.textContent =
-        "Export PDF";
-
-    }
-
-}
-
 async function loadClients(){
 
     try{
@@ -2579,29 +2491,37 @@ async function loadClients(){
 
 <div class="client-info">
 
-<div
-    class="client-avatar"
-    data-initial="${(
-        client.contactPerson ||
-        "C"
-    ).charAt(0).toUpperCase()}"
->
+${
+    showClientImage
+    ?
+    `
+    <div
+        class="client-avatar"
+        data-initial="${(
+            client.contactPerson ||
+            "C"
+        ).charAt(0).toUpperCase()}"
+    >
 
-    ${
-        client.clientImageUrl
-        ?
-        `
-        <img
-        src="${client.clientImageUrl}"
-        alt="${client.contactPerson || "Client"}">
-        `
-        :
-        getClientInitials(
-            client.contactPerson
-        )
-    }
+        ${
+            client.clientImageUrl
+            ?
+            `
+            <img
+                src="${client.clientImageUrl}"
+                alt="${client.contactPerson || "Client"}">
+            `
+            :
+            getClientInitials(
+                client.contactPerson
+            )
+        }
 
-</div>
+    </div>
+    `
+    :
+    ""
+}
 
     <div class="client-name-wrapper">
 
@@ -2859,83 +2779,614 @@ async function loadNotificationCount() {
 
 }
 
-async function loadUserProfile() {
+async function loadClientImageSetting(){
 
-    try {
+    try{
 
-        const response = await Parse.Cloud.run(
-            "getUserProfile"
+        const result =
+            await Parse.Cloud.run(
+                "getBusinessProfile"
+            );
+
+        showClientImage =
+            result &&
+            result.profile &&
+            result.profile.showClientImage !== false;
+
+    }
+    catch(error){
+
+        console.error(
+            "Client Image Setting Error:",
+            error
         );
 
-        if (!response.success) {
+        showClientImage = true;
+
+    }
+
+}
+
+async function openSendInvoiceModal(
+    invoiceId
+){
+
+    try{
+
+        showLoader();
+
+        const result =
+            await Parse.Cloud.run(
+                "getInvoiceDetails",
+                {
+                    invoiceId:
+                        invoiceId
+                }
+            );
+
+        if(
+            !result ||
+            !result.invoice
+        ){
 
             throw new Error(
-                "Unable to load profile."
+                "Unable to load invoice details."
             );
 
         }
 
-        const profile = response.profile;
+        const invoice =
+            result.invoice;
 
-        let imageURL = DEFAULT_PROFILE_IMAGE;
+        const client =
+            result.client || {};
 
-        if (profile.profileImage) {
+        const items =
+            Array.isArray(
+                result.items
+            )
+                ? result.items
+                : [];
 
-            if (typeof profile.profileImage === "string") {
+        const paymentDetails =
+            result.paymentDetails ||
+            invoice.paymentDetails ||
+            {};
 
-                imageURL = profile.profileImage;
+        const currencySymbol =
+            result.currencySymbol ||
+            invoice.currencySymbol ||
+            "";
 
-            } else if (profile.profileImage.url) {
+        const clientName =
+            client.contactPerson ||
+            client.companyName ||
+            invoice.contactPerson ||
+            invoice.companyName ||
+            "Client";
 
-                imageURL = profile.profileImage.url();
+        const clientEmail =
+            client.clientEmail ||
+            invoice.clientEmail ||
+            "";
+
+        setSendInvoiceText(
+            "sendInvoiceClientName",
+            clientName
+        );
+        
+        if (sendInvoiceClientImage) {
+
+    if (client.clientImageUrl) {
+
+        sendInvoiceClientImage.src =
+            client.clientImageUrl;
+
+        sendInvoiceClientImage.style.display =
+            "block";
+
+        if (sendInvoiceClientImageFallback) {
+
+            sendInvoiceClientImageFallback.style.display =
+                "none";
+
+        }
+
+    } else {
+
+        sendInvoiceClientImage.removeAttribute(
+            "src"
+        );
+
+        sendInvoiceClientImage.style.display =
+            "none";
+
+        if (sendInvoiceClientImageFallback) {
+
+            sendInvoiceClientImageFallback.style.display =
+                "block";
+
+        }
+
+    }
+
+}
+
+        setSendInvoiceText(
+            "sendInvoiceClientEmail",
+            clientEmail || "-"
+        );
+
+        setSendInvoiceText(
+            "sendInvoiceNumber",
+            invoice.invoiceNumber || "-"
+        );
+
+        setSendInvoiceText(
+            "sendInvoiceTitle",
+            invoice.invoiceTitle ||
+            invoice.projectName ||
+            "Invoice"
+        );
+
+        setSendInvoiceText(
+            "sendInvoiceIssueDate",
+            formatInvoiceDate(
+                invoice.issueDate
+            )
+        );
+
+        setSendInvoiceText(
+            "sendInvoiceDueDate",
+            formatInvoiceDate(
+                invoice.dueDate
+            )
+        );
+
+        setSendInvoiceText(
+            "sendInvoicePaymentTerms",
+            invoice.paymentTerms || "-"
+        );
+
+        setSendInvoiceText(
+            "sendInvoiceCurrency",
+            invoice.currencyCode
+                ? invoice.currencyCode +
+                  " (" +
+                  currencySymbol +
+                  ")"
+                : currencySymbol || "-"
+        );
+
+        setSendInvoiceText(
+            "sendInvoicePaymentStatus",
+            invoice.status || "Draft"
+        );
+
+        setSendInvoiceText(
+            "sendInvoiceAmount",
+            formatInvoiceMoney(
+                invoice.totalAmount,
+                currencySymbol
+            )
+        );
+
+        renderSendInvoiceItems(
+            items,
+            currencySymbol
+        );
+
+        setSendInvoiceText(
+            "sendInvoiceSubtotal",
+            formatInvoiceMoney(
+                invoice.subtotal,
+                currencySymbol
+            )
+        );
+
+        setSendInvoiceText(
+            "sendInvoiceTax",
+            formatInvoiceMoney(
+                invoice.tax,
+                currencySymbol
+            )
+        );
+
+        setSendInvoiceText(
+            "sendInvoiceDiscount",
+            formatInvoiceMoney(
+                invoice.discount,
+                currencySymbol
+            )
+        );
+
+        setSendInvoiceText(
+            "sendInvoiceShipping",
+            formatInvoiceMoney(
+                invoice.shipping,
+                currencySymbol
+            )
+        );
+
+        setSendInvoiceText(
+            "sendInvoiceGrandTotal",
+            formatInvoiceMoney(
+                invoice.totalAmount,
+                currencySymbol
+            )
+        );
+
+        populateSendInvoicePayment(
+            paymentDetails
+        );
+
+        setSendInvoiceText(
+            "sendInvoiceNotes",
+            invoice.notes || "-"
+        );
+
+        setSendInvoiceText(
+            "sendInvoiceTerms",
+            invoice.termsConditions || "-"
+        );
+
+        setSendInvoiceText(
+            "sendInvoiceSignatureName",
+            invoice.signatureName || "-"
+        );
+
+        setSendInvoiceText(
+            "sendInvoiceSignatureTitle",
+            invoice.signatureTitle || "-"
+        );
+
+        const signatureImage =
+            document.getElementById(
+                "sendInvoiceSignatureImage"
+            );
+
+        if(signatureImage){
+
+            if(invoice.signatureImage){
+
+                signatureImage.src =
+                    invoice.signatureImage;
+
+                signatureImage.style.display =
+                    "block";
+
+            }else{
+
+                signatureImage.removeAttribute(
+                    "src"
+                );
+
+                signatureImage.style.display =
+                    "none";
 
             }
 
         }
 
-        profileImage.src = imageURL;
-    }
+        updateSendInvoiceSectionVisibility(
+            "sendInvoicePaymentSection",
+            hasPaymentDetails(
+                paymentDetails
+            )
+        );
 
-    catch (error) {
+        updateSendInvoiceSectionVisibility(
+            "sendInvoiceNotesSection",
+            !!(
+                invoice.notes &&
+                String(
+                    invoice.notes
+                ).trim()
+            )
+        );
 
-        console.error(error);
+        updateSendInvoiceSectionVisibility(
+            "sendInvoiceTermsSection",
+            !!(
+                invoice.termsConditions &&
+                String(
+                    invoice.termsConditions
+                ).trim()
+            )
+        );
 
-        showToast(
-            error.message || error, "error"
+        updateSendInvoiceSectionVisibility(
+            "sendInvoiceSignatureSection",
+            !!(
+                invoice.signatureName ||
+                invoice.signatureTitle ||
+                invoice.signatureImage
+            )
+        );
+
+        const message =
+            document.getElementById(
+                "sendInvoiceMessage"
+            );
+
+        if(message){
+
+            message.value = "";
+
+        }
+
+        const modal =
+            document.getElementById(
+                "sendInvoiceModal"
+            );
+
+        if(!modal){
+
+            throw new Error(
+                "Send invoice modal was not found."
+            );
+
+        }
+
+        modal.dataset.invoiceId =
+            invoiceId;
+
+        const overlay =
+            document.getElementById(
+                "sendInvoiceOverlay"
+            );
+
+        if(overlay){
+
+            overlay.classList.add(
+                "show"
+            );
+
+        }
+
+        modal.classList.add(
+            "show"
+        );
+
+        document.body.classList.add(
+            "send-invoice-modal-open"
         );
 
     }
 
+    catch(error){
+
+        console.error(
+            "Open Send Invoice Error:",
+            error
+        );
+
+        showToast(
+            error.message ||
+            "Unable to load invoice.",
+            "error"
+        );
+
+    }
+
+    finally{
+
+        hideLoader();
+
+    }
+
 }
 
-if (sendEstimateSelect) {
+async function sendInvoiceToClient(
+    button
+){
+    const modal =
+        document.getElementById(
+            "sendInvoiceModal"
+        );
+
+    if(!modal){
+
+        showToast(
+            "Send invoice modal was not found.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    const invoiceId =
+        modal.dataset.invoiceId;
+
+    if(!invoiceId){
+
+        showToast(
+            "Invoice ID is missing.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    const messageElement =
+        document.getElementById(
+            "sendInvoiceMessage"
+        );
+
+    const message =
+        messageElement
+            ? messageElement.value.trim()
+            : "";
+
+    if(button.disabled){
+
+        return;
+
+    }
+
+    try{
+
+        button.disabled =
+            true;
+
+        const originalContent =
+            button.innerHTML;
+
+        button.dataset.originalContent =
+            originalContent;
+
+        button.innerHTML =
+            `
+            <i class="ri-loader-4-line ri-spin"></i>
+            Sending...
+            `;
+
+        const result =
+            await Parse.Cloud.run(
+                "sendInvoiceToClient",
+                {
+                    invoiceId:
+                        invoiceId,
+
+                    message:
+                        message
+                }
+            );
+
+        if(
+            !result ||
+            result.success !== true
+        ){
+
+            throw new Error(
+                result &&
+                result.message
+                    ? result.message
+                    : "Invoice could not be sent."
+            );
+
+        }
+
+        closeSendInvoiceModal();
+
+        showToast(
+            result.message ||
+            "Invoice sent successfully.",
+            "success"
+        );
+
+        const sentButton =
+            document.querySelector(
+                '.send-client-invoice-button[data-id="' +
+                invoiceId +
+                '"]'
+            );
+
+        if(sentButton){
+
+            const parent =
+                sentButton.parentElement;
+
+            if(parent){
+
+                sentButton.outerHTML =
+                    `
+                    <span class="invoice-sent-label">
+                        Sent
+                    </span>
+                    `;
+
+            }
+
+        }
+
+    }
+
+    catch(error){
+
+        console.error(
+            "Send Invoice Error:",
+            error
+        );
+
+        showToast(
+            error.message ||
+            "Unable to send invoice.",
+            "error"
+        );
+
+        button.disabled =
+            false;
+
+        button.innerHTML =
+            button.dataset.originalContent ||
+            `
+            <i class="ri-send-plane-line"></i>
+            Send Invoice
+            `;
+
+    }
+
+}
+
+if (viewAllClientEstimatesButton) {
     
-    sendEstimateSelect.addEventListener(
-        "change",
-        updateSelectedEstimateForSending
+    viewAllClientEstimatesButton.addEventListener(
+        "click",
+        function() {
+            
+            if (!currentlyViewedClientId) {
+                
+                showToast(
+                    "Client ID is missing.",
+                    "error"
+                );
+                
+                return;
+            }
+            
+            window.location.href =
+                "client-history.html?clientId=" +
+                encodeURIComponent(
+                    currentlyViewedClientId
+                ) +
+                "&type=estimates";
+            
+        }
     );
     
 }
 
-exportClientsButton.addEventListener(
-"click",
-()=>{
 
-    exportMenu.classList.toggle(
-        "show"
+if (viewAllClientInvoicesButton) {
+    
+    viewAllClientInvoicesButton.addEventListener(
+        "click",
+        function() {
+            
+            if (!currentlyViewedClientId) {
+                
+                showToast(
+                    "Client ID is missing.",
+                    "error"
+                );
+                
+                return;
+            }
+            
+            window.location.href =
+                "client-history.html?clientId=" +
+                encodeURIComponent(
+                    currentlyViewedClientId
+                ) +
+                "&type=invoices";
+            
+        }
     );
-
-});
-
-exportExcelButton.addEventListener(
-"click",
-exportClientsToExcel
-);
-
-exportPdfButton.addEventListener(
-    "click",
-    exportClientsToPDF
-);
+    
+}
 
 addClientButton.addEventListener(
     "click",
@@ -3168,10 +3619,6 @@ if(billingCountry.length > 100){
 
 }
     
-console.log("LINE 1:", billingAddressLine1);
-console.log("LINE 2:", billingAddressLine2);
-console.log("CITY STATE ZIP:", billingCityStateZip);
-console.log("COUNTRY:", billingCountry);
     saveClientButton.disabled = true;
 
     saveClientButton.textContent =
@@ -3387,11 +3834,6 @@ confirmDeleteClient.addEventListener(
     }
 );
 
-exportCsvButton.addEventListener(
-    "click",
-    exportClients
-);
-
 clientImageInput.addEventListener(
     "change",
     () => {
@@ -3466,6 +3908,126 @@ clientImageInput.addEventListener(
 );
 
 document.addEventListener(
+    "keydown",
+    function(event){
+
+        if(
+            event.key !== "Escape"
+        ){
+
+            return;
+
+        }
+
+        const modal =
+            document.getElementById(
+                "sendInvoiceModal"
+            );
+
+        if(
+            modal &&
+            modal.classList.contains(
+                "show"
+            )
+        ){
+
+            closeSendInvoiceModal();
+
+        }
+
+    }
+);
+
+document.addEventListener(
+    "click",
+    function(event){
+
+        if(
+            event.target.closest(
+                "#closeSendInvoiceButton"
+            )
+        ){
+
+            closeSendInvoiceModal();
+
+            return;
+
+        }
+
+        if(
+            event.target.closest(
+                "#cancelSendInvoiceButton"
+            )
+        ){
+
+            closeSendInvoiceModal();
+
+            return;
+
+        }
+
+        if(
+            event.target.closest(
+                "#sendInvoiceOverlay"
+            )
+        ){
+
+            closeSendInvoiceModal();
+
+            return;
+
+        }
+
+        const confirmButton =
+            event.target.closest(
+                "#confirmSendInvoiceButton"
+            );
+
+        if(confirmButton){
+
+            sendInvoiceToClient(
+                confirmButton
+            );
+
+        }
+
+    }
+);
+
+document.addEventListener(
+    "click",
+    function(event){
+
+        const sendButton =
+            event.target.closest(
+                ".send-client-invoice-button"
+            );
+
+        if(!sendButton){
+            return;
+        }
+
+        const invoiceId =
+            sendButton.dataset.id;
+
+        if(!invoiceId){
+
+            showToast(
+                "Invoice ID is missing.",
+                "error"
+            );
+
+            return;
+        }
+
+        openSendInvoiceModal(
+            invoiceId
+        );
+
+    }
+);
+
+document.addEventListener(
 "keydown",
 (event)=>{
 
@@ -3500,28 +4062,6 @@ document.addEventListener(
     }
 
 });
-
-document.addEventListener(
-    "click",
-    function(e){
-
-        if(window.innerWidth <= 1023){
-
-            if(
-                sidebar.classList.contains("show") &&
-                !sidebar.contains(e.target) &&
-                !menuToggle.contains(e.target)
-            ){
-
-                sidebar.classList.remove("show");
-                sidebarOverlay.classList.remove("show");
-
-            }
-
-        }
-
-    }
-);
 
 [
     contactPersonInput,
@@ -3566,11 +4106,12 @@ document.addEventListener(
 
 });
 
+    loadClientImageSetting()
+
     loadClients();
     
     loadNotificationCount();
     
     registerSendEstimateListeners();
     
-    loadUserProfile();
     
