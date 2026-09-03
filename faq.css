@@ -8,17 +8,14 @@
     --navy-500: #2b6fae;
     --navy-100: #e8f0f8;
     --navy-50: #f3f7fb;
-
     --white: #ffffff;
     --text: #162338;
     --text-light: #5d6b7d;
     --border: #dce5ee;
     --success: #16845b;
-
     --shadow: 0 18px 50px rgba(6, 20, 38, 0.08);
     --shadow-sm: 0 8px 25px rgba(6, 20, 38, 0.06);
     --shadow-lg: 0 25px 60px rgba(6, 20, 38, 0.14);
-
     --radius: 18px;
     --max-width: 1280px;
 }
@@ -61,10 +58,6 @@ img {
     max-width: 100%;
     display: block;
 }
-
-/* =========================
-   HEADER
-========================= */
 
 .header {
     width: 100%;
@@ -182,10 +175,6 @@ img {
     transform: translateY(-1px);
 }
 
-/* =========================
-   FAQ HERO
-========================= */
-
 .faq-hero {
     position: relative;
     min-height: 515px;
@@ -194,8 +183,7 @@ img {
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    background:
-        radial-gradient(
+    background: radial-gradient(
             circle at 85% 20%,
             rgba(43, 111, 174, 0.18),
             transparent 30%
@@ -278,10 +266,6 @@ img {
     line-height: 1.9;
 }
 
-/* =========================
-   FAQ SEARCH
-========================= */
-
 .faq-search {
     width: min(650px, 100%);
     height: 60px;
@@ -300,8 +284,7 @@ img {
 
 .faq-search:focus-within {
     border-color: rgba(255, 255, 255, 0.8);
-    box-shadow:
-        0 20px 45px rgba(0, 0, 0, 0.18),
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18),
         0 0 0 4px rgba(255, 255, 255, 0.08);
 }
 
@@ -379,10 +362,6 @@ img {
     line-height: 1.5;
 }
 
-/* =========================
-   HERO DECORATIONS
-========================= */
-
 .faq-hero-decoration {
     position: absolute;
     z-index: 1;
@@ -413,10 +392,6 @@ img {
     border-color: rgba(255, 255, 255, 0.06);
 }
 
-/* =========================
-   FAQ SECTION
-========================= */
-
 .faq-section {
     width: 100%;
     background: var(--white);
@@ -430,10 +405,6 @@ img {
     gap: 60px;
     align-items: start;
 }
-
-/* =========================
-   FAQ SIDEBAR
-========================= */
 
 .faq-sidebar {
     min-width: 0;
@@ -516,10 +487,6 @@ img {
     color: #c4ddf3;
 }
 
-/* =========================
-   SUPPORT BOX
-========================= */
-
 .support-box {
     margin-top: 18px;
     padding: 23px 20px;
@@ -589,10 +556,6 @@ img {
     transform: translateX(3px);
 }
 
-/* =========================
-   FAQ CONTENT
-========================= */
-
 .faq-content {
     width: 100%;
     min-width: 0;
@@ -639,10 +602,6 @@ img {
     line-height: 1.4;
     white-space: nowrap;
 }
-
-/* =========================
-   FAQ GROUPS
-========================= */
 
 .faq-group {
     width: 100%;
@@ -700,10 +659,6 @@ img {
     line-height: 1.4;
 }
 
-/* =========================
-   FAQ LIST
-========================= */
-
 .faq-list {
     width: 100%;
     display: flex;
@@ -717,8 +672,7 @@ img {
     background: var(--white);
     border: 1px solid var(--border);
     border-radius: 13px;
-    transition:
-        border-color 0.25s ease,
+    transition: border-color 0.25s ease,
         box-shadow 0.25s ease,
         background 0.25s ease;
 }
@@ -816,10 +770,6 @@ img {
     color: var(--navy-900);
 }
 
-/* =========================
-   EMPTY STATE
-========================= */
-
 .faq-empty-state {
     width: 100%;
     padding: 65px 30px;
@@ -885,10 +835,6 @@ img {
     transform: translateY(-1px);
 }
 
-/* =========================
-   FAQ CTA
-========================= */
-
 .faq-cta {
     width: 100%;
     padding: 0 24px 80px;
@@ -905,8 +851,7 @@ img {
     align-items: center;
     gap: 30px;
     overflow: hidden;
-    background:
-        linear-gradient(
+    background: linear-gradient(
             135deg,
             var(--navy-950),
             var(--navy-700)
@@ -935,20 +880,6 @@ img {
     bottom: -160px;
     border: 1px solid rgba(255, 255, 255, 0.07);
     border-radius: 50%;
-}
-
-.cta-image {
-    position: relative;
-    z-index: 2;
-    width: 90px;
-    height: 90px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 20px;
 }
 
 .cta-image img {
@@ -1024,10 +955,6 @@ img {
 .cta-btn a:hover i {
     transform: translateX(3px);
 }
-
-/* =========================
-   FOOTER
-========================= */
 
 footer {
     width: 100%;
@@ -1209,12 +1136,8 @@ footer {
     color: var(--white);
 }
 
-/* =========================
-   TABLET
-========================= */
-
 @media (max-width: 1100px) {
-    .header {
+.header {
         padding: 0 4%;
     }
 
@@ -1253,12 +1176,8 @@ footer {
     }
 }
 
-/* =========================
-   TABLET / SMALL DESKTOP
-========================= */
-
 @media (max-width: 900px) {
-    .header {
+.header {
         flex-wrap: wrap;
         min-height: auto;
         padding-top: 14px;
@@ -1318,12 +1237,8 @@ footer {
     }
 }
 
-/* =========================
-   MOBILE
-========================= */
-
 @media (max-width: 760px) {
-    html {
+html {
         scroll-padding-top: 80px;
     }
 
@@ -1650,12 +1565,8 @@ footer {
     }
 }
 
-/* =========================
-   SMALL MOBILE
-========================= */
-
 @media (max-width: 420px) {
-    .header {
+.header {
         padding: 14px 16px;
     }
 
@@ -1812,12 +1723,8 @@ footer {
     }
 }
 
-/* =========================
-   VERY SMALL DEVICES
-========================= */
-
 @media (max-width: 340px) {
-    .header {
+.header {
         justify-content: center;
     }
 
@@ -1869,12 +1776,17 @@ footer {
 }
 
 .cta-image {
+    position: relative;
+    z-index: 2;
     width: 90px;
     height: 90px;
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 50%;
     flex-shrink: 0;
 }
 
@@ -1892,4 +1804,154 @@ footer {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
+}
+@media (max-width: 480px) {
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: hidden;
+    }
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    img,
+    svg,
+    video,
+    canvas,
+    iframe {
+        max-width: 100%;
+        height: auto;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    table {
+        width: 100%;
+        max-width: 100%;
+        table-layout: fixed;
+    }
+
+    th,
+    td {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    pre,
+    code {
+        max-width: 100%;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    p,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    label,
+    span {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    .container,
+    .page-container,
+    .page-content,
+    .main-content,
+    .content,
+    .main,
+    .app,
+    .wrapper {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    [class*="grid"] {
+        min-width: 0;
+    }
+
+    [class*="row"],
+    [class*="actions"],
+    [class*="header"],
+    [class*="toolbar"] {
+        min-width: 0;
+        flex-wrap: wrap;
+    }
+
+    [class*="card"],
+    [class*="panel"],
+    [class*="modal"],
+    [class*="section"] {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    [class*="modal"] {
+        max-height: calc(100vh - 24px);
+        overflow-y: auto;
+    }
+
+    .table-responsive,
+    [class*="table-wrap"],
+    [class*="table-container"] {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    button,
+    .btn,
+    [class*="button"] {
+        max-width: 100%;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 360px) {
+    body {
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: clamp(20px, 7vw, 28px);
+    }
+
+    h2 {
+        font-size: clamp(18px, 6vw, 24px);
+    }
+
+    h3 {
+        font-size: clamp(16px, 5vw, 20px);
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+        font-size: 14px;
+    }
 }
