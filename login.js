@@ -227,18 +227,18 @@ async function initializeGoogleLogin() {
                         }
                     );
 
-                if (
-                    !result ||
-                    !result.sessionToken
-                ) {
+if (
+    !result ||
+    !result.sessionToken
+) {
 
-                    throw new Error(
-                        "Unable to log you in with Google."
-                    );
+    throw new Error(
+        "Unable to log you in with Google."
+    );
 
-                }
+}
 
-                const loggedInUser =
+const loggedInUser =
     await Parse.User.become(
         result.sessionToken
     );
@@ -257,7 +257,7 @@ const currentUser =
 if (!currentUser) {
 
     throw new Error(
-        "Google login succeeded, but your session could not be restored."
+        "Google login succeeded, but the InvoicePro session could not be restored."
     );
 
 }
@@ -305,7 +305,7 @@ localStorage.setItem(
 );
 
 window.location.replace(
-    "/dashboard.html"
+    "dashboard.html"
 );
 
 return;

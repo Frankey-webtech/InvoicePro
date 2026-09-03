@@ -260,19 +260,39 @@ if (dashboardPage) {
 
 async function handleGoogleAuthentication() {
 
-    const currentUser =
-        await Parse.User.currentAsync();
+    try {
 
-    if (!currentUser) {
+        const currentUser =
+            await Parse.User.currentAsync();
 
-        window.location.href =
-            "login.html";
+        if (!currentUser) {
+
+            window.location.replace(
+                "login.html"
+            );
+
+            return false;
+
+        }
+
+        return true;
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Authentication Check Error:",
+            error
+        );
+
+        window.location.replace(
+            "login.html"
+        );
 
         return false;
 
     }
-
-    return true;
 
 }
 
