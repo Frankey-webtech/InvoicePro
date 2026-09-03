@@ -1,8 +1,5 @@
 let currentUserCountry = "";
-const profileImage = document.getElementById("profileImage");
 const headerProfileImage = document.getElementById("headerProfileImage");
-const DEFAULT_PROFILE_IMAGE = 
-     "profile.png";
 const userFullName = document.getElementById("userFullName");
 const userEmail = document.getElementById("userEmail");
 
@@ -162,28 +159,10 @@ async function loadUserProfile() {
 
         }
 
-        const profile = response.profile;
-        
+        const profile =
+            response.profile;
+
         loadPaymentDetails(profile);
-
-        let imageURL = DEFAULT_PROFILE_IMAGE;
-
-        if (profile.profileImage) {
-
-            if (typeof profile.profileImage === "string") {
-
-                imageURL = profile.profileImage;
-
-            } else if (profile.profileImage.url) {
-
-                imageURL = profile.profileImage.url();
-
-            }
-
-        }
-
-        profileImage.src = imageURL;
-        headerProfileImage.src = imageURL;
 
         userFullName.textContent =
             profile.fullName || "-";
@@ -199,11 +178,12 @@ async function loadUserProfile() {
 
         phoneField.textContent =
             profile.phone || "-";
-            
-            
+
+        currentUserCountry =
+            profile.country || "";
 
         countryField.textContent =
-            profile.country || "-";
+            currentUserCountry || "-";
 
         userPlan.textContent =
             profile.plan || "Free Plan";
@@ -216,12 +196,6 @@ async function loadUserProfile() {
 
         clientCount.textContent =
             profile.clientCount ?? 0;
-            
-            currentUserCountry =
-    profile.country || "";
-
-countryField.textContent =
-    currentUserCountry || "-";
 
         const symbol =
             profile.currencySymbol || "";
@@ -275,8 +249,8 @@ countryField.textContent =
         console.error(error);
 
         showToast(
-            
-            error.message || error, "error"
+            error.message || error,
+            "error"
         );
 
     }

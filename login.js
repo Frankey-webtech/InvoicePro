@@ -176,7 +176,7 @@ async function initializeGoogleLogin() {
 
                     redirect_uri:
                         window.location.origin +
-                        "/dashboard.html"
+                        "/callback.html"
 
                 }
 
@@ -245,11 +245,11 @@ async function initializeGoogleLogin() {
                 window.history.replaceState(
                     {},
                     document.title,
-                    "dashboard.html"
+                    "callback.html"
                 );
 
                 window.location.replace(
-                    "dashboard.html"
+                    "callback.html"
                 );
 
                 return;

@@ -700,6 +700,146 @@
     }
 }
 
+    async function initializeClientImageSetting() {
+    const toggle = $("showClientImageToggle");
+
+    if (!toggle) {
+        return;
+    }
+
+    toggle.checked = true;
+
+    try {
+        const currentUser = Parse.User.current();
+
+        if (!currentUser) {
+            console.warn(
+                "Unable to load client image setting: user is not logged in."
+            );
+            return;
+        }
+
+        const BusinessProfile =
+            Parse.Object.extend("BusinessProfile");
+
+        const query =
+            new Parse.Query(BusinessProfile);
+
+        query.equalTo(
+            "user",
+            currentUser
+        );
+
+        const profile =
+            await query.first();
+
+        if (profile) {
+            const savedValue =
+                profile.get("showClientImage");
+
+            if (typeof savedValue === "boolean") {
+                toggle.checked = savedValue;
+            } else {
+                toggle.checked = true;
+            }
+
+            if (!settingsBusinessProfile) {
+                settingsBusinessProfile = {};
+            }
+
+            settingsBusinessProfile.showClientImage =
+                toggle.checked;
+        }
+    } catch (error) {
+        console.error(
+            "Client image setting loading failed:",
+            error
+        );
+
+        toggle.checked = true;
+    }
+
+    toggle.addEventListener(
+        "change",
+        async function () {
+            const newValue = this.checked;
+
+            this.disabled = true;
+
+            try {
+                const currentUser =
+                    Parse.User.current();
+
+                if (!currentUser) {
+                    throw new Error(
+                        "You must be logged in to change this setting."
+                    );
+                }
+
+                const BusinessProfile =
+                    Parse.Object.extend("BusinessProfile");
+
+                const query =
+                    new Parse.Query(BusinessProfile);
+
+                query.equalTo(
+                    "user",
+                    currentUser
+                );
+
+                let profile =
+                    await query.first();
+
+                if (!profile) {
+                    throw new Error(
+                        "Business profile not found. Please complete your Business Profile first."
+                    );
+                }
+
+                profile.set(
+                    "showClientImage",
+                    newValue
+                );
+
+                await profile.save();
+
+                if (!settingsBusinessProfile) {
+                    settingsBusinessProfile = {};
+                }
+
+                settingsBusinessProfile.showClientImage =
+                    newValue;
+
+                showToast(
+                    newValue
+                        ? "Client images enabled."
+                        : "Client images disabled.",
+                    "success"
+                );
+
+            } catch (error) {
+                console.error(
+                    "Client image setting save failed:",
+                    error
+                );
+
+                this.checked = !newValue;
+
+                showToast(
+                    getErrorMessage(
+                        error,
+                        "Unable to save client image setting."
+                    ),
+                    "error"
+                );
+
+            } finally {
+                this.disabled = false;
+            }
+        }
+    );
+}
+
     function displaySettingsBusinessProfile(profile) {
 
     const businessName =
@@ -2487,6 +2627,18 @@ showToast(
     "success"
 );
 
+const checkExportWindow = setInterval(() => {
+
+    if (exportWindow.closed) {
+
+        clearInterval(checkExportWindow);
+
+        window.location.reload();
+
+    }
+
+}, 500);
+
     } catch (error) {
 
         console.error(
@@ -2729,11 +2881,9 @@ showToast(
             initializeBusinessSettingsState();
 
             await loadSettingsBusinessProfile();
-
-           /* loadNotificationSettings();
-
-            initializeNotificationSettings();*/
-
+            
+            await initializeClientImageSetting();
+            
             await loadSubscriptionSettings();
 
             initializeAutoRenew();

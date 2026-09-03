@@ -12,7 +12,10 @@ let selectedInvoiceItems = [];
 let invoiceCurrencyCode = "";
 let invoiceCurrencySymbol = "$";
 let invoicePaymentDetails = {};
-
+let showClientImage = true;
+let currentSubscriptionSettings = null;
+let invoiceClientSearchTimer =
+    null;
 const DEFAULT_PROFILE_IMAGE = "logo.png";
 
 const totalInvoicesCount =
@@ -144,6 +147,31 @@ const invoiceCurrencyInput =
 
 const invoiceClientInput =
     document.getElementById("invoiceClientInput");
+    
+const invoiceClientPicker =
+    document.getElementById(
+        "invoiceClientPicker"
+    );
+
+const invoiceClientPickerTrigger =
+    document.getElementById(
+        "invoiceClientPickerTrigger"
+    );
+
+const invoiceClientPickerSelected =
+    document.getElementById(
+        "invoiceClientPickerSelected"
+    );
+
+const invoiceClientPickerSearch =
+    document.getElementById(
+        "invoiceClientPickerSearch"
+    );
+
+const invoiceClientPickerOptions =
+    document.getElementById(
+        "invoiceClientPickerOptions"
+    );
 
 const invoiceIssueDateInput =
     document.getElementById("invoiceIssueDateInput");
@@ -450,12 +478,6 @@ const invoiceExportMenu =
 const exportInvoicesPdfBtn =
     document.getElementById("exportInvoicesPdfBtn");
 
-const exportInvoicesExcelBtn =
-    document.getElementById("exportInvoicesExcelBtn");
-
-const exportInvoicesCsvBtn =
-    document.getElementById("exportInvoicesCsvBtn");
-    
 const previewStatusBadge =
     document.getElementById("previewStatusBadge");
     
@@ -544,6 +566,42 @@ async function loadInvoices() {
         totalPages = result.totalPages || 1;
         totalRecords = result.totalRecords || 0;
 
+        await Promise.all(
+            invoices.map(
+                async invoice => {
+                    if (
+                        invoice?.clientImageUrl ||
+                        !invoice?.objectId
+                    ) {
+                        return;
+                    }
+
+                    try {
+                        const details =
+                            await Parse.Cloud.run(
+                                "getInvoiceDetails",
+                                {
+                                    invoiceId:
+                                        invoice.objectId
+                                }
+                            );
+
+                        if (
+                            details?.client?.clientImageUrl
+                        ) {
+                            invoice.clientImageUrl =
+                                details.client.clientImageUrl;
+                        }
+                    } catch (error) {
+                        console.warn(
+                            "Unable to load invoice client image:",
+                            error
+                        );
+                    }
+                }
+            )
+        );
+
         renderInvoiceTable();
         updateInvoiceTableState();
     } catch (error) {
@@ -594,33 +652,26 @@ function renderInvoiceTable() {
         const clientImageUrl =
             invoice.clientImageUrl || "";
 
-        const clientAvatar =
+const clientAvatar =
+    showClientImage
+        ? (
             clientImageUrl
                 ? `
                     <img
                         src="${escapeInvoiceHtml(clientImageUrl)}"
+                        class="client-table-avatar"
                         alt="${escapeInvoiceHtml(clientName)}"
-                        class="client-table-image"
                     >
                 `
                 : `
-<div class="client-table-avatar">
-    ${
-        clientImageUrl
-            ? `
-                <img
-                    src="${escapeInvoiceHtml(clientImageUrl)}"
-                    alt="${escapeInvoiceHtml(clientName)}"
-                    class="client-table-image"
-                >
-            `
-            : `
-                <div class="client-table-initials">
-                    ${clientInitials}
-                </div>
-            `
-    }
-</div> `;
+                    <div
+                        class="client-table-avatar client-table-initials"
+                    >
+                        ${clientInitials}
+                    </div>
+                `
+        )
+        : "";
 
         const currencySymbol =
             invoice.currencySymbol || "$";
@@ -1036,6 +1087,33 @@ function getInvoicePaginationPages() {
     return pages;
 }
 
+async function loadBusinessProfileSettings() {
+
+    try {
+
+        const result =
+            await Parse.Cloud.run(
+                "getBusinessProfile"
+            );
+
+        showClientImage =
+            result &&
+            result.profile &&
+            result.profile.showClientImage !== false;
+
+    } catch (error) {
+
+        console.error(
+            "Business Profile Settings Error:",
+            error
+        );
+
+        showClientImage = true;
+
+    }
+
+}
+
 async function openCreateInvoiceModal() {
     editingInvoice = false;
     editingInvoiceId = null;
@@ -1104,12 +1182,12 @@ async function openEditInvoiceModal(invoiceId) {
             "Update the invoice details for your client.";
 
         createInvoiceModal.classList.add(
-    "show"
-);
+            "show"
+        );
 
-createInvoiceOverlay.classList.add(
-    "show"
-);
+        createInvoiceOverlay.classList.add(
+            "show"
+        );
 
         document.body.classList.add(
             "modal-open"
@@ -1124,43 +1202,45 @@ createInvoiceOverlay.classList.add(
             );
 
         if (
-    !result ||
-    !result.invoice
-) {
-    throw new Error(
-        result?.message ||
-        "Unable to load invoice."
-    );
-    showToast("Unable to load invoice.")
-}
+            !result ||
+            !result.invoice
+        ) {
+            throw new Error(
+                result?.message ||
+                "Unable to load invoice."
+            );
+        }
 
         const invoice =
             result.invoice;
-            
+
         invoice.items =
-    (result.items || []).map(item => ({
-        objectId:
-            item.objectId || "",
+            (result.items || []).map(
+                item => ({
+                    objectId:
+                        item.objectId || "",
 
-        name:
-            item.description || "",
+                    name:
+                        item.description || "",
 
-        quantity:
-            item.quantity ?? 1,
+                    quantity:
+                        item.quantity ?? 1,
 
-        rate:
-            item.unitPrice ?? 0,
+                    rate:
+                        item.unitPrice ?? 0,
 
-        total:
-            item.total ?? 0
-    }));
+                    total:
+                        item.total ?? 0
+                })
+            );
 
         selectedInvoice =
             invoice;
 
         await populateInvoiceForm(
-            invoice
-        );
+    invoice,
+    result.client
+);
 
         await loadInvoicePaymentInformation();
 
@@ -1174,7 +1254,7 @@ createInvoiceOverlay.classList.add(
 
         closeCreateInvoiceModal();
 
-        console.log(
+        showToast(
             error.message ||
             "Unable to load invoice for editing.",
             "error"
@@ -1182,7 +1262,10 @@ createInvoiceOverlay.classList.add(
     }
 }
 
-async function populateInvoiceForm(invoice) {
+async function populateInvoiceForm(
+    invoice,
+    client
+) {
     invoiceIdInput.value =
         invoice.objectId || "";
 
@@ -1238,6 +1321,7 @@ async function populateInvoiceForm(invoice) {
         invoice.notes || "";
 
     invoiceTermsInput.value =
+        invoice.termsConditions ||
         invoice.terms || "";
 
     invoiceSignatureNameInput.value =
@@ -1249,11 +1333,19 @@ async function populateInvoiceForm(invoice) {
     invoiceSignatureImageInput.value =
         "";
 
+    const savedSignatureUrl =
+        invoice.signatureImage ||
+        invoice.signatureImageUrl ||
+        "";
+
+    invoiceSignaturePreview.dataset.savedUrl =
+        savedSignatureUrl;
+
     invoiceSignaturePreview.src =
-        invoice.signatureImageUrl || "";
+        savedSignatureUrl;
 
     invoiceSignaturePreview.style.display =
-        invoice.signatureImageUrl
+        savedSignatureUrl
             ? "block"
             : "none";
 
@@ -1266,10 +1358,11 @@ async function populateInvoiceForm(invoice) {
     await loadInvoiceClients();
 
     selectInvoiceClient(
-        invoice.clientId ||
-        invoice.client?.objectId ||
-        ""
-    );
+    invoice.clientId ||
+    client?.objectId ||
+    invoice.client?.objectId ||
+    ""
+);
 
     invoiceItemsContainer.innerHTML =
         "";
@@ -1353,9 +1446,6 @@ async function viewInvoice(invoiceId) {
                     invoiceId
                 }
             );
-            result.invoice.clientImageUrl =
-    result.client.clientImageUrl;
-
         if (
             !result ||
             !result.invoice
@@ -1364,6 +1454,11 @@ async function viewInvoice(invoiceId) {
                 result?.message ||
                 "Unable to load invoice."
             );
+        }
+        
+        if (result.client) {
+            result.invoice.clientImageUrl =
+                result.client.clientImageUrl || "";
         }
 
         const invoice =
@@ -1510,6 +1605,7 @@ async function viewInvoice(invoiceId) {
 
         invoiceClientInput.value =
             selectedInvoiceClient.objectId;
+            
 
         invoiceItemsContainer.innerHTML =
             "";
@@ -1632,33 +1728,46 @@ async function updateInvoiceStatus(invoiceId, status) {
     }
 }
 
-function selectInvoiceClient(clientId) {
+function selectInvoiceClient(
+    clientId
+) {
+    
     if (!clientId) {
-        invoiceClientInput.value = "";
-        selectedInvoiceClient = null;
-        clearInvoiceClientPreview();
+        
+        clearInvoiceClientPicker();
+        
         return;
+        
     }
-
-    const option =
-        Array.from(
-            invoiceClientInput.options
-        ).find(
-            option =>
-                option.value === clientId
-        );
-
-    if (!option) {
-        invoiceClientInput.value = "";
-        selectedInvoiceClient = null;
-        clearInvoiceClientPreview();
+    
+    if (
+        selectedInvoiceClient &&
+        selectedInvoiceClient.objectId ===
+        clientId
+    ) {
+        
+        invoiceClientInput.value =
+            clientId;
+        
+        invoiceClientPickerSelected.textContent =
+            getInvoiceClientDisplayName(
+                selectedInvoiceClient
+            );
+        
         return;
+        
     }
-
+    
     invoiceClientInput.value =
         clientId;
-
-    handleInvoiceClientSelection();
+    
+    invoiceClientPickerSelected.textContent =
+        "Selected Client";
+    
+    loadInvoiceClients(
+        ""
+    );
+    
 }
 
 async function deleteInvoice(invoiceId) {
@@ -1728,7 +1837,7 @@ function resetInvoiceModal() {
     invoicePurchaseOrderInput.value = "";
     invoiceNumberInput.value = "";
     invoiceCurrencyInput.value = "";
-    invoiceClientInput.value = "";
+    clearInvoiceClientPicker();
     const today = formatInvoiceDateInput(new Date());
     invoiceIssueDateInput.value = today;
     invoiceDueDateInput.value = today;
@@ -1746,6 +1855,7 @@ function resetInvoiceModal() {
     invoiceSignatureImageInput.value = "";
     invoiceSignaturePreview.src = "";
     invoiceSignaturePreview.style.display = "none";
+    invoiceSignaturePreview.removeAttribute("data-saved-url");
     invoiceSubtotal.textContent = "0.00";
     invoiceGrandTotal.textContent = "0.00";
     invoicePaymentDetails = {};
@@ -2059,9 +2169,18 @@ function handleInvoiceSignatureChange() {
         invoiceSignatureImageInput.files?.[0];
 
     if (!file) {
-        invoiceSignaturePreview.src = "";
+        const savedSignatureUrl =
+            invoiceSignaturePreview.dataset.savedUrl ||
+            "";
+
+        invoiceSignaturePreview.src =
+            savedSignatureUrl;
         invoiceSignaturePreview.style.display =
-            "none";
+            savedSignatureUrl
+                ? "block"
+                : "none";
+
+        updateInvoicePreview();
 
         return;
     }
@@ -2075,6 +2194,7 @@ function handleInvoiceSignatureChange() {
 
         invoiceSignaturePreview.style.display =
             "block";
+        updateInvoicePreview();
     };
 
     reader.readAsDataURL(file);
@@ -2231,162 +2351,29 @@ function validateInvoiceForm() {
     };
 }
 
-async function loadInvoiceClients() {
-    try {
-        const result =
-            await Parse.Cloud.run(
-                "getClients",
-                {
-                    search: "",
-                    status: "active",
-                    sort: "name",
-                    page: 1,
-                    limit: 100
-                }
-            );
-
-        invoiceClientInput.innerHTML = `
-            <option value="">
-                Select Client
-            </option>
-        `;
-
-        const clients =
-            result.clients || [];
-
-        clients.forEach(client => {
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-            option.value =
-                client.objectId;
-
-            option.textContent =
-                client.contactPerson +
-                (
-                    client.companyName
-                        ? ` (${client.companyName})`
-                        : ""
-                );
-
-            option.dataset.contactPerson =
-                client.contactPerson || "";
-
-            option.dataset.companyName =
-                client.companyName || "";
-
-            option.dataset.email =
-                client.clientEmail || "";
-
-            option.dataset.phone =
-                client.clientPhone || "";
-
-            option.dataset.imageUrl =
-                client.clientImageUrl || "";
-                
-            option.dataset.billingAddressLine1 =
-                client.billingAddressLine1 || "";
-
-            option.dataset.billingAddressLine2 =
-                client.billingAddressLine2 || "";
-
-            option.dataset.billingCityStateZip =
-                client.billingCityStateZip || "";
-
-            option.dataset.billingCountry =
-                client.billingCountry || "";
-
-            invoiceClientInput.appendChild(
-                option
-            );
-        });
-    } catch (error) {
-        console.error(
-            "Invoice Client Load Error:",
-            error
-        );
-        showToast(
-    "Unable to load clients.",
-    "error"
-);
-
-        invoiceClientInput.innerHTML = `
-            <option value="">
-                Unable to load clients
-            </option>
-        `;
-    }
-}
-
 function initializeInvoiceClientSelection() {
-    invoiceClientInput.addEventListener(
-        "change",
-        handleInvoiceClientSelection
-    );
+
+    initializeInvoiceClientPicker();
+
 }
 
 function handleInvoiceClientSelection() {
+
     const clientId =
         invoiceClientInput.value;
 
     if (!clientId) {
-        selectedInvoiceClient = null;
 
-        clearInvoiceClientPreview();
+        clearInvoiceClientPicker();
 
         return;
+
     }
 
-    const selectedOption =
-        invoiceClientInput.options[
-            invoiceClientInput.selectedIndex
-        ];
-
-    selectedInvoiceClient = {
-    objectId: clientId,
-
-    contactPerson:
-        selectedOption.dataset
-            .contactPerson || "",
-
-    companyName:
-        selectedOption.dataset
-            .companyName || "",
-
-    clientEmail:
-        selectedOption.dataset
-            .email || "",
-
-    clientPhone:
-        selectedOption.dataset
-            .phone || "",
-
-    clientImageUrl:
-        selectedOption.dataset
-            .imageUrl || "",
-
-    billingAddressLine1:
-        selectedOption.dataset
-            .billingAddressLine1 || "",
-
-    billingAddressLine2:
-        selectedOption.dataset
-            .billingAddressLine2 || "",
-
-    billingCityStateZip:
-        selectedOption.dataset
-            .billingCityStateZip || "",
-
-    billingCountry:
-        selectedOption.dataset
-            .billingCountry || ""
-};
-
-    updateInvoiceClientPreview(
-        selectedInvoiceClient
+    loadInvoiceClients(
+        ""
     );
+
 }
 
 function updateInvoiceClientPreview(
@@ -2410,30 +2397,47 @@ function updateInvoiceClientPreview(
 }
 
 function clearInvoiceClientPreview() {
-    previewCustomerName.textContent =
-        "-";
+    setInvoicePreviewText(
+        previewCustomerName,
+        "-"
+    );
 
-    previewCustomerCompany.textContent =
-        "-";
+    setInvoicePreviewText(
+        previewCustomerCompany,
+        "-"
+    );
 
-    previewCustomerEmail.textContent =
-        "-";
+    setInvoicePreviewText(
+        previewCustomerEmail,
+        "-"
+    );
 
-    previewCustomerPhone.textContent =
-        "-";
+    setInvoicePreviewText(
+        previewCustomerPhone,
+        "-"
+    );
 
-    previewCustomerAddress1.textContent =
-        "-";
+    setInvoicePreviewText(
+        previewCustomerAddress1,
+        "-"
+    );
 
-    previewCustomerAddress2.textContent =
-        "-";
+    setInvoicePreviewText(
+        previewCustomerAddress2,
+        "-"
+    );
 
-    previewCustomerCity.textContent =
-        "-";
+    setInvoicePreviewText(
+        previewCustomerCity,
+        "-"
+    );
 
-    previewCustomerCountry.textContent =
-        "-";
+    setInvoicePreviewText(
+        previewCustomerCountry,
+        "-"
+    );
 }
+
 
 function addInvoiceItem() {
     const row =
@@ -2701,22 +2705,6 @@ function initializeInvoicePreviewRefresh() {
     );
 }
 
-function printInvoicePreview() {
-    try {
-        window.print();
-    } catch (error) {
-        console.error(
-            "Print Invoice Preview Error:",
-            error
-        );
-        
-        showToast(
-            "Unable to print invoice preview.",
-            "error"
-        );
-    }
-}
-
 function updateAllInvoiceItemTotals() {
     const rows =
         invoiceItemsContainer.querySelectorAll(
@@ -2886,6 +2874,12 @@ function initializeInvoicePaymentInformation() {
     loadInvoicePaymentInformation();
 }
 
+function setInvoicePreviewText(element, value) {
+    if (element) {
+        element.textContent = value;
+    }
+}
+
 function updateInvoiceBusinessPreview() {
     const profile =
         invoicePreviewState.userProfile;
@@ -2894,43 +2888,55 @@ function updateInvoiceBusinessPreview() {
         return;
     }
 
-    invoiceCompanyName.textContent =
+    setInvoicePreviewText(
+        invoiceCompanyName,
         profile.businessName ||
         profile.companyName ||
-        "Invoice Pro";
+        "Invoice Pro"
+    );
 
-    previewBusinessName.textContent =
+    setInvoicePreviewText(
+        previewBusinessName,
         profile.businessName ||
         profile.companyName ||
-        "";
+        ""
+    );
 
-    previewBusinessAddress1.textContent =
+    setInvoicePreviewText(
+        previewBusinessAddress1,
         profile.businessAddress ||
         profile.businessAddressLine1 ||
-        "";
+        ""
+    );
 
-    previewBusinessAddress2.textContent =
+    setInvoicePreviewText(
+        previewBusinessAddress2,
         profile.businessAddressLine2 ||
-        "";
+        ""
+    );
 
-    previewBusinessPhone.textContent =
+    setInvoicePreviewText(
+        previewBusinessPhone,
         profile.businessPhone ||
         profile.phone ||
-        "";
+        ""
+    );
 
-    previewBusinessEmail.textContent =
+    setInvoicePreviewText(
+        previewBusinessEmail,
         profile.businessEmail ||
         profile.email ||
-        "";
+        ""
+    );
 
-    previewBusinessWebsite.textContent =
+    setInvoicePreviewText(
+        previewBusinessWebsite,
         profile.businessWebsite ||
         profile.website ||
-        "";
-
-    updateInvoiceBusinessLogo(
-        profile
+        ""
     );
+
+    updateInvoiceBusinessLogo(profile);
 }
 
 function updateInvoiceBusinessLogo(profile) {
@@ -3064,64 +3070,92 @@ function initializeInvoicePreviewModal() {
 }
 
 function updateInvoiceHeaderPreview() {
-    previewInvoiceTitle.textContent =
-        invoiceTitleInput.value.trim() ||
-        "INVOICE";
+    setInvoicePreviewText(
+        previewInvoiceTitle,
+        invoiceTitleInput?.value?.trim() ||
+        "INVOICE"
+    );
 
-    previewInvoiceNumber.textContent =
-        invoiceNumberInput.value ||
-        "INV-000001";
+    setInvoicePreviewText(
+        previewInvoiceNumber,
+        invoiceNumberInput?.value ||
+        "INV-000001"
+    );
 
-    previewInvoiceDate.textContent =
+    setInvoicePreviewText(
+        previewInvoiceDate,
         formatInvoicePreviewDate(
-            invoiceIssueDateInput.value
-        );
+            invoiceIssueDateInput?.value
+        )
+    );
 
-    previewDueDate.textContent =
+    setInvoicePreviewText(
+        previewDueDate,
         formatInvoicePreviewDate(
-            invoiceDueDateInput.value
-        );
+            invoiceDueDateInput?.value
+        )
+    );
 }
 
 function updateInvoiceDetailsPreview() {
-    previewDetailsInvoiceNumber.textContent =
-        invoiceNumberInput.value ||
-        "INV-000001";
+    setInvoicePreviewText(
+        previewDetailsInvoiceNumber,
+        invoiceNumberInput?.value ||
+        "INV-000001"
+    );
 
-    previewDetailsIssueDate.textContent =
+    setInvoicePreviewText(
+        previewDetailsIssueDate,
         formatInvoicePreviewDate(
-            invoiceIssueDateInput.value
-        );
+            invoiceIssueDateInput?.value
+        )
+    );
 
-    previewDetailsDueDate.textContent =
+    setInvoicePreviewText(
+        previewDetailsDueDate,
         formatInvoicePreviewDate(
-            invoiceDueDateInput.value
+            invoiceDueDateInput?.value
+        )
+    );
+
+    setInvoicePreviewText(
+        previewInvoiceStatus,
+        invoicePaymentStatusInput?.value ||
+        "Pending"
+    );
+
+    setInvoicePreviewText(
+        previewPaymentTerms,
+        invoicePaymentTermsInput?.value ||
+        "-"
+    );
+
+    if (previewCurrency) {
+        setInvoicePreviewText(
+            previewCurrency,
+            invoiceCurrencyCode ||
+            invoiceCurrencyInput?.value ||
+            "-"
         );
+    }
 
-    previewInvoiceStatus.textContent =
-        invoicePaymentStatusInput.value ||
-        "Pending";
+    setInvoicePreviewText(
+        previewPurchaseOrder,
+        invoicePurchaseOrderInput?.value ||
+        "-"
+    );
 
-    previewPaymentTerms.textContent =
-        invoicePaymentTermsInput.value ||
-        "-";
+    setInvoicePreviewText(
+        previewReference,
+        invoiceReferenceNumberInput?.value ||
+        "-"
+    );
 
-    previewCurrency.textContent =
-    invoiceCurrencyCode ||
-    invoiceCurrencyInput.value ||
-    "-";
-
-    previewPurchaseOrder.textContent =
-        invoicePurchaseOrderInput.value ||
-        "-";
-
-    previewReference.textContent =
-        invoiceReferenceNumberInput.value ||
-        "-";
-
-    previewProjectName.textContent =
-        invoiceProjectNameInput.value ||
-        "-";
+    setInvoicePreviewText(
+        previewProjectName,
+        invoiceProjectNameInput?.value ||
+        "-"
+    );
 }
 
 function updateInvoiceCustomerPreview() {
@@ -3134,32 +3168,52 @@ function updateInvoiceCustomerPreview() {
         return;
     }
 
-    previewCustomerName.textContent =
-        client.contactPerson || "-";
+    setInvoicePreviewText(
+        previewCustomerName,
+        client.contactPerson || "-"
+    );
 
-    previewCustomerCompany.textContent =
-        client.companyName || "-";
+    setInvoicePreviewText(
+        previewCustomerCompany,
+        client.companyName || "-"
+    );
 
-    previewCustomerEmail.textContent =
-        client.clientEmail || "-";
+    setInvoicePreviewText(
+        previewCustomerEmail,
+        client.clientEmail || "-"
+    );
 
-    previewCustomerPhone.textContent =
-        client.clientPhone || "-";
+    setInvoicePreviewText(
+        previewCustomerPhone,
+        client.clientPhone || "-"
+    );
 
-    previewCustomerAddress1.textContent =
-        client.billingAddressLine1 || "-";
+    setInvoicePreviewText(
+        previewCustomerAddress1,
+        client.billingAddressLine1 || "-"
+    );
 
-    previewCustomerAddress2.textContent =
-        client.billingAddressLine2 || "-";
+    setInvoicePreviewText(
+        previewCustomerAddress2,
+        client.billingAddressLine2 || "-"
+    );
 
-    previewCustomerCity.textContent =
-        client.billingCityStateZip || "-";
+    setInvoicePreviewText(
+        previewCustomerCity,
+        client.billingCityStateZip || "-"
+    );
 
-    previewCustomerCountry.textContent =
-        client.billingCountry || "-";
+    setInvoicePreviewText(
+        previewCustomerCountry,
+        client.billingCountry || "-"
+    );
 }
 
 function updateInvoiceItemsPreview() {
+    if (!previewItemsBody) {
+        return;
+    }
+
     previewItemsBody.innerHTML = "";
 
     const items =
@@ -3171,9 +3225,7 @@ function updateInvoiceItemsPreview() {
 
     items.forEach(item => {
         const row =
-            document.createElement(
-                "tr"
-            );
+            document.createElement("tr");
 
         row.innerHTML = `
             <td>
@@ -3209,100 +3261,130 @@ function updateInvoiceTotalsPreview() {
     const totals =
         calculateInvoiceTotals();
 
-    previewSubtotal.textContent =
+    setInvoicePreviewText(
+        previewSubtotal,
         formatInvoiceMoney(
             totals.subtotal
-        );
+        )
+    );
 
-    previewDiscount.textContent =
+    setInvoicePreviewText(
+        previewDiscount,
         formatInvoiceMoney(
             totals.discount
-        );
+        )
+    );
 
-    previewTax.textContent =
+    setInvoicePreviewText(
+        previewTax,
         formatInvoiceMoney(
             totals.tax
-        );
+        )
+    );
 
-    previewShipping.textContent =
+    setInvoicePreviewText(
+        previewShipping,
         formatInvoiceMoney(
             totals.shipping
-        );
+        )
+    );
 
-    previewGrandTotal.textContent =
+    setInvoicePreviewText(
+        previewGrandTotal,
         formatInvoiceMoney(
             totals.totalAmount
-        );
+        )
+    );
 
-    previewDiscountRow.style.display =
-        totals.discount > 0
-            ? ""
-            : "none";
+    if (previewDiscountRow) {
+        previewDiscountRow.style.display =
+            totals.discount > 0
+                ? ""
+                : "none";
+    }
 
-    previewTaxRow.style.display =
-        totals.tax > 0
-            ? ""
-            : "none";
+    if (previewTaxRow) {
+        previewTaxRow.style.display =
+            totals.tax > 0
+                ? ""
+                : "none";
+    }
 
-    previewShippingRow.style.display =
-        totals.shipping > 0
-            ? ""
-            : "none";
+    if (previewShippingRow) {
+        previewShippingRow.style.display =
+            totals.shipping > 0
+                ? ""
+                : "none";
+    }
 }
 
 function updateInvoicePaymentPreview() {
     const payment =
         invoicePaymentDetails || {};
 
-    previewPaymentAccountName.textContent =
-        payment.accountName ||
-        "-";
+    setInvoicePreviewText(
+        previewPaymentAccountName,
+        payment.accountName || "-"
+    );
 
-    previewPaymentBankName.textContent =
-        payment.bankName ||
-        "-";
+    setInvoicePreviewText(
+        previewPaymentBankName,
+        payment.bankName || "-"
+    );
 
-    previewPaymentAccountNumber.textContent =
-        payment.accountNumber ||
-        "-";
+    setInvoicePreviewText(
+        previewPaymentAccountNumber,
+        payment.accountNumber || "-"
+    );
 
-    previewPaymentProvider.textContent =
-        payment.paymentProvider ||
-        "-";
+    setInvoicePreviewText(
+        previewPaymentProvider,
+        payment.paymentProvider || "-"
+    );
 }
 
 function updateInvoiceNotesPreview() {
-    previewNoteLine1.textContent =
-        invoiceNotesInput.value.trim() ||
-        "";
+    setInvoicePreviewText(
+        previewNoteLine1,
+        invoiceNotesInput?.value?.trim() ||
+        ""
+    );
 
-    previewTerms.textContent =
-        invoiceTermsInput.value.trim() ||
-        "";
+    setInvoicePreviewText(
+        previewTerms,
+        invoiceTermsInput?.value?.trim() ||
+        ""
+    );
 }
 
 function updateInvoiceSignaturePreview() {
-    previewSignatureName.textContent =
-        invoiceSignatureNameInput.value.trim() ||
-        "";
+    setInvoicePreviewText(
+        previewSignatureName,
+        invoiceSignatureNameInput?.value?.trim() ||
+        ""
+    );
 
-    previewSignatureTitle.textContent =
-        invoiceSignatureTitleInput.value.trim() ||
-        "";
+    setInvoicePreviewText(
+        previewSignatureTitle,
+        invoiceSignatureTitleInput?.value?.trim() ||
+        ""
+    );
 
     const imageFile =
-        invoiceSignatureImageInput.files?.[0];
+        invoiceSignatureImageInput?.files?.[0];
 
     if (imageFile) {
         const reader =
             new FileReader();
 
         reader.onload = event => {
-            previewSignatureImage.src =
-                event.target.result;
+            if (previewSignatureImage) {
+                previewSignatureImage.src =
+                    event.target.result;
 
-            previewSignatureImage.style.display =
-                "block";
+                previewSignatureImage.style.display =
+                    "block";
+            }
         };
 
         reader.readAsDataURL(
@@ -3313,34 +3395,44 @@ function updateInvoiceSignaturePreview() {
     }
 
     const savedSignatureUrl =
-        invoiceSignaturePreview.dataset.savedUrl ||
+        invoiceSignaturePreview?.dataset?.savedUrl ||
         "";
 
     if (savedSignatureUrl) {
-        previewSignatureImage.src =
-            savedSignatureUrl;
+        if (previewSignatureImage) {
+            previewSignatureImage.src =
+                savedSignatureUrl;
 
-        previewSignatureImage.style.display =
-            "block";
-
+            previewSignatureImage.style.display =
+                "block";
+        }
         return;
     }
 
-    previewSignatureImage.src = "";
-    previewSignatureImage.style.display =
-        "none";
+    if (previewSignatureImage) {
+        previewSignatureImage.src = "";
+        previewSignatureImage.style.display =
+            "none";
+    }
 }
 
 function updateInvoicePreview() {
-    updateInvoiceBusinessPreview();
-    updateInvoiceHeaderPreview();
-    updateInvoiceDetailsPreview();
-    updateInvoiceCustomerPreview();
-    updateInvoiceItemsPreview();
-    updateInvoiceTotalsPreview();
-    updateInvoicePaymentPreview();
-    updateInvoiceNotesPreview();
-    updateInvoiceSignaturePreview();
+    try {
+        updateInvoiceBusinessPreview();
+        updateInvoiceHeaderPreview();
+        updateInvoiceDetailsPreview();
+        updateInvoiceCustomerPreview();
+        updateInvoiceItemsPreview();
+        updateInvoiceTotalsPreview();
+        updateInvoicePaymentPreview();
+        updateInvoiceNotesPreview();
+        updateInvoiceSignaturePreview();
+    } catch (error) {
+        console.error(
+            "Invoice Preview Error:",
+            error
+        );
+    }
 }
 
 function initializeInvoicePreviewListeners() {
@@ -3474,135 +3566,181 @@ showToast(
     }
 }
 
+async function createInvoiceExportCanvas() {
+    if (!invoicePaper) {
+        throw new Error("Invoice preview is not available.");
+    }
+
+    updateInvoicePreview();
+
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+    const exportContainer = document.createElement("div");
+    const exportPaper = invoicePaper.cloneNode(true);
+    const paperWidth = invoicePaper.getBoundingClientRect().width || invoicePaper.offsetWidth || 820;
+
+    exportContainer.style.position = "fixed";
+    exportContainer.style.left = "-100000px";
+    exportContainer.style.top = "0";
+    exportContainer.style.width = `${paperWidth}px`;
+    exportContainer.style.minHeight = "0";
+    exportContainer.style.height = "auto";
+    exportContainer.style.margin = "0";
+    exportContainer.style.padding = "0";
+    exportContainer.style.background = "#ffffff";
+    exportContainer.style.overflow = "visible";
+    exportContainer.style.zIndex = "-1";
+    exportContainer.style.pointerEvents = "none";
+
+    exportPaper.style.transform = "none";
+    exportPaper.style.transformOrigin = "top left";
+    exportPaper.style.margin = "0";
+    exportPaper.style.marginBottom = "0";
+    exportPaper.style.width = `${paperWidth}px`;
+    exportPaper.style.maxWidth = "none";
+    exportPaper.style.maxHeight = "none";
+    exportPaper.style.height = "auto";
+    exportPaper.style.overflow = "visible";
+
+    exportContainer.appendChild(exportPaper);
+    document.body.appendChild(exportContainer);
+
+    try {
+        const images = Array.from(exportPaper.querySelectorAll("img"));
+
+        await Promise.all(
+            images.map(image => {
+                if (image.complete && image.naturalWidth > 0) {
+                    return Promise.resolve();
+                }
+
+                return new Promise(resolve => {
+                    const finish = () => resolve();
+                    image.addEventListener("load", finish, { once: true });
+                    image.addEventListener("error", finish, { once: true });
+                });
+            })
+        );
+
+        await new Promise(resolve => requestAnimationFrame(resolve));
+
+        return await html2canvas(exportPaper, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: false,
+            backgroundColor: "#ffffff",
+            logging: false,
+            imageTimeout: 15000,
+            width: Math.ceil(exportPaper.scrollWidth),
+            height: Math.ceil(exportPaper.scrollHeight),
+            windowWidth: Math.ceil(exportPaper.scrollWidth),
+            windowHeight: Math.ceil(exportPaper.scrollHeight),
+            scrollX: 0,
+            scrollY: 0
+        });
+    } finally {
+        exportContainer.remove();
+    }
+}
+
+function addInvoiceCanvasToPdf(pdf, canvas) {
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const imageWidth = pageWidth;
+    const pixelsPerPdfPage = Math.floor(canvas.width * pageHeight / pageWidth);
+    let offsetY = 0;
+    let pageNumber = 0;
+
+    while (offsetY < canvas.height) {
+        const sliceHeight = Math.min(pixelsPerPdfPage, canvas.height - offsetY);
+        const pageCanvas = document.createElement("canvas");
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = sliceHeight;
+
+        const context = pageCanvas.getContext("2d");
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+        context.drawImage(
+            canvas,
+            0,
+            offsetY,
+            canvas.width,
+            sliceHeight,
+            0,
+            0,
+            canvas.width,
+            sliceHeight
+        );
+
+        if (pageNumber > 0) {
+            pdf.addPage();
+        }
+
+        const imageHeight = sliceHeight * imageWidth / canvas.width;
+
+        pdf.addImage(
+            pageCanvas.toDataURL("image/jpeg", 0.98),
+            "JPEG",
+            0,
+            0,
+            imageWidth,
+            imageHeight,
+            undefined,
+            "FAST"
+        );
+
+        offsetY += sliceHeight;
+        pageNumber++;
+    }
+}
+
 async function downloadInvoicePdf() {
     if (!invoicePaper) {
         return;
     }
 
+    if (!currentSubscriptionSettings) {
+        await loadInvoiceSubscriptionSettings();
+    }
+
+    if (!canExportInvoicePdf()) {
+        return;
+    }
+
     try {
         if (typeof html2canvas === "undefined") {
-            throw new Error(
-                "PDF rendering library is not loaded."
-            );
+            throw new Error("PDF rendering library is not loaded.");
         }
 
-        if (
-            typeof window.jspdf === "undefined" ||
-            !window.jspdf.jsPDF
-        ) {
-            throw new Error(
-                "PDF library is not loaded."
-            );
+        if (typeof window.jspdf === "undefined" || !window.jspdf.jsPDF) {
+            throw new Error("PDF library is not loaded.");
         }
 
-        updateInvoicePreview();
+        const canvas = await createInvoiceExportCanvas();
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+            orientation: "portrait",
+            unit: "mm",
+            format: "a4",
+            compress: true
+        });
 
-        await new Promise(resolve =>
-            setTimeout(resolve, 300)
-        );
+        addInvoiceCanvasToPdf(pdf, canvas);
 
-        const canvas =
-            await html2canvas(
-                invoicePaper,
-                {
-                    scale: 2,
-                    useCORS: true,
-                    allowTaint: false,
-                    backgroundColor: "#ffffff",
-                    logging: false,
-                    imageTimeout: 15000
-                }
-            );
+        const invoiceNumber = invoiceNumberInput.value.trim() || "invoice";
+        const safeFileName = invoiceNumber.replace(/[^a-z0-9-_]/gi, "_");
 
-        const {
-            jsPDF
-        } = window.jspdf;
+        pdf.save(`${safeFileName}.pdf`);
 
-        const pdf =
-            new jsPDF({
-                orientation: "portrait",
-                unit: "mm",
-                format: "a4"
-            });
+        await recordInvoicePdfExport();
 
-        const pageWidth =
-            pdf.internal.pageSize.getWidth();
-
-        const pageHeight =
-            pdf.internal.pageSize.getHeight();
-
-        const imageWidth =
-            pageWidth;
-
-        const imageHeight =
-            canvas.height *
-            imageWidth /
-            canvas.width;
-
-        const imageData =
-            canvas.toDataURL(
-                "image/jpeg",
-                0.95
-            );
-
-        const totalPages =
-            Math.ceil(
-                imageHeight /
-                pageHeight
-            );
-
-        for (
-            let page = 0;
-            page < totalPages;
-            page++
-        ) {
-            if (page > 0) {
-                pdf.addPage();
-            }
-
-            const position =
-                -(page * pageHeight);
-
-            pdf.addImage(
-                imageData,
-                "JPEG",
-                0,
-                position,
-                imageWidth,
-                imageHeight
-            );
-        }
-
-        const invoiceNumber =
-            invoiceNumberInput.value.trim() ||
-            "invoice";
-
-        const safeFileName =
-            invoiceNumber.replace(
-                /[^a-z0-9-_]/gi,
-                "_"
-            );
-
-        pdf.save(
-            `${safeFileName}.pdf`
-        );
-        
-        showToast(
-    "Invoice PDF generated successfully.",
-    "success"
-);
-
+        showToast("Invoice PDF generated successfully.", "success");
     } catch (error) {
-        console.error(
-            "Invoice PDF Error:",
-            error
-        );
-
+        console.error("Invoice PDF Error:", error);
         showToast(
-    error.message ||
-    "Unable to export the invoice as PDF.",
-    "error"
-);
+            error.message || "Unable to export the invoice as PDF.",
+            "error"
+        );
     }
 }
 
@@ -3929,217 +4067,6 @@ function closeInvoicePreviewModal() {
     );
 }
 
-function getInvoiceExportData() {
-    return invoices.map(invoice => {
-        const totalAmount =
-            Number(
-                invoice.totalAmount
-            ) || 0;
-
-        return {
-            Invoice:
-                invoice.invoiceNumber || "",
-
-            Title:
-                invoice.invoiceTitle || "",
-
-            Client:
-                invoice.companyName ||
-                invoice.contactPerson ||
-                "",
-
-            Email:
-                invoice.clientEmail || "",
-
-            Amount:
-                totalAmount,
-
-            Currency:
-                invoice.currencyCode ||
-                "",
-
-            Status:
-                invoice.status || "",
-
-            IssueDate:
-                formatInvoiceDate(
-                    invoice.issueDate
-                ),
-
-            DueDate:
-                formatInvoiceDate(
-                    invoice.dueDate
-                ),
-
-            PaymentTerms:
-                invoice.paymentTerms || "",
-
-            Reference:
-                invoice.referenceNumber || "",
-
-            Project:
-                invoice.projectName || ""
-        };
-    });
-}
-
-function exportInvoicesAsExcel() {
-    try {
-        if (
-            typeof XLSX === "undefined"
-        ) {
-            throw new Error(
-                "Excel export library is not loaded."
-            );
-        }
-
-        if (!invoices.length) {
-            showToast(
-                "There are no invoices to export.",
-                "info"
-            );
-
-            return;
-        }
-
-        const data =
-            getInvoiceExportData();
-
-        const worksheet =
-            XLSX.utils.json_to_sheet(
-                data
-            );
-
-        const workbook =
-            XLSX.utils.book_new();
-
-        XLSX.utils.book_append_sheet(
-            workbook,
-            worksheet,
-            "Invoices"
-        );
-
-        XLSX.writeFile(
-            workbook,
-            "invoices.xlsx"
-        );
-
-        showToast(
-            "Invoices exported as Excel successfully.",
-            "success"
-        );
-
-    } catch (error) {
-        console.error(
-            "Invoice Excel Export Error:",
-            error
-        );
-
-        showToast(
-            error.message ||
-            "Unable to export invoices as Excel.",
-            "error"
-        );
-    }
-}
-
-function exportInvoicesAsCsv() {
-    try {
-        if (!invoices.length) {
-            showToast(
-                "There are no invoices to export.",
-                "info"
-            );
-
-            return;
-        }
-
-        const data =
-            getInvoiceExportData();
-
-        const headers =
-            Object.keys(
-                data[0]
-            );
-
-        const csvRows =
-            [
-                headers.join(",")
-            ];
-
-        data.forEach(invoice => {
-            const row =
-                headers.map(header => {
-                    const value =
-                        invoice[header] ?? "";
-
-                /*    return `"${String(value)
-                        .replace(/"/g, '""')}`";*/
-                });
-
-            csvRows.push(
-                row.join(",")
-            );
-        });
-
-        const csv =
-            csvRows.join("\n");
-
-        const blob =
-            new Blob(
-                [csv],
-                {
-                    type:
-                        "text/csv;charset=utf-8;"
-                }
-            );
-
-        const url =
-            URL.createObjectURL(
-                blob
-            );
-
-        const link =
-            document.createElement(
-                "a"
-            );
-
-        link.href = url;
-
-        link.download =
-            "invoices.csv";
-
-        document.body.appendChild(
-            link
-        );
-
-        link.click();
-
-        link.remove();
-
-        URL.revokeObjectURL(
-            url
-        );
-
-        showToast(
-            "Invoices exported as CSV successfully.",
-            "success"
-        );
-
-    } catch (error) {
-        console.error(
-            "Invoice CSV Export Error:",
-            error
-        );
-
-        showToast(
-            error.message ||
-            "Unable to export invoices as CSV.",
-            "error"
-        );
-    }
-}
-
 async function loadInvoiceForExport(
     invoice,
     items
@@ -4260,6 +4187,8 @@ async function loadInvoiceForExport(
 
     invoiceClientInput.value =
         selectedInvoiceClient.objectId;
+        
+    
 
     invoiceCurrencyInput.value =
         invoice.currencyCode || "";
@@ -4324,236 +4253,754 @@ async function loadInvoiceForExport(
     updateInvoicePreview();
 }
 
-async function exportInvoicesAsPdf() {
-    if (!invoicePaper) {
+function canExportInvoicePdf() {
+    const exportUsage =
+        currentSubscriptionSettings?.usage?.exports;
+
+    if (!exportUsage) {
+        showToast(
+            "Unable to verify your PDF export limit.",
+            "error"
+        );
+        return false;
+    }
+
+    const maximum =
+        exportUsage.maximum;
+
+    if (
+        maximum === undefined ||
+        maximum === null
+    ) {
+        showToast(
+            "PDF exports are not available on your current plan.",
+            "error"
+        );
+        return false;
+    }
+
+    if (maximum !== -1) {
+        const remaining =
+            Number(exportUsage.remaining);
+
+        if (
+            Number.isNaN(remaining) ||
+            remaining <= 0
+        ) {
+            showToast(
+                "You have reached the PDF export limit for your current plan.",
+                "error"
+            );
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function updateInvoiceExportButtonState() {
+    const buttons = [
+        exportInvoicesPdfBtn,
+        downloadPdfBtn
+    ];
+
+    const exportUsage =
+        currentSubscriptionSettings?.usage?.exports;
+
+    if (!exportUsage) {
         return;
     }
 
-    try {
-        if (
-            typeof html2canvas === "undefined"
-        ) {
-            throw new Error(
-                "PDF rendering library is not loaded."
-            );
-        }
+    const maximum =
+        exportUsage.maximum;
 
-        if (
-            typeof window.jspdf === "undefined" ||
-            !window.jspdf.jsPDF
-        ) {
-            throw new Error(
-                "PDF library is not loaded."
-            );
-        }
-
-        const firstPage =
-            await Parse.Cloud.run(
-                "getInvoices",
-                {
-                    page: 1,
-                    limit: 100,
-                    search: "",
-                    status: "all",
-                    date: "all",
-                    sort: "newest"
-                }
-            );
-
-        const allInvoices =
-            firstPage.invoices || [];
-
-        const totalRecords =
-            Number(
-                firstPage.totalRecords
-            ) || 0;
-
-        const totalPages =
-            Math.ceil(
-                totalRecords / 100
-            );
-
-        for (
-            let page = 2;
-            page <= totalPages;
-            page++
-        ) {
-            const pageResult =
-                await Parse.Cloud.run(
-                    "getInvoices",
-                    {
-                        page,
-                        limit: 100,
-                        search: "",
-                        status: "all",
-                        date: "all",
-                        sort: "newest"
-                    }
-                );
-
-            if (
-                Array.isArray(
-                    pageResult.invoices
-                )
-            ) {
-                allInvoices.push(
-                    ...pageResult.invoices
-                );
-            }
-        }
-
-        if (!allInvoices.length) {
-            showToast(
-                "There are no invoices to export.",
-                "info"
-            );
-
+    buttons.forEach(button => {
+        if (!button) {
             return;
         }
 
-        const {
-            jsPDF
-        } = window.jspdf;
-
-        const pdf =
-            new jsPDF({
-                orientation: "portrait",
-                unit: "mm",
-                format: "a4"
-            });
-
-        const pageWidth =
-            pdf.internal.pageSize.getWidth();
-
-        const pageHeight =
-            pdf.internal.pageSize.getHeight();
-
-        for (
-            let index = 0;
-            index < allInvoices.length;
-            index++
-        ) {
-            const invoice =
-                allInvoices[index];
-
-            const result =
-                await Parse.Cloud.run(
-                    "getInvoiceDetails",
-                    {
-                        invoiceId:
-                            invoice.objectId
-                    }
-                );
-                result.invoice.clientImageUrl =
-    result.client.clientImageUrl;
-
-            if (
-                !result ||
-                !result.invoice
-            ) {
-                continue;
-            }
-
-            await loadInvoiceForExport(
-                result.invoice,
-                result.items || []
-            );
-
-            updateInvoicePreview();
-
-            await new Promise(
-                resolve =>
-                    setTimeout(
-                        resolve,
-                        300
-                    )
-            );
-
-            const canvas =
-                await html2canvas(
-                    invoicePaper,
-                    {
-                        scale: 2,
-                        useCORS: true,
-                        allowTaint: false,
-                        backgroundColor:
-                            "#ffffff",
-                        logging: false,
-                        imageTimeout: 15000
-                    }
-                );
-
-            const imageWidth =
-                pageWidth;
-
-            const imageHeight =
-                canvas.height *
-                imageWidth /
-                canvas.width;
-
-            const imageData =
-                canvas.toDataURL(
-                    "image/jpeg",
-                    0.95
-                );
-
-            if (index > 0) {
-                pdf.addPage();
-            }
-
-            let remainingHeight =
-                imageHeight;
-
-            let position = 0;
-
-            let pageIndex = 0;
-
-            while (
-                remainingHeight > 0
-            ) {
-                if (
-                    pageIndex > 0
-                ) {
-                    pdf.addPage();
-                }
-
-                pdf.addImage(
-                    imageData,
-                    "JPEG",
-                    0,
-                    position,
-                    imageWidth,
-                    imageHeight
-                );
-
-                remainingHeight -=
-                    pageHeight;
-
-                position -=
-                    pageHeight;
-
-                pageIndex++;
-            }
+        if (maximum === -1) {
+            button.disabled = false;
+            return;
         }
 
-        pdf.save(
-            "invoices.pdf"
+        if (
+            maximum === undefined ||
+            maximum === null
+        ) {
+            button.disabled = true;
+            return;
+        }
+
+        const remaining =
+            Number(exportUsage.remaining);
+
+        if (
+            Number.isNaN(remaining) ||
+            remaining <= 0
+        ) {
+            button.disabled = true;
+            return;
+        }
+
+        button.disabled = false;
+    });
+
+    if (exportInvoicesPdfBtn) {
+        if (maximum === -1) {
+            exportInvoicesPdfBtn.querySelector("span")?.replaceChildren(
+                document.createTextNode("Export as PDF")
+            );
+        } else if (
+            maximum !== undefined &&
+            maximum !== null
+        ) {
+            const remaining =
+                Number(exportUsage.remaining);
+
+            exportInvoicesPdfBtn.querySelector("span")?.replaceChildren(
+                document.createTextNode(
+                    remaining > 0
+                        ? `Export as PDF (${remaining} left)`
+                        : "Export as PDF (Limit Reached)"
+                )
+            );
+        }
+    }
+}
+
+function getInvoiceClientDisplayName(
+    client
+) {
+
+    return (
+        client.contactPerson ||
+        client.companyName ||
+        client.clientEmail ||
+        "Unnamed Client"
+    );
+
+}
+
+function renderInvoiceClientOptions(
+    clients
+) {
+
+    if (!clients.length) {
+
+        invoiceClientPickerOptions.innerHTML = `
+            <div class="client-picker-empty">
+                No clients found.
+            </div>
+        `;
+
+        return;
+
+    }
+
+    invoiceClientPickerOptions.innerHTML =
+        "";
+
+    clients.forEach(
+        client => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.type =
+                "button";
+
+            button.className =
+                "client-picker-option";
+
+            if (
+                invoiceClientInput.value ===
+                client.objectId
+            ) {
+
+                button.classList.add(
+                    "selected"
+                );
+
+            }
+
+            const name =
+                getInvoiceClientDisplayName(
+                    client
+                );
+
+            const company =
+                client.companyName ||
+                "";
+
+            const email =
+                client.clientEmail ||
+                "";
+
+            const imageUrl =
+                client.clientImageUrl ||
+                "";
+
+            const avatar =
+                document.createElement(
+                    "div"
+                );
+
+            avatar.className =
+                "client-picker-option-avatar";
+
+            if (imageUrl) {
+
+                const image =
+                    document.createElement(
+                        "img"
+                    );
+
+                image.src =
+                    imageUrl;
+
+                image.alt =
+                    name;
+
+                image.onerror =
+                    () => {
+
+                        image.remove();
+
+                        avatar.textContent =
+                            getInvoiceClientInitials(
+                                name
+                            );
+
+                    };
+
+                avatar.appendChild(
+                    image
+                );
+
+            }
+            else {
+
+                avatar.textContent =
+                    getInvoiceClientInitials(
+                        name
+                    );
+
+            }
+
+            const info =
+                document.createElement(
+                    "div"
+                );
+
+            info.className =
+                "client-picker-option-info";
+
+            const nameElement =
+                document.createElement(
+                    "div"
+                );
+
+            nameElement.className =
+                "client-picker-option-name";
+
+            nameElement.textContent =
+                name;
+
+            info.appendChild(
+                nameElement
+            );
+
+            if (company) {
+
+                const companyElement =
+                    document.createElement(
+                        "div"
+                    );
+
+                companyElement.className =
+                    "client-picker-option-company";
+
+                companyElement.textContent =
+                    company;
+
+                info.appendChild(
+                    companyElement
+                );
+
+            }
+
+            if (email) {
+
+                const emailElement =
+                    document.createElement(
+                        "div"
+                    );
+
+                emailElement.className =
+                    "client-picker-option-email";
+
+                emailElement.textContent =
+                    email;
+
+                info.appendChild(
+                    emailElement
+                );
+
+            }
+
+            button.appendChild(
+                avatar
+            );
+
+            button.appendChild(
+                info
+            );
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    selectInvoiceClientObject(
+                        client
+                    );
+
+                }
+            );
+
+            invoiceClientPickerOptions.appendChild(
+                button
+            );
+
+        }
+    );
+
+}
+
+function selectInvoiceClientObject(
+    client
+) {
+
+    if (!client) {
+
+        clearInvoiceClientPicker();
+
+        return;
+
+    }
+
+    invoiceClientInput.value =
+        client.objectId || "";
+
+    selectedInvoiceClient = {
+        objectId:
+            client.objectId || "",
+
+        contactPerson:
+            client.contactPerson || "",
+
+        companyName:
+            client.companyName || "",
+
+        clientEmail:
+            client.clientEmail || "",
+
+        clientPhone:
+            client.clientPhone || "",
+
+        clientImageUrl:
+            client.clientImageUrl || "",
+
+        billingAddressLine1:
+            client.billingAddressLine1 || "",
+
+        billingAddressLine2:
+            client.billingAddressLine2 || "",
+
+        billingCityStateZip:
+            client.billingCityStateZip || "",
+
+        billingCountry:
+            client.billingCountry || ""
+    };
+
+    invoiceClientPickerSelected.textContent =
+        getInvoiceClientDisplayName(
+            client
         );
+
+    updateInvoiceClientPreview(
+        selectedInvoiceClient
+    );
+
+    closeInvoiceClientPicker();
+
+}
+
+function clearInvoiceClientPicker() {
+
+    invoiceClientInput.value =
+        "";
+
+    selectedInvoiceClient =
+        null;
+
+    invoiceClientPickerSelected.textContent =
+        "Select Client";
+
+    clearInvoiceClientPreview();
+
+}
+
+function closeInvoiceClientPicker() {
+    
+    invoiceClientPicker.classList.remove(
+        "open"
+    );
+    
+    invoiceClientPickerOptions.innerHTML =
+        "";
+    
+    invoiceClientPickerSearch.value =
+        "";
+    
+}
+
+function toggleInvoiceClientPicker() {
+    
+    const isOpen =
+        invoiceClientPicker.classList.contains(
+            "open"
+        );
+    
+    if (isOpen) {
+        
+        closeInvoiceClientPicker();
+        
+        return;
+        
+    }
+    
+    invoiceClientPicker.classList.add(
+        "open"
+    );
+    
+    invoiceClientPickerSearch.value =
+        "";
+    
+    invoiceClientPickerSearch.focus();
+    
+    loadInvoiceClients(
+        ""
+    );
+    
+}
+
+function initializeInvoiceClientPicker() {
+
+    invoiceClientPickerTrigger.addEventListener(
+        "click",
+        toggleInvoiceClientPicker
+    );
+
+    invoiceClientPickerSearch.addEventListener(
+        "input",
+        () => {
+
+            clearTimeout(
+                invoiceClientSearchTimer
+            );
+
+            invoiceClientSearchTimer =
+                setTimeout(
+                    () => {
+
+                        loadInvoiceClients(
+                            invoiceClientPickerSearch.value
+                        );
+
+                    },
+                    300
+                );
+
+        }
+    );
+
+    document.addEventListener(
+        "click",
+        event => {
+
+            if (
+                invoiceClientPicker.contains(
+                    event.target
+                )
+            ) {
+
+                return;
+
+            }
+
+            closeInvoiceClientPicker();
+
+        }
+    );
+
+}
+
+async function loadInvoiceClients(
+    search = ""
+) {
+
+    try {
+
+        invoiceClientPickerOptions.innerHTML = `
+            <div class="client-picker-loading">
+                Loading clients...
+            </div>
+        `;
+
+        const result =
+            await Parse.Cloud.run(
+                "getClients",
+                {
+                    search:
+                        search.trim(),
+
+                    status:
+                        "active",
+
+                    sort:
+                        "name",
+
+                    page:
+                        1,
+
+                    limit:
+                        100
+                }
+            );
+
+        const clients =
+            Array.isArray(
+                result?.clients
+            )
+            ? result.clients
+            : [];
+
+        renderInvoiceClientOptions(
+            clients
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Invoice Client Load Error:",
+            error
+        );
+
+        invoiceClientPickerOptions.innerHTML = `
+            <div class="client-picker-error">
+                Unable to load clients.
+            </div>
+        `;
 
         showToast(
-            `${allInvoices.length} invoices exported as one PDF successfully.`,
-            "success"
+            error.message ||
+            "Unable to load clients.",
+            "error"
         );
 
+    }
+
+}
+
+async function loadInvoiceSubscriptionSettings() {
+    try {
+        const result =
+            await Parse.Cloud.run(
+                "getCurrentSubscription"
+            );
+
+        if (
+            !result ||
+            !result.success
+        ) {
+            throw new Error(
+                "Unable to load subscription information."
+            );
+        }
+
+        currentSubscriptionSettings =
+            result;
+
+        updateInvoiceExportButtonState();
+
+        return result;
     } catch (error) {
         console.error(
-            "Invoice List PDF Export Error:",
+            "Invoice subscription loading failed:",
             error
         );
 
         showToast(
             error.message ||
-            "Unable to export invoices as PDF.",
+            "Unable to load subscription information.",
+            "error"
+        );
+
+        return null;
+    }
+}
+
+async function recordInvoicePdfExport() {
+    const exportResult =
+        await Parse.Cloud.run(
+            "recordPdfExport"
+        );
+
+    if (!exportResult?.success) {
+        throw new Error(
+            "Unable to record your PDF export."
+        );
+    }
+
+    if (
+        currentSubscriptionSettings?.usage?.exports
+    ) {
+        currentSubscriptionSettings.usage.exports.used =
+            exportResult.used;
+
+        currentSubscriptionSettings.usage.exports.maximum =
+            exportResult.maximum;
+
+        currentSubscriptionSettings.usage.exports.remaining =
+            exportResult.remaining;
+
+        updateInvoiceExportButtonState();
+    }
+
+    return exportResult;
+}
+
+async function exportInvoicesAsPdf() {
+    if (!invoicePaper) {
+        return;
+    }
+
+    if (!currentSubscriptionSettings) {
+        await loadInvoiceSubscriptionSettings();
+    }
+
+    if (!canExportInvoicePdf()) {
+        return;
+    }
+
+    try {
+        if (typeof html2canvas === "undefined") {
+            throw new Error("PDF rendering library is not loaded.");
+        }
+
+        if (typeof window.jspdf === "undefined" || !window.jspdf.jsPDF) {
+            throw new Error("PDF library is not loaded.");
+        }
+
+        const firstPage = await Parse.Cloud.run("getInvoices", {
+            page: 1,
+            limit: 100,
+            search: "",
+            status: "all",
+            date: "all",
+            sort: "newest"
+        });
+
+        const allInvoices = Array.isArray(firstPage?.invoices)
+            ? [...firstPage.invoices]
+            : [];
+
+        const totalRecords = Number(firstPage?.totalRecords) || allInvoices.length;
+        const totalPages = Math.ceil(totalRecords / 100);
+
+        for (let page = 2; page <= totalPages; page++) {
+            const pageResult = await Parse.Cloud.run("getInvoices", {
+                page,
+                limit: 100,
+                search: "",
+                status: "all",
+                date: "all",
+                sort: "newest"
+            });
+
+            if (Array.isArray(pageResult?.invoices)) {
+                allInvoices.push(...pageResult.invoices);
+            }
+        }
+
+        if (!allInvoices.length) {
+            showToast("There are no invoices to export.", "info");
+            return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+            orientation: "portrait",
+            unit: "mm",
+            format: "a4",
+            compress: true
+        });
+
+        let exportedCount = 0;
+
+        for (const invoice of allInvoices) {
+            if (!invoice?.objectId) {
+                continue;
+            }
+
+            const result = await Parse.Cloud.run("getInvoiceDetails", {
+                invoiceId: invoice.objectId
+            });
+
+            if (!result?.invoice) {
+                continue;
+            }
+
+            if (result.client) {
+                result.invoice.clientImageUrl = result.client.clientImageUrl;
+            }
+
+            await loadInvoiceForExport(
+                result.invoice,
+                Array.isArray(result.items) ? result.items : []
+            );
+
+            const canvas = await createInvoiceExportCanvas();
+
+            if (exportedCount > 0) {
+                pdf.addPage();
+            }
+
+            addInvoiceCanvasToPdf(pdf, canvas);
+            exportedCount++;
+        }
+
+        if (!exportedCount) {
+            throw new Error("No invoices could be rendered for PDF export.");
+        }
+
+        pdf.save("invoices.pdf");
+
+        await recordInvoicePdfExport();
+
+        showToast(
+            `${exportedCount} invoices exported as one PDF successfully.`,
+            "success"
+        );
+    } catch (error) {
+        console.error("Invoice List PDF Export Error:", error);
+        showToast(
+            error.message || "Unable to export invoices as PDF.",
             "error"
         );
     }
@@ -4605,43 +5052,10 @@ function initializeInvoiceExport() {
         }
     );
 
-    exportInvoicesExcelBtn.addEventListener(
-        "click",
-        () => {
-            invoiceExportMenu.classList.remove(
-                "active"
-            );
-
-            exportInvoicesAsExcel();
-        }
-    );
-
-    exportInvoicesCsvBtn.addEventListener(
-        "click",
-        () => {
-            invoiceExportMenu.classList.remove(
-                "active"
-            );
-
-            exportInvoicesAsCsv();
-        }
-    );
 }
 
-function printInvoicePreview() {
-    try {
-        window.print();
-    } catch (error) {
-        console.error(
-            "Print Invoice Preview Error:",
-            error
-        );
-
-        showToast(
-            "Unable to print invoice preview.",
-            "error"
-        );
-    }
+async function printInvoicePreview() {
+    await downloadInvoicePdf();
 }
 
 function initializeInvoicePrint() {
@@ -4656,34 +5070,7 @@ function initializeInvoicePrint() {
 }
 
 function toggleInvoicePreviewFullscreen() {
-    if (!invoicePreviewCard) {
-        return;
-    }
-
-    if (!document.fullscreenElement) {
-        invoicePreviewCard
-            .requestFullscreen()
-            .catch(error => {
-                console.error(
-                    "Fullscreen Preview Error:",
-                    error
-                );
-
-                showToast(
-                    "Unable to enter fullscreen preview.",
-                    "error"
-                );
-            });
-
-        return;
-    }
-
-    document.exitFullscreen().catch(error => {
-        console.error(
-            "Exit Fullscreen Error:",
-            error
-        );
-    });
+    openInvoicePreviewModal();
 }
 
 function initializeInvoiceFullscreen() {
@@ -4732,17 +5119,56 @@ function updateInvoicePreviewZoom() {
             previewZoomSelect.value
         ) || 100;
 
+    const baseScale =
+        zoom / 100;
+
+    const isMobile =
+        window.innerWidth <= 768;
+
+    if (isMobile) {
+        const availableWidth =
+            previewDocumentArea
+                ? previewDocumentArea.clientWidth - 24
+                : window.innerWidth - 24;
+
+        const paperWidth =
+            invoicePaper.offsetWidth || 794;
+
+        const fitScale =
+            availableWidth / paperWidth;
+
+        const finalScale =
+            Math.min(
+                baseScale,
+                fitScale
+            );
+
+        invoicePaper.style.transform =
+            `scale(${finalScale})`;
+
+        invoicePaper.style.transformOrigin =
+            "top center";
+
+        invoicePaper.style.marginBottom =
+            `${Math.max(
+                0,
+                (finalScale - 1) * invoicePaper.offsetHeight
+            )}px`;
+
+        return;
+    }
+
     invoicePaper.style.transform =
-        `scale(${zoom / 100})`;
+        `scale(${baseScale})`;
 
     invoicePaper.style.transformOrigin =
         "top center";
 
-    const scale =
-        zoom / 100;
-
     invoicePaper.style.marginBottom =
-        `${(scale - 1) * 100}%`;
+        `${Math.max(
+            0,
+            (baseScale - 1) * 100
+        )}%`;
 }
 
 function initializeInvoicePreviewZoom() {
@@ -4829,8 +5255,8 @@ async function openSendInvoiceModal(invoiceId) {
     );
 
 const sendInvoiceClientImageFallback =
-    document.getElementById(
-        "sendInvoiceClientImageFallback"
+    document.querySelector(
+        "#sendInvoiceModal #sendInvoiceClientImageFallbackIcon"
     );
 
 const clientImageUrl =
@@ -4869,28 +5295,40 @@ if (sendInvoiceClientImage) {
         sendInvoiceClientImage.src =
             clientImageUrl;
 
-        sendInvoiceClientImage.style.display =
-            "block";
+        sendInvoiceClientImage.style.setProperty(
+            "display",
+            "block",
+            "important"
+        );
 
         if (
             sendInvoiceClientImageFallback
         ) {
-            sendInvoiceClientImageFallback.style.display =
-                "none";
+            sendInvoiceClientImageFallback.style.setProperty(
+                "display",
+                "none",
+                "important"
+            );
         }
     } else {
         sendInvoiceClientImage.removeAttribute(
             "src"
         );
 
-        sendInvoiceClientImage.style.display =
-            "none";
+        sendInvoiceClientImage.style.setProperty(
+            "display",
+            "none",
+            "important"
+        );
 
         if (
             sendInvoiceClientImageFallback
         ) {
-            sendInvoiceClientImageFallback.style.display =
-                "flex";
+            sendInvoiceClientImageFallback.style.setProperty(
+                "display",
+                "flex",
+                "important"
+            );
         }
     }
 }
@@ -5213,6 +5651,30 @@ if (sendInvoicePaymentInstructions) {
         ).textContent =
             invoice.signatureTitle ||
             "-";
+
+        const sendInvoiceSignatureImage =
+            document.getElementById(
+                "sendInvoiceSignatureImage"
+            );
+
+        const sendInvoiceSignatureUrl =
+            invoice.signatureImage ||
+            "";
+
+        if (sendInvoiceSignatureImage) {
+            if (sendInvoiceSignatureUrl) {
+                sendInvoiceSignatureImage.src =
+                    sendInvoiceSignatureUrl;
+                sendInvoiceSignatureImage.style.display =
+                    "block";
+            } else {
+                sendInvoiceSignatureImage.removeAttribute(
+                    "src"
+                );
+                sendInvoiceSignatureImage.style.display =
+                    "none";
+            }
+        }
 
         const message =
             document.getElementById(
@@ -6122,62 +6584,7 @@ function handleInvoiceBackendError(
     return false;
 }
 
-async function loadUserProfile() {
-
-    try {
-
-        const response = await Parse.Cloud.run(
-            "getUserProfile"
-        );
-
-        if (!response.success) {
-
-            throw new Error(
-                "Unable to load profile."
-            );
-
-        }
-
-        const profile = response.profile;
-
-        let imageURL = DEFAULT_PROFILE_IMAGE;
-
-        if (profile.profileImage) {
-
-            if (typeof profile.profileImage === "string") {
-
-                imageURL = profile.profileImage;
-
-            } else if (profile.profileImage.url) {
-
-                imageURL = profile.profileImage.url();
-
-            }
-
-        }
-
-        profileImage.src = imageURL;
-        
-        userFullName.textContent =
-            profile.fullName || "-";
-
-    }
-
-    catch (error) {
-
-        console.error(error);
-
-        showToast(
-            
-            error.message || error, "error"
-        );
-
-    }
-
-}
-
 async function initializeInvoicePage() {
-    loadUserProfile();
     initializeCreateInvoiceModal();
     initializeInvoiceForm();
     initializeInvoiceClientSelection();
@@ -6199,6 +6606,8 @@ async function initializeInvoicePage() {
     initializeInvoicePreviewZoom();
     initializeInvoicePreviewModal();
 
+    await loadBusinessProfileSettings();
+    await loadInvoiceSubscriptionSettings();
     await loadInvoiceClients();
     await loadInvoiceStatistics();
     await loadInvoices();
@@ -6210,4 +6619,9 @@ async function initializeInvoicePage() {
 document.addEventListener(
     "DOMContentLoaded",
     initializeInvoicePage
+);
+
+window.addEventListener(
+    "resize",
+    updateInvoicePreviewZoom
 );

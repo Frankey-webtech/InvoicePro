@@ -1,3 +1,4 @@
+let searchTimeout;
 
 let selectedEstimate = null;
 
@@ -8,6 +9,10 @@ let deletingEstimateId = null;
 let selectedEstimateItems = [];
 
 let selectedEstimateClient = null;
+
+let currentSubscriptionSettings = null;
+
+let showClientImage = true;
 
 let currentPage = 1;
 
@@ -23,14 +28,17 @@ let estimateCurrencyCode = "";
 
 let estimateCurrencySymbol = "";
 
+let currencySymbol = "$";
+
 let editingEstimate = false;
 
 let editingEstimateId = null;
 
 let estimateItemCount = 0;
 
-const exportEstimateSelect =
-document.getElementById("exportEstimateSelect");
+let estimateTemplateSaveTimeout = null;
+
+let estimateTemplateSaving = false;
 
 const toastContainer =
 document.getElementById("toastContainer");
@@ -56,14 +64,37 @@ const estimateStatusFilter = document.getElementById("estimateStatusFilter");
 
 const sortEstimates = document.getElementById("sortEstimates");
 
+const estimateClientPicker =
+    document.getElementById(
+        "estimateClientPicker"
+    );
+
+const estimateClientPickerTrigger =
+    document.getElementById(
+        "estimateClientPickerTrigger"
+    );
+
+const estimateClientPickerSelected =
+    document.getElementById(
+        "estimateClientPickerSelected"
+    );
+
+const estimateClientPickerSearch =
+    document.getElementById(
+        "estimateClientPickerSearch"
+    );
+
+const estimateClientPickerOptions =
+    document.getElementById(
+        "estimateClientPickerOptions"
+    );
 
 const createEstimateButton = document.getElementById("createEstimateButton");
 
 const emptyStateCreateEstimateButton = document.getElementById("emptyStateCreateEstimateButton");
 
-const exportEstimatesButton = document.getElementById("exportEstimatesButton");
-
-const exportMenu = document.getElementById("exportMenu");
+const exportEstimatesPdfButton =
+document.getElementById("exportEstimatesPdfButton");
 
 const previousPageButton = document.getElementById("previousPageButton");
 
@@ -149,6 +180,12 @@ document.getElementById("profileMenuButton");
 const profileDropdown =
 document.getElementById("profileDropdown");
 
+const sidebar =
+document.getElementById("sidebar");
+
+const sidebarOverlay =
+document.getElementById("sidebarOverlay");
+
 if (profileMenuButton && profileDropdown) {
 
     profileMenuButton.addEventListener(
@@ -180,27 +217,11 @@ async function loadUserProfile() {
         const result =
         await Parse.Cloud.run("getDashboardProfile");
 
-        document.getElementById("profileName").textContent =
-            result.fullName || "User";
-
-        document.getElementById("profileRole").textContent =
-            result.businessName || "Business Owner";
-
-        const profileImage =
-        document.getElementById("profileImage");
-
-        profileImage.src =
-            result.profileImage || "profile.png";
-
-        profileImage.onerror = function () {
-
-            profileImage.src = "profile.png";
-
-        };
-
-        // Keep the currency symbol available for the page
-        currencySymbol =
+        estimateCurrencySymbol =
             result.currencySymbol || "$";
+
+        currencySymbol =
+            estimateCurrencySymbol;
 
     }
 
@@ -226,6 +247,1685 @@ document.getElementById("notificationBtn");
 
 const notificationBadge =
 document.getElementById("notificationBadge");
+
+const estimatePreviewState = {
+
+    initialized: false,
+
+    userProfile: null,
+
+    template: null,
+
+    currencyCode: "USD",
+
+    currencySymbol: "$",
+
+    logoUrl: "",
+
+    primaryColor: "#2563EB",
+
+    secondaryColor: "#FFFFFF",
+
+    estimate: null
+
+};
+
+const estimatePreviewElements = {
+
+    paper: document.getElementById("estimatePaper"),
+
+    title: document.getElementById("estimatePreviewTitle"),
+
+    number: document.getElementById("estimatePreviewNumber"),
+
+    companyName: document.getElementById("estimateCompanyName"),
+
+    logo: document.getElementById("estimateCompanyLogo"),
+
+    itemsTable: document.getElementById("estimateItemsTableBody"),
+
+    subtotal: document.getElementById("previewSubtotal"),
+
+    grandTotal: document.getElementById("estimatePreviewGrandTotal")
+
+};
+
+const printEstimateButton =
+document.getElementById(
+    "printEstimateButton"
+);
+
+if (printEstimateButton) {
+
+    printEstimateButton.addEventListener(
+        "click",
+        printEstimatePreview
+    );
+
+}
+
+const downloadEstimatePdfButton =
+document.getElementById(
+    "downloadEstimatePdfButton"
+);
+
+const signatureImageInput =
+    document.getElementById("signatureImageInput");
+
+const signaturePreview =
+    document.getElementById("signaturePreview");
+
+if (downloadEstimatePdfButton) {
+
+    downloadEstimatePdfButton.addEventListener(
+        "click",
+        () => {
+
+            exportEstimatesPdf(
+                selectedEstimate?.objectId
+            );
+
+        }
+    );
+
+}
+
+function formatDate(date) {
+
+    if (!date) {
+        return "-";
+    }
+
+    const parsedDate =
+        new Date(date);
+
+    if (isNaN(parsedDate.getTime())) {
+        return "-";
+    }
+
+    return parsedDate.toLocaleDateString();
+}
+
+function initializeEstimatePreviewDefaults() {
+
+    const profile =
+    estimatePreviewState.userProfile;
+
+    customerNotesInput.value =
+    profile.defaultInvoiceNotes || "";
+
+    estimateTermsInput.value =
+    profile.defaultInvoiceTerms || "";
+
+    estimateTaxInput.value =
+    profile.defaultTaxPercentage || 0;
+
+}
+
+function updateEstimatePreview() {
+
+    updateEstimateHeaderPreview();
+
+    updateEstimateDetailsPreview();
+
+    updateEstimateNotesPreview();
+
+    updateEstimateSignaturePreview();
+
+}
+
+function updateEstimatePaymentPreview() {
+
+    const paymentDetails =
+    selectedEstimate?.paymentDetails || {};
+
+setPreviewText(
+    "previewPaymentProvider",
+    paymentDetails.paymentProvider,
+    "-"
+);
+
+setPreviewText(
+    "previewPaymentMethod",
+    paymentDetails.paymentMethod,
+    "-"
+);
+
+const paymentReference =
+    [
+        paymentDetails.accountName
+            ? `<strong>Account Name:</strong> ${paymentDetails.accountName}`
+            : "",
+        paymentDetails.bankName
+            ? `<strong>Bank Name:</strong> ${paymentDetails.bankName}`
+            : "",
+        paymentDetails.accountNumber
+            ? `<strong>Account Number:</strong> ${paymentDetails.accountNumber}`
+            : "",
+        paymentDetails.routingNumber
+            ? `<strong>Routing Number:</strong> ${paymentDetails.routingNumber}`
+            : "",
+        paymentDetails.swiftCode
+            ? `<strong>SWIFT Code:</strong> ${paymentDetails.swiftCode}`
+            : "",
+        paymentDetails.paymentAccount
+            ? `<strong>Payment Account:</strong> ${paymentDetails.paymentAccount}`
+            : "",
+        paymentDetails.paymentLink
+            ? `<strong>Payment Link:</strong> ${paymentDetails.paymentLink}`
+            : ""
+    ]
+    .filter(Boolean)
+    .join("<br><br>");
+
+document.getElementById(
+    "previewPaymentReference"
+).innerHTML =
+    paymentReference || "-";
+
+    setPreviewText(
+        "previewPaymentStatus",
+        paymentDetails.paymentStatus,
+        "Pending"
+    );
+    
+    setPreviewText(
+    "previewPaymentStatus",
+    paymentDetails.paymentStatus || "Pending",
+    "Pending"
+);
+
+}
+
+function updateEstimateHeaderPreview() {
+
+    setPreviewText(
+        "estimatePreviewTitle",
+        estimateTitleInput.value,
+        "ESTIMATE"
+    );
+
+    setPreviewText(
+        "estimatePreviewProjectName",
+        projectNameInput.value,
+        "-"
+    );
+
+    setPreviewText(
+        "estimatePreviewNumber",
+        estimateNumberInput.value,
+        "-"
+    );
+
+}
+
+function updateEstimateDetailsPreview() {
+
+    setPreviewText(
+        "estimatePreviewReference",
+        referenceNumberInput.value,
+        "-"
+    );
+
+    setPreviewText(
+        "estimatePreviewPurchaseOrder",
+        purchaseOrderInput.value,
+        "-"
+    );
+
+    setPreviewText(
+        "estimatePreviewIssueDate",
+        formatPreviewDate(
+            estimateIssueDateInput.value
+        ),
+        "-"
+    );
+
+    setPreviewText(
+        "estimatePreviewExpiryDate",
+        formatPreviewDate(
+            estimateExpiryDateInput.value
+        ),
+        "-"
+    );
+
+}
+
+function updateEstimateNotesPreview() {
+
+    setPreviewText(
+        "estimatePreviewNotes",
+        customerNotesInput.value,
+        "No notes."
+    );
+
+    setPreviewText(
+        "estimatePreviewTerms",
+        estimateTermsInput.value,
+        "No terms."
+    );
+
+    setPreviewText(
+        "estimatePreviewValidity",
+        validityMessageInput.value,
+        ""
+    );
+    
+    updateEstimateSignaturePreview();
+
+}
+
+function updateEstimateSignaturePreview() {
+
+    setPreviewText(
+        "estimatePreviewSignatureName",
+        signatureNameInput.value,
+        ""
+    );
+
+    setPreviewText(
+        "estimatePreviewSignatureTitle",
+        signatureTitleInput.value,
+        ""
+    );
+
+    const previewImage =
+        document.getElementById(
+            "estimatePreviewSignatureImage"
+        );
+
+    if (!previewImage) {
+        return;
+    }
+
+    if (
+        signatureImageInput &&
+        signatureImageInput.files &&
+        signatureImageInput.files.length > 0
+    ) {
+
+        const file =
+            signatureImageInput.files[0];
+
+        if (!file.type.startsWith("image/")) {
+
+            previewImage.style.display = "none";
+
+            return;
+
+        }
+
+        const reader =
+            new FileReader();
+
+        reader.onload =
+            function(event) {
+
+                previewImage.src =
+                    event.target.result;
+
+                previewImage.style.display =
+                    "block";
+
+            };
+
+        reader.readAsDataURL(file);
+
+    }
+
+}
+
+function registerEstimatePreviewListeners() {
+
+    const controls = [
+
+        estimateTitleInput,
+
+        projectNameInput,
+
+        estimateNumberInput,
+
+        referenceNumberInput,
+
+        purchaseOrderInput,
+
+        estimateIssueDateInput,
+
+        estimateExpiryDateInput,
+
+        customerNotesInput,
+
+        estimateTermsInput,
+
+        validityMessageInput,
+
+        signatureNameInput,
+
+        signatureTitleInput
+
+    ];
+
+    controls.forEach(control => {
+
+        if (!control) return;
+
+        control.addEventListener("input", updateEstimatePreview);
+
+        control.addEventListener("change", updateEstimatePreview);
+
+    });
+
+    if (signatureImageInput) {
+
+        signatureImageInput.addEventListener(
+            "change",
+            updateEstimateSignatureImagePreview
+        );
+
+    }
+    
+    estimateClientInput.addEventListener(
+    "change",
+    updateEstimateClientPreview
+);
+
+estimateTaxInput.addEventListener(
+    "input",
+    updateEstimateTotalsPreview
+);
+
+estimateDiscountInput.addEventListener(
+    "input",
+    updateEstimateTotalsPreview
+);
+
+estimateShippingInput.addEventListener(
+    "input",
+    updateEstimateTotalsPreview
+);
+
+    updateEstimatePreview();
+
+}
+
+function updateEstimateSignatureImagePreview() {
+
+    if (!signatureImageInput || !signaturePreview) {
+        return;
+    }
+
+    const file = signatureImageInput.files[0];
+
+    if (!file) {
+
+        signaturePreview.src = "";
+        signaturePreview.style.display = "none";
+
+        return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+
+        signatureImageInput.value = "";
+        signaturePreview.src = "";
+        signaturePreview.style.display = "none";
+
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function (event) {
+
+        signaturePreview.src = event.target.result;
+        signaturePreview.style.display = "block";
+
+    };
+
+    reader.readAsDataURL(file);
+}
+
+function setPreviewText(
+    id,
+    value,
+    fallback = ""
+) {
+
+    const element =
+    document.getElementById(id);
+
+    if (!element) return;
+
+    element.textContent =
+        value && value.trim()
+        ? value
+        : fallback;
+
+}
+
+function formatPreviewDate(value) {
+
+    if (!value) {
+
+        return "";
+
+    }
+
+    return new Date(value)
+        .toLocaleDateString(
+            undefined,
+            {
+
+                year: "numeric",
+
+                month: "long",
+
+                day: "numeric"
+
+            }
+
+        );
+
+}
+
+function updateEstimateBusinessPreview() {
+
+    const profile =
+        estimatePreviewState.userProfile;
+
+    if (!profile) {
+        return;
+    }
+
+    setPreviewText(
+        "previewCompanyName",
+        profile.businessName ||
+        profile.companyName ||
+        profile.name,
+        "Invoice Pro"
+    );
+
+    setPreviewText(
+        "previewCompanyAddress",
+        profile.businessAddress ||
+        profile.address ||
+        "",
+        ""
+    );
+
+    setPreviewText(
+        "previewCompanyPhone",
+        profile.businessPhone ||
+        profile.phone ||
+        "",
+        ""
+    );
+
+    setPreviewText(
+        "previewCompanyEmail",
+        profile.businessEmail ||
+        profile.email ||
+        "",
+        ""
+    );
+
+    setPreviewText(
+        "previewCompanyWebsite",
+        profile.businessWebsite ||
+        profile.website ||
+        "",
+        ""
+    );
+
+    updateEstimateCompanyLogo(profile);
+
+}
+
+function updateEstimateCompanyLogo(profile) {
+
+    const logo =
+        document.getElementById(
+            "previewCompanyLogo"
+        );
+
+    if (!logo) {
+        return;
+    }
+
+    let logoUrl =
+        estimatePreviewState.logoUrl || "";
+
+    if (!logoUrl && profile) {
+
+        const businessLogo =
+            profile.businessLogo;
+
+        if (
+            businessLogo &&
+            typeof businessLogo.url === "function"
+        ) {
+
+            logoUrl =
+                businessLogo.url();
+
+        }
+
+        else if (
+            typeof businessLogo === "string"
+        ) {
+
+            logoUrl =
+                businessLogo;
+
+        }
+
+    }
+
+    if (logoUrl) {
+
+        logo.src =
+            logoUrl;
+
+        logo.style.display =
+            "block";
+
+    }
+
+    else {
+
+        logo.removeAttribute(
+            "src"
+        );
+
+        logo.style.display =
+            "none";
+
+    }
+
+}
+
+function applyEstimateBrandColors(profile) {
+
+    const paper =
+        document.getElementById(
+            "estimatePaper"
+        );
+
+    if (!paper) {
+
+        return;
+
+    }
+
+    paper.style.setProperty(
+
+        "--estimate-primary",
+
+        profile.primaryColor || "#2563EB"
+
+    );
+
+    paper.style.setProperty(
+
+        "--estimate-secondary",
+
+        profile.secondaryColor || "#FFFFFF"
+
+    );
+
+}
+
+function refreshEstimateBusinessPreview() {
+
+    updateEstimateBusinessPreview();
+
+}
+
+function setEstimatePreviewClients(clients) {
+
+    estimatePreviewState.clients =
+        Array.isArray(clients)
+        ? clients
+        : [];
+
+}
+
+function updateEstimateClientPreview() {
+    
+    const clientId =
+        estimateClientInput.value;
+    
+    const client =
+        selectedEstimateClient &&
+        (
+            selectedEstimateClient.objectId ===
+            clientId ||
+            selectedEstimateClient.id ===
+            clientId
+        ) ?
+        selectedEstimateClient :
+        estimatePreviewState.clients.find(
+            item => {
+                
+                return (
+                    item.objectId ===
+                    clientId ||
+                    item.id ===
+                    clientId
+                );
+                
+            }
+        );
+    
+    if (!client) {
+        
+        clearEstimateClientPreview();
+        
+        return;
+        
+    }
+    
+    setPreviewText(
+        "estimatePreviewClientName",
+        client.contactPerson ||
+        client.contactName ||
+        client.fullName ||
+        client.name,
+        "-"
+    );
+    
+    setPreviewText(
+        "estimatePreviewCompany",
+        client.companyName,
+        "-"
+    );
+    
+    setPreviewText(
+        "estimatePreviewClientEmail",
+        client.clientEmail ||
+        client.email ||
+        client.contactEmail,
+        "-"
+    );
+    
+    setPreviewText(
+        "estimatePreviewClientPhone",
+        client.clientPhone ||
+        client.phone ||
+        client.contactPhone,
+        "-"
+    );
+    
+    setPreviewText(
+        "estimatePreviewClientAddress",
+        client.clientAddress ||
+        client.address ||
+        client.businessAddress,
+        "-"
+    );
+    
+}
+
+function clearEstimateClientPreview() {
+
+    const ids = [
+
+        "estimatePreviewClientName",
+
+        "estimatePreviewCompany",
+
+        "estimatePreviewClientEmail",
+
+        "estimatePreviewClientPhone",
+
+        "estimatePreviewClientAddress"
+
+    ];
+
+    ids.forEach(id => {
+
+        setPreviewText(
+            id,
+            "",
+            "-"
+        );
+
+    });
+
+}
+
+function setEstimatePreviewItems(items) {
+
+    estimatePreviewState.items = Array.isArray(items)
+        ? items
+        : [];
+
+    updateEstimateItemsPreview();
+
+}
+
+function updateEstimateItemsPreview() {
+
+    const tbody =
+        document.getElementById(
+            "previewItemsBody"
+        );
+
+    if (!tbody) {
+
+        console.warn(
+            "previewItemsBody was not found."
+        );
+
+        return;
+
+    }
+
+    tbody.innerHTML = "";
+
+    const items =
+        Array.isArray(estimatePreviewState.items)
+            ? estimatePreviewState.items
+            : [];
+
+    if (items.length === 0) {
+
+        tbody.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="5"
+                    class="empty-items-row">
+
+                    No items added yet.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+    items.forEach((item, index) => {
+
+        const quantity =
+            Number(item.quantity) || 0;
+
+        const unitPrice =
+            Number(
+                item.rate ??
+                item.unitPrice ??
+                0
+            );
+
+        const description =
+            item.itemName ??
+            item.description ??
+            "-";
+
+        const total =
+            Number(
+                item.total ??
+                (quantity * unitPrice)
+            );
+
+        const row =
+            document.createElement("tr");
+
+        row.innerHTML = `
+
+            <td class="item-number">
+                ${index + 1}
+            </td>
+
+            <td class="item-description">
+                ${description}
+            </td>
+
+            <td>
+                ${quantity}
+            </td>
+
+            <td>
+                ${formatEstimateMoney(unitPrice)}
+            </td>
+
+            <td class="amount-column">
+                ${formatEstimateMoney(total)}
+            </td>
+
+        `;
+
+        tbody.appendChild(row);
+
+    });
+
+}
+
+function formatEstimateMoney(amount) {
+
+    return `${estimatePreviewState.currencySymbol}${Number(amount || 0).toLocaleString(
+        undefined,
+        {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }
+    )}`;
+
+}
+
+function updateEstimateTotalsPreview() {
+
+    const items =
+        Array.isArray(estimatePreviewState.items)
+            ? estimatePreviewState.items
+            : [];
+
+    let subtotal = 0;
+
+    items.forEach(item => {
+
+        const quantity =
+            Number(item.quantity) || 0;
+
+        const unitPrice =
+            Number(
+                item.rate ??
+                item.unitPrice ??
+                0
+            );
+
+        subtotal +=
+            quantity * unitPrice;
+
+    });
+
+    const taxPercent =
+        Number(
+            estimateTaxInput.value
+        ) || 0;
+
+    const discount =
+        Number(
+            estimateDiscountInput.value
+        ) || 0;
+
+    const shipping =
+        Number(
+            estimateShippingInput.value
+        ) || 0;
+
+    const taxAmount =
+        subtotal *
+        (taxPercent / 100);
+
+    const grandTotal =
+        subtotal +
+        taxAmount +
+        shipping -
+        discount;
+
+    setPreviewText(
+        "previewSubtotal",
+        formatEstimateMoney(subtotal),
+        formatEstimateMoney(0)
+    );
+
+    setPreviewText(
+        "previewTax",
+        formatEstimateMoney(taxAmount),
+        formatEstimateMoney(0)
+    );
+
+    setPreviewText(
+        "previewDiscount",
+        formatEstimateMoney(discount),
+        formatEstimateMoney(0)
+    );
+
+    setPreviewText(
+        "previewShipping",
+        formatEstimateMoney(shipping),
+        formatEstimateMoney(0)
+    );
+
+    setPreviewText(
+        "previewGrandTotal",
+        formatEstimateMoney(
+            Math.max(grandTotal, 0)
+        ),
+        formatEstimateMoney(0)
+    );
+
+}
+
+function applyEstimateTemplate() {
+
+    const paper =
+        document.getElementById("estimatePaper");
+
+    if (!paper) {
+
+        return;
+
+    }
+
+    const settings =
+        estimatePreviewState.template || {};
+
+    // ======================================
+    // COLORS
+    // ======================================
+
+    paper.style.backgroundColor =
+        settings.backgroundColor || "#FFFFFF";
+
+    paper.style.color =
+        settings.textColor || "#111827";
+
+    paper.style.setProperty(
+        "--estimate-accent-color",
+        settings.accentColor || "#2563EB"
+    );
+
+    // ======================================
+    // TYPOGRAPHY
+    // ======================================
+
+    paper.style.fontFamily =
+        settings.fontFamily || "Inter";
+
+    paper.style.fontSize =
+        `${settings.fontSize || 16}px`;
+
+    paper.style.fontWeight =
+        settings.fontWeight || "400";
+
+    paper.style.lineHeight =
+        settings.lineHeight || 1.5;
+
+    paper.style.letterSpacing =
+        `${settings.letterSpacing || 0}px`;
+
+    paper.style.textTransform =
+        settings.textTransform || "none";
+
+    paper.style.borderRadius =
+        `${settings.borderRadius || 0}px`;
+
+    paper.style.padding =
+        `${settings.padding || 40}px`;
+
+    paper.style.width =
+        `${settings.width || 100}%`;
+
+    // ======================================
+    // BORDER
+    // ======================================
+
+    paper.style.border =
+        settings.borderEnabled
+        ? `${settings.borderWidth || 1}px ${settings.borderStyle || "solid"} ${settings.borderColor || "#D9E2EC"}`
+        : "none";
+
+    // ======================================
+    // SHADOW
+    // ======================================
+
+    paper.style.boxShadow =
+        settings.shadowEnabled
+        ? `0 0 ${settings.shadowBlur || 12}px rgba(0,0,0,.15)`
+        : "none";
+
+    // ======================================
+    // ALIGNMENT
+    // ======================================
+
+    paper.style.textAlign =
+        settings.textAlign || "left";
+
+    // ======================================
+    // VISIBILITY
+    // ======================================
+
+    toggleEstimateSection(
+        "estimateHeaderSelection",
+        settings.showEstimateTitle
+    );
+
+    toggleEstimateSection(
+        "estimateCompanySelection",
+        settings.showCompanyInfo
+    );
+
+    toggleEstimateSection(
+        "estimateCustomerSelection",
+        settings.showCustomerInfo
+    );
+
+    toggleEstimateSection(
+        "estimateItemsSelection",
+        settings.showItemsTable
+    );
+
+    toggleEstimateSection(
+        "estimateTotalsSelection",
+        settings.showGrandTotal
+    );
+
+    toggleEstimateSection(
+        "estimateNotesSelection",
+        settings.showNotes
+    );
+
+    toggleEstimateSection(
+        "estimateFooterSelection",
+        settings.showFooter
+    );
+
+    toggleEstimateElement(
+        "estimateCompanyLogo",
+        settings.showLogo
+    );
+
+    toggleEstimateElement(
+        "estimateCompanyAddress",
+        settings.showCompanyAddress
+    );
+
+    toggleEstimateElement(
+        "estimateCompanyPhone",
+        settings.showCompanyPhone
+    );
+
+    toggleEstimateElement(
+        "estimateCompanyEmail",
+        settings.showCompanyEmail
+    );
+
+}
+
+function toggleEstimateSection(id, visible) {
+
+    const element =
+        document.getElementById(id);
+
+    if (!element) {
+
+        return;
+
+    }
+
+    element.style.display =
+        visible === false
+        ? "none"
+        : "";
+
+}
+
+function toggleEstimateElement(id, visible) {
+
+    const element =
+        document.getElementById(id);
+
+    if (!element) {
+
+        return;
+
+    }
+
+    element.style.display =
+        visible === false
+        ? "none"
+        : "";
+
+}
+
+function queueEstimateTemplateSave(section) {
+
+    clearTimeout(
+        estimateTemplateSaveTimeout
+    );
+
+    estimateTemplateSaveTimeout =
+        setTimeout(() => {
+
+            saveEstimateTemplate(section);
+
+        }, 600);
+
+}
+
+function updateEstimateTemplateSetting(
+    key,
+    value,
+    section = "general"
+) {
+
+    estimatePreviewState.template[key] =
+        value;
+
+    applyEstimateTemplate();
+
+    queueEstimateTemplateSave(section);
+
+}
+
+function getEstimatePreviewElement() {
+
+    return document.getElementById(
+        "estimatePaper"
+    );
+
+}
+
+function prepareEstimatePreviewForExport() {
+
+    const paper =
+        getEstimatePreviewElement();
+
+    if (!paper) {
+
+        return null;
+
+    }
+
+    paper.classList.add(
+        "estimate-export-mode"
+    );
+
+    return paper;
+
+}
+
+function restoreEstimatePreviewAfterExport() {
+
+    const paper =
+        getEstimatePreviewElement();
+
+    if (!paper) {
+
+        return;
+
+    }
+
+    paper.classList.remove(
+        "estimate-export-mode"
+    );
+
+}
+
+function populateEstimatePreview() {
+
+    if (!selectedEstimate) {
+        return;
+    }
+
+    const estimate =
+        selectedEstimate;
+
+    const client =
+        selectedEstimateClient;
+        
+    
+    estimatePreviewState.currencyCode =
+        estimate.currencyCode || "USD";
+
+    estimatePreviewState.currencySymbol =
+        estimate.currencySymbol || "$";
+
+    setPreviewText(
+        "previewCurrency",
+        estimate.currencyCode &&
+        estimate.currencySymbol
+            ? `${estimate.currencyCode} (${estimate.currencySymbol})`
+            : "USD ($)"
+    );
+
+    setPreviewText(
+        "previewHeaderEstimateNumber",
+        estimate.estimateNumber,
+        "EST-000001"
+    );
+
+    setPreviewText(
+        "previewHeaderIssueDate",
+        formatPreviewDate(
+            estimate.issueDate
+        ),
+        "-"
+    );
+
+    setPreviewText(
+        "previewHeaderExpiryDate",
+        formatPreviewDate(
+            estimate.expiryDate
+        ),
+        "-"
+    );
+
+    setPreviewText(
+        "previewEstimateNumber",
+        estimate.estimateNumber,
+        "EST-000001"
+    );
+
+    setPreviewText(
+        "previewEstimateTitle",
+        estimate.estimateTitle ||
+        "ESTIMATE",
+        "ESTIMATE"
+    );
+
+    setPreviewText(
+        "estimatePreviewPurchaseOrder",
+        estimate.purchaseOrder,
+        "-"
+    );
+
+    setPreviewText(
+        "estimatePreviewReference",
+        estimate.referenceNumber,
+        "-"
+    );
+
+    setPreviewText(
+        "estimatePreviewProjectName",
+        estimate.projectName,
+        "-"
+    );
+
+    const statusElement =
+        document.getElementById(
+            "previewEstimateStatus"
+        );
+
+    if (statusElement) {
+
+        const status =
+            estimate.status || "Draft";
+
+        statusElement.textContent =
+            status;
+
+        statusElement.className =
+            `estimate-status ${status.toLowerCase()}`;
+
+    }
+
+    setPreviewText(
+        "previewIssueDate",
+        formatPreviewDate(
+            estimate.issueDate
+        ),
+        "-"
+    );
+
+    setPreviewText(
+        "previewExpiryDate",
+        formatPreviewDate(
+            estimate.expiryDate
+        ),
+        "-"
+    );
+
+    updateEstimateBusinessPreview();
+    
+    setPreviewText(
+    "previewSalesRepresentative",
+    selectedEstimateCompany?.salesRepresentative,
+    "-"
+);
+
+    if (client) {
+
+        setPreviewText(
+            "previewClientName",
+            client.contactPerson,
+            "-"
+        );
+
+        setPreviewText(
+            "previewClientCompany",
+            client.companyName,
+            "-"
+        );
+
+        setPreviewText(
+    "previewClientAddress",
+    [
+        client.billingAddressLine1,
+        client.billingAddressLine2,
+        client.billingCityStateZip,
+        client.billingCountry
+    ]
+    .filter(Boolean)
+    .join("\n"),
+    "-"
+);
+
+        setPreviewText(
+            "previewClientEmail",
+            client.clientEmail,
+            "-"
+        );
+
+        setPreviewText(
+            "previewClientPhone",
+            client.clientPhone,
+            "-"
+        );
+        
+        const clientImage =
+    document.getElementById(
+        "estimatePreviewClientImage"
+    );
+
+if (clientImage) {
+
+    if (
+        showClientImage &&
+        client.clientImageUrl
+    ) {
+
+        clientImage.src =
+            client.clientImageUrl;
+
+        clientImage.style.display =
+            "block";
+
+    } else {
+
+        clientImage.removeAttribute(
+            "src"
+        );
+
+        clientImage.style.display =
+            "none";
+
+    }
+
+}
+
+        setPreviewText(
+            "estimatePreviewClientName",
+            client.contactPerson,
+            "-"
+        );
+
+        setPreviewText(
+            "estimatePreviewCompany",
+            client.companyName,
+            "-"
+        );
+
+        setPreviewText(
+            "estimatePreviewClientEmail",
+            client.clientEmail,
+            "-"
+        );
+
+        setPreviewText(
+            "estimatePreviewClientPhone",
+            client.clientPhone,
+            "-"
+        );
+
+        setPreviewText(
+    "estimatePreviewBillingAddressLine1",
+    client.billingAddressLine1,
+    "-"
+);
+
+setPreviewText(
+    "estimatePreviewBillingAddressLine2",
+    client.billingAddressLine2,
+    "-"
+);
+
+setPreviewText(
+    "estimatePreviewBillingCityStateZip",
+    client.billingCityStateZip,
+    "-"
+);
+
+setPreviewText(
+    "estimatePreviewBillingCountry",
+    client.billingCountry,
+    "-"
+);
+
+        setPreviewText(
+            "previewClientShipName",
+            client.contactPerson,
+            "-"
+        );
+
+        setPreviewText(
+    "previewClientShipAddress",
+    [
+        client.billingAddressLine1,
+        client.billingAddressLine2,
+        client.billingCityStateZip,
+        client.billingCountry
+    ]
+    .filter(Boolean)
+    .join("\n"),
+    "-"
+);
+
+    } else {
+
+        setPreviewText(
+            "previewClientName",
+            "",
+            "-"
+        );
+
+        setPreviewText(
+            "previewClientCompany",
+            "",
+            "-"
+        );
+
+        setPreviewText(
+        "previewClientAddress",
+        "",
+        "-"
+);
+
+        setPreviewText(
+            "previewClientEmail",
+            "",
+            "-"
+        );
+
+        setPreviewText(
+            "previewClientPhone",
+            "",
+            "-"
+        );
+
+        setPreviewText(
+            "estimatePreviewClientName",
+            "",
+            "-"
+        );
+
+        setPreviewText(
+            "estimatePreviewCompany",
+            "",
+            "-"
+        );
+
+        setPreviewText(
+            "estimatePreviewClientEmail",
+            "",
+            "-"
+        );
+
+        setPreviewText(
+            "estimatePreviewClientPhone",
+            "",
+            "-"
+        );
+
+        setPreviewText(
+            "estimatePreviewBillingAddress",
+            "",
+            "-"
+        );
+
+        setPreviewText(
+            "previewClientShipName",
+            "",
+            "-"
+        );
+
+        setPreviewText(
+    "previewClientShipAddress",
+    [
+        client.billingAddressLine1,
+        client.billingAddressLine2,
+        client.billingCityStateZip,
+        client.billingCountry
+    ]
+    .filter(Boolean)
+    .join("\n"),
+    "-"
+);
+
+    }
+
+    setEstimatePreviewItems(
+        Array.isArray(
+            selectedEstimateItems
+        )
+            ? selectedEstimateItems
+            : []
+    );
+
+    updateEstimateSavedTotalsPreview(
+        estimate
+    );
+
+    updateEstimatePaymentPreview();
+
+    setPreviewText(
+        "estimatePreviewNotes",
+        estimate.notes,
+        "No notes."
+    );
+
+    setPreviewText(
+        "estimatePreviewTerms",
+        estimate.terms,
+        "No terms available."
+    );
+
+    setPreviewText(
+        "estimatePreviewValidity",
+        estimate.validityMessage,
+        ""
+    );
+
+    setPreviewText(
+        "estimatePreviewSignatureName",
+        estimate.signatureName,
+        ""
+    );
+
+    setPreviewText(
+    "estimatePreviewSignatureTitle",
+    estimate.signatureTitle
+        ? ` (${estimate.signatureTitle})`
+        : "",
+    ""
+);
+
+    const signatureImage =
+        document.getElementById(
+            "estimatePreviewSignatureImage"
+        );
+
+    if (signatureImage) {
+
+        if (estimate.signatureImage) {
+
+            signatureImage.src =
+                estimate.signatureImage;
+
+            signatureImage.style.display =
+                "block";
+
+        } else {
+
+            signatureImage.removeAttribute(
+                "src"
+            );
+
+            signatureImage.style.display =
+                "none";
+
+        }
+
+    }
+
+}
+
+function updateEstimateSavedTotalsPreview(estimate) {
+
+    if (!estimate) {
+
+        return;
+
+    }
+
+    setPreviewText(
+        "previewSubtotal",
+        formatEstimateMoney(
+            estimate.subtotal || 0
+        ),
+        formatEstimateMoney(0)
+    );
+
+    setPreviewText(
+        "previewTax",
+        formatEstimateMoney(
+            estimate.taxAmount || 0
+        ),
+        formatEstimateMoney(0)
+    );
+
+    setPreviewText(
+        "previewDiscount",
+        formatEstimateMoney(
+            estimate.discount || 0
+        ),
+        formatEstimateMoney(0)
+    );
+
+    setPreviewText(
+        "previewShipping",
+        formatEstimateMoney(
+            estimate.shipping || 0
+        ),
+        formatEstimateMoney(0)
+    );
+
+    setPreviewText(
+        "previewGrandTotal",
+        formatEstimateMoney(
+            estimate.grandTotal || 0
+        ),
+        formatEstimateMoney(0)
+    );
+
+}
 
 function getClientInitials(name) {
 
@@ -324,9 +2024,7 @@ if (estimateCurrencyInput) {
     
     selectedEstimate = null;
 
-    document.getElementById(
-    "estimateClientInput"
-    ).selectedIndex = 0;
+    clearEstimateClientPicker();
 
     document.getElementById(
     "estimateNumberInput"
@@ -437,10 +2135,22 @@ function populateEstimateForm(result){
 
 }
 
-    document.getElementById(
-        "estimateClientInput"
-    ).value =
+    estimateClientInput.value =
     client.objectId || "";
+
+selectedEstimateClient =
+    client;
+
+estimateClientPickerSelected.textContent =
+    getEstimateClientDisplayName(
+        client
+    );
+
+setEstimatePreviewClients([
+    client
+]);
+
+updateEstimateClientPreview();
 
     document.getElementById(
         "estimateNumberInput"
@@ -702,21 +2412,29 @@ function renderEstimatesTable() {
 
                     </button>
 
-                    <button
-                        class="action-btn edit-btn"
-                        data-id="${estimate.objectId}">
+<button
+    class="action-btn edit-btn"
+    data-id="${estimate.objectId}">
 
-                        <i class="ri-edit-line"></i>
+    <i class="ri-edit-line"></i>
 
-                    </button>
+</button>
 
-                    <button
-                        class="action-btn convert-btn"
-                        data-id="${estimate.objectId}">
+<button
+    class="action-btn duplicate-btn"
+    data-id="${estimate.objectId}">
 
-                        <i class="ri-exchange-line"></i>
-                       
-                    </button>
+    <i class="ri-file-copy-line"></i>
+
+</button>
+
+<button
+    class="action-btn convert-btn"
+    data-id="${estimate.objectId}">
+
+    <i class="ri-exchange-line"></i>
+   
+</button>
 
                     <button
                         class="action-btn delete-btn"
@@ -1456,6 +3174,60 @@ function loadEstimateCurrencies() {
 
 }
 
+function canExportEstimatePdf() {
+
+    const exportUsage =
+        currentSubscriptionSettings?.usage?.exports;
+
+    if (!exportUsage) {
+
+        showToast(
+            "Unable to verify your PDF export limit.",
+            "error"
+        );
+
+        return false;
+    }
+
+    const maximum =
+        exportUsage.maximum;
+
+    if (
+        maximum === undefined ||
+        maximum === null
+    ) {
+
+        showToast(
+            "PDF exports are not available on your current plan.",
+            "error"
+        );
+
+        return false;
+    }
+
+    if (maximum !== -1) {
+
+        const remaining =
+            Number(exportUsage.remaining);
+
+        if (
+            Number.isNaN(remaining) ||
+            remaining <= 0
+        ) {
+
+            showToast(
+                "You have reached the PDF export limit for your current plan.",
+                "error"
+            );
+
+            return false;
+        }
+
+    }
+
+    return true;
+}
+
 function setDefaultEstimateCurrency() {
 
     const currencyInput =
@@ -1467,10 +3239,9 @@ function setDefaultEstimateCurrency() {
         return;
     }
 
-    if (
-        typeof currentUser === "undefined" ||
-        !currentUser
-    ) {
+    const currentUser = Parse.User.current();
+
+    if (!currentUser) {
         return;
     }
 
@@ -1494,6 +3265,562 @@ function setDefaultEstimateCurrency() {
             currencyCode;
 
     }
+
+}
+
+function updateEstimateExportButtonState() {
+
+    const button =
+    exportEstimatesPdfButton;
+    
+    const exportUsage =
+        currentSubscriptionSettings?.usage?.exports;
+
+    if (!button || !exportUsage) {
+        return;
+    }
+
+    const maximum =
+        exportUsage.maximum;
+
+    if (maximum === -1) {
+
+        button.disabled = false;
+
+        button.textContent =
+            "Export PDF";
+
+        button.title =
+            "Unlimited PDF exports";
+
+        return;
+    }
+
+    if (
+        maximum === undefined ||
+        maximum === null
+    ) {
+
+        button.disabled = true;
+
+        button.textContent =
+            "Unavailable";
+
+        button.title =
+            "PDF exports are not available on your current plan.";
+
+        return;
+    }
+
+    const remaining =
+        Number(exportUsage.remaining);
+
+    if (remaining <= 0) {
+
+        button.disabled = true;
+
+        button.textContent =
+            "Limit Reached";
+
+        button.title =
+            `You have used all ${maximum} PDF exports included in your plan.`;
+
+        return;
+    }
+
+    button.disabled = false;
+
+    button.textContent =
+        `Export PDF (${remaining} left)`;
+
+    button.title =
+        `${remaining} PDF exports remaining`;
+}
+
+function addEstimateCanvasToPdf(
+    pdf,
+    canvas
+) {
+    
+    const pageWidth =
+        pdf.internal.pageSize.getWidth();
+    
+    const pageHeight =
+        pdf.internal.pageSize.getHeight();
+    
+    const imageWidth =
+        pageWidth;
+    
+    const pixelsPerPdfPage =
+        Math.floor(
+            canvas.width *
+            pageHeight /
+            pageWidth
+        );
+    
+    let offsetY = 0;
+    
+    let pageNumber = 0;
+    
+    while (
+        offsetY < canvas.height
+    ) {
+        
+        const sliceHeight =
+            Math.min(
+                pixelsPerPdfPage,
+                canvas.height - offsetY
+            );
+        
+        const pageCanvas =
+            document.createElement(
+                "canvas"
+            );
+        
+        pageCanvas.width =
+            canvas.width;
+        
+        pageCanvas.height =
+            sliceHeight;
+        
+        const context =
+            pageCanvas.getContext(
+                "2d"
+            );
+        
+        context.fillStyle =
+            "#ffffff";
+        
+        context.fillRect(
+            0,
+            0,
+            pageCanvas.width,
+            pageCanvas.height
+        );
+        
+        context.drawImage(
+            canvas,
+            0,
+            offsetY,
+            canvas.width,
+            sliceHeight,
+            0,
+            0,
+            canvas.width,
+            sliceHeight
+        );
+        
+        if (
+            pageNumber > 0
+        ) {
+            
+            pdf.addPage();
+            
+        }
+        
+        const imageHeight =
+            sliceHeight *
+            imageWidth /
+            canvas.width;
+        
+        pdf.addImage(
+            pageCanvas.toDataURL(
+                "image/jpeg",
+                0.98
+            ),
+            "JPEG",
+            0,
+            0,
+            imageWidth,
+            imageHeight,
+            undefined,
+            "FAST"
+        );
+        
+        offsetY +=
+            sliceHeight;
+        
+        pageNumber++;
+        
+    }
+    
+}
+
+function getEstimateClientDisplayName(
+    client
+) {
+
+    return (
+        client.contactPerson ||
+        client.companyName ||
+        client.clientEmail ||
+        "Unnamed Client"
+    );
+
+}
+
+function getEstimateClientInitials(
+    name
+) {
+
+    const parts =
+        String(name || "")
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean);
+
+    if (!parts.length) {
+        return "C";
+    }
+
+    if (parts.length === 1) {
+
+        return parts[0]
+            .substring(0, 2)
+            .toUpperCase();
+
+    }
+
+    return (
+        parts[0][0] +
+        parts[1][0]
+    ).toUpperCase();
+
+}
+
+function renderEstimateClientOptions(
+    clients
+) {
+
+    if (!clients.length) {
+
+        estimateClientPickerOptions.innerHTML = `
+            <div class="client-picker-empty">
+                No clients found.
+            </div>
+        `;
+
+        return;
+
+    }
+
+    estimateClientPickerOptions.innerHTML =
+        "";
+
+    clients.forEach(
+        client => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.type =
+                "button";
+
+            button.className =
+                "client-picker-option";
+
+            if (
+                estimateClientInput.value ===
+                client.objectId
+            ) {
+
+                button.classList.add(
+                    "selected"
+                );
+
+            }
+
+            const name =
+                getEstimateClientDisplayName(
+                    client
+                );
+
+            const company =
+                client.companyName ||
+                "";
+
+            const email =
+                client.clientEmail ||
+                "";
+
+            const imageUrl =
+                client.clientImageUrl ||
+                "";
+
+            const avatar =
+                document.createElement(
+                    "div"
+                );
+
+            avatar.className =
+                "client-picker-option-avatar";
+
+            if (imageUrl) {
+
+                const image =
+                    document.createElement(
+                        "img"
+                    );
+
+                image.src =
+                    imageUrl;
+
+                image.alt =
+                    name;
+
+                image.onerror =
+                    () => {
+
+                        image.remove();
+
+                        avatar.textContent =
+                            getEstimateClientInitials(
+                                name
+                            );
+
+                    };
+
+                avatar.appendChild(
+                    image
+                );
+
+            }
+            else {
+
+                avatar.textContent =
+                    getEstimateClientInitials(
+                        name
+                    );
+
+            }
+
+            const info =
+                document.createElement(
+                    "div"
+                );
+
+            info.className =
+                "client-picker-option-info";
+
+            const nameElement =
+                document.createElement(
+                    "div"
+                );
+
+            nameElement.className =
+                "client-picker-option-name";
+
+            nameElement.textContent =
+                name;
+
+            info.appendChild(
+                nameElement
+            );
+
+            if (company) {
+
+                const companyElement =
+                    document.createElement(
+                        "div"
+                    );
+
+                companyElement.className =
+                    "client-picker-option-company";
+
+                companyElement.textContent =
+                    company;
+
+                info.appendChild(
+                    companyElement
+                );
+
+            }
+
+            if (email) {
+
+                const emailElement =
+                    document.createElement(
+                        "div"
+                    );
+
+                emailElement.className =
+                    "client-picker-option-email";
+
+                emailElement.textContent =
+                    email;
+
+                info.appendChild(
+                    emailElement
+                );
+
+            }
+
+            button.appendChild(
+                avatar
+            );
+
+            button.appendChild(
+                info
+            );
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    selectEstimateClientObject(
+                        client
+                    );
+
+                }
+            );
+
+            estimateClientPickerOptions.appendChild(
+                button
+            );
+
+        }
+    );
+
+}
+
+function selectEstimateClientObject(
+    client
+) {
+
+    if (!client) {
+
+        clearEstimateClientPicker();
+
+        return;
+
+    }
+
+    estimateClientInput.value =
+        client.objectId || "";
+
+    selectedEstimateClient =
+        client;
+
+    estimateClientPickerSelected.textContent =
+        getEstimateClientDisplayName(
+            client
+        );
+
+    setEstimatePreviewClients([
+        client
+    ]);
+
+    updateEstimateClientPreview();
+
+    closeEstimateClientPicker();
+
+}
+
+function clearEstimateClientPicker() {
+
+    estimateClientInput.value =
+        "";
+
+    selectedEstimateClient =
+        null;
+
+    estimateClientPickerSelected.textContent =
+        "Select Client";
+
+    setEstimatePreviewClients([]);
+
+    clearEstimateClientPreview();
+
+}
+
+function closeEstimateClientPicker() {
+
+    estimateClientPicker.classList.remove(
+        "open"
+    );
+
+}
+
+function toggleEstimateClientPicker() {
+
+    const isOpen =
+        estimateClientPicker.classList.contains(
+            "open"
+        );
+
+    if (isOpen) {
+
+        closeEstimateClientPicker();
+
+        return;
+
+    }
+
+    estimateClientPicker.classList.add(
+        "open"
+    );
+
+    estimateClientPickerSearch.focus();
+
+    loadEstimateClients(
+        estimateClientPickerSearch.value
+    );
+
+}
+
+let estimateClientSearchTimer =
+    null;
+
+function initializeEstimateClientPicker() {
+
+    estimateClientPickerTrigger.addEventListener(
+        "click",
+        toggleEstimateClientPicker
+    );
+
+    estimateClientPickerSearch.addEventListener(
+        "input",
+        () => {
+
+            clearTimeout(
+                estimateClientSearchTimer
+            );
+
+            estimateClientSearchTimer =
+                setTimeout(
+                    () => {
+
+                        loadEstimateClients(
+                            estimateClientPickerSearch.value
+                        );
+
+                    },
+                    300
+                );
+
+        }
+    );
+
+    document.addEventListener(
+        "click",
+        event => {
+
+            if (
+                estimateClientPicker.contains(
+                    event.target
+                )
+            ) {
+
+                return;
+
+            }
+
+            closeEstimateClientPicker();
+
+        }
+    );
 
 }
 
@@ -2239,246 +4566,6 @@ async function confirmDeleteEstimate(){
 
 }
 
-async function exportEstimatesCsv(estimateId){
-
-    try{
-
-        const result =
-        await Parse.Cloud.run(
-
-            "getEstimates",
-
-            {
-
-                page: 1,
-
-                limit: 100000,
-
-                search: "",
-
-                status: "",
-
-                sort: "newest"
-
-            }
-
-        );
-
-        const estimate =
-        (result.estimates || []).find(
-            item =>
-            item.objectId === estimateId
-        );
-
-        if(!estimate){
-
-            showToast(
-                "Selected estimate was not found.",
-                "error"
-            );
-
-            return;
-
-        }
-
-        let csv =
-`Estimate Number,Client,Issue Date,Expiry Date,Status,Subtotal,Tax,Discount,Shipping,Grand Total\n`;
-
-        csv +=
-
-`"${estimate.estimateNumber}","${estimate.clientName}","${new Date(estimate.issueDate).toLocaleDateString()}","${new Date(estimate.expiryDate).toLocaleDateString()}","${estimate.status}",${estimate.subtotal},${estimate.taxAmount},${estimate.discount},${estimate.shipping},${estimate.grandTotal}\n`;
-
-        const blob =
-        new Blob(
-
-            [csv],
-
-            {
-
-                type:
-                "text/csv;charset=utf-8;"
-
-            }
-
-        );
-
-        const url =
-        URL.createObjectURL(
-            blob
-        );
-
-        const link =
-        document.createElement(
-            "a"
-        );
-
-        link.href = url;
-
-        link.download =
-        `${estimate.estimateNumber}.csv`;
-
-        document.body.appendChild(
-            link
-        );
-
-        link.click();
-
-        document.body.removeChild(
-            link
-        );
-
-        URL.revokeObjectURL(
-            url
-        );
-
-        exportMenu.classList.remove(
-            "show"
-        );
-
-    }
-
-    catch(error){
-
-        console.error(error);
-
-        showToast(
-            error.message,
-            "error"
-        );
-
-    }
-
-}
-
-async function exportEstimatesExcel(estimateId){
-
-    try{
-
-        const result =
-        await Parse.Cloud.run(
-
-            "getEstimates",
-
-            {
-
-                page: 1,
-
-                limit: 100000,
-
-                search: "",
-
-                status: "",
-
-                sort: "newest"
-
-            }
-
-        );
-
-        const estimate =
-        (result.estimates || []).find(
-            item =>
-            item.objectId === estimateId
-        );
-
-        if(!estimate){
-
-            showToast(
-                "Selected estimate was not found.",
-                "error"
-            );
-
-            return;
-
-        }
-
-        const data = [
-
-            {
-
-                "Estimate Number":
-                estimate.estimateNumber,
-
-                "Client":
-                estimate.clientName,
-
-                "Issue Date":
-                new Date(
-                    estimate.issueDate
-                ).toLocaleDateString(),
-
-                "Expiry Date":
-                new Date(
-                    estimate.expiryDate
-                ).toLocaleDateString(),
-
-                "Status":
-                estimate.status,
-
-                "Subtotal":
-                estimate.subtotal,
-
-                "Tax":
-                estimate.taxAmount,
-
-                "Discount":
-                estimate.discount,
-
-                "Shipping":
-                estimate.shipping,
-
-                "Grand Total":
-                estimate.grandTotal
-
-            }
-
-        ];
-
-        const worksheet =
-        XLSX.utils.json_to_sheet(
-            data
-        );
-
-        const workbook =
-        XLSX.utils.book_new();
-
-        XLSX.utils.book_append_sheet(
-
-            workbook,
-
-            worksheet,
-
-            "Estimate"
-
-        );
-
-        XLSX.writeFile(
-
-            workbook,
-
-            `${estimate.estimateNumber}.xlsx`
-
-        );
-
-        exportMenu.classList.remove(
-            "show"
-        );
-
-    }
-
-    catch(error){
-
-        console.error(error);
-
-        showToast(
-            error.message,
-            "error"
-        );
-
-    }
-
-}
-
 async function loadNotificationCount() {
 
     try {
@@ -2549,50 +4636,71 @@ async function openCreateEstimateModal() {
 
 }
 
-async function loadEstimateClients() {
+async function loadEstimateClients(
+    search = ""
+) {
 
     try {
 
-        const result =
-        await Parse.Cloud.run(
-            "getEstimateClients"
-        );
-
-        estimateClientInput.innerHTML = `
-            <option value="">
-                Select Client
-            </option>
+        estimateClientPickerOptions.innerHTML = `
+            <div class="client-picker-loading">
+                Loading clients...
+            </div>
         `;
 
-        result.clients.forEach(client => {
+        const result =
+            await Parse.Cloud.run(
+                "getClients",
+                {
+                    search:
+                        search.trim(),
 
-            const option =
-            document.createElement("option");
+                    status:
+                        "active",
 
-            option.value =
-            client.objectId;
+                    sort:
+                        "name",
 
-            option.textContent =
-                client.contactPerson +
-                (
-                    client.companyName
-                    ? ` (${client.companyName})`
-                    : ""
-                );
+                    page:
+                        1,
 
-            estimateClientInput.appendChild(option);
+                    limit:
+                        100
+                }
+            );
 
-        });
+        const clients =
+            Array.isArray(
+                result?.clients
+            )
+            ? result.clients
+            : [];
+
+        setEstimatePreviewClients(
+            clients
+        );
+
+        renderEstimateClientOptions(
+            clients
+        );
 
     }
-
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "Estimate Client Load Error:",
+            error
+        );
+
+        estimateClientPickerOptions.innerHTML = `
+            <div class="client-picker-error">
+                Unable to load clients.
+            </div>
+        `;
 
         showToast(
             error.message ||
-            "Failed to load clients.",
+            "Unable to load clients.",
             "error"
         );
 
@@ -2941,6 +5049,267 @@ async function loadExportEstimates(){
 
 }
 
+async function exportEstimatesPdf(estimateId) {
+    
+    if (!currentSubscriptionSettings) {
+
+        await loadEstimateSubscriptionSettings();
+
+    }
+
+    if (!canExportEstimatePdf()) {
+
+        return;
+
+    }
+
+    if (!estimateId) {
+
+        showToast(
+            "No estimate was selected.",
+            "warning"
+        );
+
+        return;
+
+    }
+
+    let exportStarted = false;
+
+    try {
+
+        const paper =
+            getEstimatePreviewElement();
+
+        if (!paper) {
+
+            showToast(
+                "Estimate preview could not be found.",
+                "error"
+            );
+
+            return;
+
+        }
+
+        const result =
+            await loadEstimateDetails(
+                estimateId
+            );
+
+        if (!result || !selectedEstimate) {
+
+            showToast(
+                "Could not load the selected estimate.",
+                "error"
+            );
+
+            return;
+
+        }
+
+        if (
+            !estimatePreviewState.initialized
+        ) {
+
+            await initializeEstimatePreview();
+
+        }
+
+        populateEstimatePreview();
+
+        paper.classList.add(
+            "estimate-export-mode"
+        );
+
+        exportStarted = true;
+
+        if (document.fonts) {
+
+            await document.fonts.ready;
+
+        }
+
+        const images =
+            paper.querySelectorAll("img");
+
+        await Promise.all(
+            Array.from(images).map(
+                image => {
+
+                    if (
+                        image.complete &&
+                        image.naturalWidth > 0
+                    ) {
+
+                        return Promise.resolve();
+
+                    }
+
+                    return new Promise(
+                        resolve => {
+
+                            image.onload =
+                                resolve;
+
+                            image.onerror =
+                                resolve;
+
+                        }
+                    );
+
+                }
+            )
+        );
+
+        await new Promise(resolve => {
+
+            requestAnimationFrame(() => {
+
+                requestAnimationFrame(resolve);
+
+            });
+
+        });
+
+        const fileName =
+            `${selectedEstimate.estimateNumber || "estimate"}.pdf`;
+
+        const options = {
+
+            margin: 0,
+
+            filename: fileName,
+
+            image: {
+                type: "jpeg",
+                quality: 1
+            },
+
+            html2canvas: {
+
+                scale: 2,
+
+                useCORS: true,
+
+                allowTaint: false,
+
+                backgroundColor: "#ffffff",
+
+                logging: false,
+
+                scrollX: 0,
+
+                scrollY: 0,
+
+                windowWidth:
+                    paper.scrollWidth,
+
+                windowHeight:
+                    paper.scrollHeight
+
+            },
+
+            jsPDF: {
+
+                unit: "mm",
+
+                format: "a4",
+
+                orientation: "portrait",
+
+                compress: true
+
+            },
+
+            pagebreak: {
+
+                mode: [
+                    "css",
+                    "legacy"
+                ]
+
+            }
+
+        };
+
+        await html2pdf()
+            .set(options)
+            .from(paper)
+            .save();
+            
+        const exportResult =
+    await Parse.Cloud.run(
+        "recordPdfExport"
+    );
+
+if (!exportResult?.success) {
+
+    throw new Error(
+        "Unable to record your PDF export."
+    );
+
+}
+
+if (
+    currentSubscriptionSettings?.usage?.exports
+) {
+
+    currentSubscriptionSettings.usage.exports.used =
+        exportResult.used;
+
+    currentSubscriptionSettings.usage.exports.maximum =
+        exportResult.maximum;
+
+    currentSubscriptionSettings.usage.exports.remaining =
+        exportResult.remaining;
+
+    updateEstimateExportButtonState();
+
+}
+
+        if (exportMenu) {
+
+            exportMenu.classList.remove(
+                "show"
+            );
+
+        }
+
+        showToast(
+            "Estimate PDF exported successfully.",
+            "success"
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Estimate PDF Export Error:",
+            error
+        );
+
+        showToast(
+            error.message ||
+            "Unable to export estimate PDF.",
+            "error"
+        );
+
+    }
+
+    finally {
+
+        if (exportStarted) {
+
+            restoreEstimatePreviewAfterExport();
+
+        }
+
+    }
+
+}
+
 async function loadEstimatePaymentMethod() {
 
     try {
@@ -3027,21 +5396,673 @@ async function loadEstimatePaymentMethod() {
     }
 
 }
-/*
-if (notificationButton) {
 
-    notificationButton.addEventListener(
-        "click",
-        function () {
+async function loadEstimateSubscriptionSettings() {
 
-            window.location.href =
-            "notifications.html";
+    try {
+
+        const result =
+            await Parse.Cloud.run(
+                "getCurrentSubscription"
+            );
+
+        if (
+            !result ||
+            !result.success
+        ) {
+
+            throw new Error(
+                "Unable to load subscription information."
+            );
 
         }
-    );
+
+        currentSubscriptionSettings =
+            result;
+
+        updateEstimateExportButtonState();
+
+        return result;
+
+    } catch (error) {
+
+        console.error(
+            "Estimate subscription loading failed:",
+            error
+        );
+
+        showToast(
+            getErrorMessage(
+                error,
+                "Unable to load subscription information."
+            ),
+            "error"
+        );
+
+        return null;
+    }
+}
+
+async function loadBusinessProfileSettings() {
+
+    try {
+
+        const result =
+            await Parse.Cloud.run(
+                "getBusinessProfile"
+            );
+
+        showClientImage =
+            result &&
+            result.profile &&
+            result.profile.showClientImage !== false;
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Business Profile Settings Error:",
+            error
+        );
+
+        showClientImage = true;
+
+    }
 
 }
-*/
+
+async function initializeEstimatePreview() {
+
+    try {
+
+
+        await loadEstimatePreviewProfile();
+
+        await loadEstimatePreviewTemplate();
+
+        initializeEstimatePreviewDefaults();
+        
+        updateEstimateBusinessPreview();
+
+        registerEstimatePreviewListeners();
+        
+        applyEstimateTemplate();
+
+        estimatePreviewState.initialized = true;
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        showToast(
+            error.message || error,
+            "error"
+        );
+
+    }
+
+}
+
+async function loadEstimatePreviewProfile() {
+
+    const response =
+    await Parse.Cloud.run(
+        "getUserProfile"
+    );
+
+    if (!response.success) {
+
+        throw "Unable to load profile.";
+
+    }
+
+    const profile =
+    response.profile;
+
+    estimatePreviewState.userProfile =
+    profile;
+
+    estimatePreviewState.currencyCode =
+    profile.currencyCode || "USD";
+
+    estimatePreviewState.currencySymbol =
+    profile.currencySymbol || "$";
+
+    estimatePreviewState.logoUrl =
+    profile.businessLogo
+    ? profile.businessLogo
+    : "";
+
+    estimatePreviewState.primaryColor =
+    profile.primaryColor || "#2563EB";
+
+    estimatePreviewState.secondaryColor =
+    profile.secondaryColor || "#FFFFFF";
+
+}
+
+async function loadEstimatePreviewTemplate() {
+
+    const response =
+    await Parse.Cloud.run(
+        "getEstimateTemplate"
+    );
+
+    if (
+        response.success &&
+        response.exists
+    ) {
+
+        estimatePreviewState.template =
+        response.settings || {};
+
+    }
+
+    else {
+
+        estimatePreviewState.template = {};
+
+    }
+
+}
+
+async function saveEstimateTemplate(section = "general") {
+
+    if (estimateTemplateSaving) {
+
+        return;
+
+    }
+
+    estimateTemplateSaving = true;
+
+    try {
+
+        await Parse.Cloud.run(
+
+            "saveEstimateTemplate",
+
+            {
+
+                templateName: "Default",
+
+                section,
+
+                settings:
+                estimatePreviewState.template
+
+            }
+
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        showToast(
+
+            error.message || error,
+
+            "error"
+
+        );
+
+    }
+
+    finally {
+
+        estimateTemplateSaving = false;
+
+    }
+
+}
+
+async function exportAllEstimatesAsPdf() {
+
+    if (!currentSubscriptionSettings) {
+
+        await loadEstimateSubscriptionSettings();
+
+    }
+
+    if (!canExportEstimatePdf()) {
+
+        return;
+
+    }
+
+    if (
+        typeof html2canvas === "undefined"
+    ) {
+
+        showToast(
+            "PDF rendering library is not loaded.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    if (
+        typeof window.jspdf === "undefined" ||
+        !window.jspdf.jsPDF
+    ) {
+
+        showToast(
+            "PDF library is not loaded.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    let exportStarted = false;
+
+    try {
+
+        const firstPage =
+            await Parse.Cloud.run(
+                "getEstimates",
+                {
+                    page: 1,
+                    limit: 100,
+                    search: "",
+                    status: "",
+                    sort: "newest"
+                }
+            );
+
+        const allEstimates =
+            Array.isArray(firstPage?.estimates)
+            ? [...firstPage.estimates]
+            : [];
+
+        const totalRecords =
+            Number(
+                firstPage?.totalRecords
+            ) || allEstimates.length;
+
+        const totalPages =
+            Math.ceil(
+                totalRecords / 100
+            );
+
+        for (
+            let page = 2;
+            page <= totalPages;
+            page++
+        ) {
+
+            const pageResult =
+                await Parse.Cloud.run(
+                    "getEstimates",
+                    {
+                        page,
+                        limit: 100,
+                        search: "",
+                        status: "",
+                        sort: "newest"
+                    }
+                );
+
+            if (
+                Array.isArray(
+                    pageResult?.estimates
+                )
+            ) {
+
+                allEstimates.push(
+                    ...pageResult.estimates
+                );
+
+            }
+
+        }
+
+        if (!allEstimates.length) {
+
+            showToast(
+                "There are no estimates to export.",
+                "info"
+            );
+
+            return;
+
+        }
+
+        const paper =
+            getEstimatePreviewElement();
+
+        if (!paper) {
+
+            throw new Error(
+                "Estimate preview could not be found."
+            );
+
+        }
+
+        if (
+            !estimatePreviewState.initialized
+        ) {
+
+            await initializeEstimatePreview();
+
+        }
+
+        const {
+            jsPDF
+        } = window.jspdf;
+
+        const pdf =
+            new jsPDF(
+                {
+                    orientation: "portrait",
+                    unit: "mm",
+                    format: "a4",
+                    compress: true
+                }
+            );
+
+        let exportedCount = 0;
+
+        for (
+            const estimate of allEstimates
+        ) {
+
+            if (
+                !estimate?.objectId
+            ) {
+
+                continue;
+
+            }
+
+            const result =
+                await loadEstimateDetails(
+                    estimate.objectId
+                );
+
+            if (
+                !result ||
+                !selectedEstimate
+            ) {
+
+                continue;
+
+            }
+
+            populateEstimatePreview();
+
+            paper.classList.add(
+                "estimate-export-mode"
+            );
+
+            exportStarted = true;
+
+            if (document.fonts) {
+
+                await document.fonts.ready;
+
+            }
+
+            const images =
+                paper.querySelectorAll(
+                    "img"
+                );
+
+            await Promise.all(
+                Array.from(images).map(
+                    image => {
+
+                        if (
+                            image.complete &&
+                            image.naturalWidth > 0
+                        ) {
+
+                            return Promise.resolve();
+
+                        }
+
+                        return new Promise(
+                            resolve => {
+
+                                image.onload =
+                                    resolve;
+
+                                image.onerror =
+                                    resolve;
+
+                            }
+                        );
+
+                    }
+                )
+            );
+
+            await new Promise(
+                resolve => {
+
+                    requestAnimationFrame(
+                        () => {
+
+                            requestAnimationFrame(
+                                resolve
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+            const canvas =
+                await html2canvas(
+                    paper,
+                    {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: false,
+                        backgroundColor: "#ffffff",
+                        logging: false,
+                        scrollX: 0,
+                        scrollY: 0,
+                        windowWidth:
+                            paper.scrollWidth,
+                        windowHeight:
+                            paper.scrollHeight
+                    }
+                );
+
+            if (
+                exportedCount > 0
+            ) {
+
+                pdf.addPage();
+
+            }
+
+            addEstimateCanvasToPdf(
+                pdf,
+                canvas
+            );
+
+            exportedCount++;
+
+            paper.classList.remove(
+                "estimate-export-mode"
+            );
+
+        }
+
+        if (
+            !exportedCount
+        ) {
+
+            throw new Error(
+                "No estimates could be rendered for PDF export."
+            );
+
+        }
+
+        pdf.save(
+            "estimates.pdf"
+        );
+
+        const exportResult =
+            await Parse.Cloud.run(
+                "recordPdfExport"
+            );
+
+        if (
+            !exportResult?.success
+        ) {
+
+            throw new Error(
+                "Unable to record your PDF export."
+            );
+
+        }
+
+        if (
+            currentSubscriptionSettings?.usage?.exports
+        ) {
+
+            currentSubscriptionSettings
+                .usage
+                .exports
+                .used =
+                    exportResult.used;
+
+            currentSubscriptionSettings
+                .usage
+                .exports
+                .maximum =
+                    exportResult.maximum;
+
+            currentSubscriptionSettings
+                .usage
+                .exports
+                .remaining =
+                    exportResult.remaining;
+
+            updateEstimateExportButtonState();
+
+        }
+
+        showToast(
+            `${exportedCount} estimates exported as one PDF successfully.`,
+            "success"
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Estimate List PDF Export Error:",
+            error
+        );
+
+        showToast(
+            error.message ||
+            "Unable to export estimates as PDF.",
+            "error"
+        );
+
+    }
+    finally {
+
+        if (exportStarted) {
+
+            restoreEstimatePreviewAfterExport();
+
+        }
+
+    }
+
+}
+
+async function duplicateEstimate(
+    estimateId
+) {
+    
+    if (!estimateId) {
+        
+        return;
+        
+    }
+    
+    try {
+        
+        const result =
+            await Parse.Cloud.run(
+                "duplicateEstimate",
+                {
+                    estimateId
+                }
+            );
+        
+        if (
+            !result ||
+            !result.success
+        ) {
+            
+            throw new Error(
+                result?.message ||
+                "Unable to duplicate estimate."
+            );
+            
+        }
+        
+        showToast(
+            result.message ||
+            "Estimate duplicated successfully.",
+            "success"
+        );
+        
+        await Promise.all([
+            loadEstimateStatistics(),
+            loadEstimates()
+        ]);
+        
+    }
+    catch (error) {
+        
+        console.error(
+            "Duplicate Estimate Error:",
+            error
+        );
+        
+        showToast(
+            error.message ||
+            "Unable to duplicate estimate.",
+            "error"
+        );
+        
+    }
+    
+}
+
+exportEstimatesPdfButton.addEventListener(
+    "click",
+    async function(event){
+
+        event.stopPropagation();
+
+        await exportAllEstimatesAsPdf();
+
+    }
+);
+
+estimatePreviewState.clients = [];
+
+estimatePreviewState.items = [];
 
 deleteEstimateButton.addEventListener(
 
@@ -3051,133 +6072,12 @@ deleteEstimateButton.addEventListener(
 
 );
 
-exportEstimatesButton.addEventListener(
-    "click",
-    async function(event){
-
-        event.stopPropagation();
-
-        exportMenu.classList.toggle(
-            "show"
-        );
-
-        if (
-            exportMenu.classList.contains("show")
-        ) {
-
-            await loadExportEstimates();
-
-        }
-
-    }
-);
-
 cancelDeleteEstimateButton.addEventListener(
 
     "click",
 
     closeDeleteEstimateModal
 
-);
-
-exportEstimateSelect.addEventListener(
-    "change",
-    function(){
-
-        const hasSelection =
-            exportEstimateSelect.value !== "";
-
-        exportPdfButton.disabled =
-            !hasSelection;
-
-        exportExcelButton.disabled =
-            !hasSelection;
-
-        exportCsvButton.disabled =
-            !hasSelection;
-
-    }
-);
-
-exportPdfButton.addEventListener(
-    "click",
-    async function(event){
-
-        event.stopPropagation();
-
-        const estimateId =
-            exportEstimateSelect.value;
-
-        if (!estimateId) {
-
-            return;
-
-        }
-
-        console.log(
-            "EXPORT PDF SELECTED ESTIMATE:",
-            estimateId
-        );
-
-        await exportEstimatesPdf(
-            estimateId
-        );
-
-    }
-);
-
-exportExcelButton.addEventListener(
-    "click",
-    async function(event){
-
-        event.stopPropagation();
-
-        const estimateId =
-            exportEstimateSelect.value;
-
-        if (!estimateId) {
-
-            return;
-
-        }
-
-        console.log(
-            "EXPORT EXCEL SELECTED ESTIMATE:",
-            estimateId
-        );
-
-        await exportEstimatesExcel(
-            estimateId
-        );
-
-    }
-);
-
-exportCsvButton.addEventListener(
-    "click",
-    async function(event){
-
-        event.stopPropagation();
-
-        const estimateId =
-            exportEstimateSelect.value;
-
-        if (!estimateId) {
-
-            return;
-
-        }
-
-        console.log(
-            "EXPORT CSV SELECTED ESTIMATE:",
-            estimateId
-        );
-
-        await exportEstimatesCsv(
-            estimateId
-        );
-
-    }
 );
 
 deleteEstimateOverlay.addEventListener(
@@ -3325,8 +6225,6 @@ pageThreeButton.addEventListener("click", () => {
 
 });
 
-let searchTimeout;
-
 estimateSearchInput.addEventListener("input", () => {
 
     clearTimeout(searchTimeout);
@@ -3394,6 +6292,12 @@ printEstimatePdfButton.addEventListener(
 
         event.stopPropagation();
 
+        if (!canExportEstimatePdf()) {
+
+            return;
+
+        }
+
         if(!selectedEstimate){
 
             return;
@@ -3449,6 +6353,16 @@ estimatesTableBody.addEventListener("click", async function (event) {
         return;
 
     }
+    
+    if (button.classList.contains("duplicate-btn")) {
+
+    await duplicateEstimate(
+        estimateId
+    );
+
+    return;
+
+}
 
     if (button.classList.contains("delete-btn")) {
 
@@ -3531,26 +6445,6 @@ document.addEventListener(
     }
 );
 
-document.addEventListener(
-    "click",
-    function(event){
-
-        if (
-            exportMenu.contains(event.target) ||
-            exportEstimatesButton.contains(event.target)
-        ){
-
-            return;
-
-        }
-
-        exportMenu.classList.remove(
-            "show"
-        );
-
-    }
-);
-
 window.addEventListener("resize", () => {
 
     if(window.innerWidth > 992){
@@ -3589,7 +6483,7 @@ function(e){
 
     }
 
-    profileDropdown.classList.remove(
+    profileDropdown?.classList.remove(
     "show"
     );
 
@@ -3602,7 +6496,10 @@ document.addEventListener(
     "DOMContentLoaded",
     async function () {
         
+        await loadBusinessProfileSettings();
+        
         initializeTotalInputs();
+        initializeEstimateClientPicker();
         
         await initializeEstimatePreview();
         
@@ -3616,7 +6513,9 @@ document.addEventListener(
             
             loadEstimateClients(),
             
-            loadEstimateStatistics()
+            loadEstimateStatistics(),
+            
+            loadEstimateSubscriptionSettings()
             
             
         ]);

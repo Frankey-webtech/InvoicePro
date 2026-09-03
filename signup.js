@@ -428,8 +428,8 @@ async function initializeAuth0() {
         authorizationParams: {
 
             redirect_uri:
-                window.location.origin +
-                "/dashboard.html"
+    window.location.origin +
+    "/callback.html"
 
         }
 

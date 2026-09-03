@@ -492,11 +492,12 @@ img {
 
 .social-login {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 11px;
 }
 
 .social-btn {
+    width:100%;
     min-height: 46px;
     display: flex;
     align-items: center;
