@@ -8,21 +8,17 @@
     --navy-500: #2f6fa8;
     --navy-100: #eaf2f9;
     --navy-50: #f4f8fc;
-
     --white: #ffffff;
     --text: #172033;
     --text-light: #667085;
     --border: #dce5ef;
     --soft-border: #e9eef4;
-
     --warning: #b7791f;
     --warning-light: #fff8e8;
     --warning-border: #f3dfad;
-
     --shadow-sm: 0 4px 16px rgba(6, 19, 38, 0.06);
     --shadow-md: 0 12px 35px rgba(6, 19, 38, 0.09);
     --shadow-lg: 0 24px 60px rgba(6, 19, 38, 0.13);
-
     --radius-sm: 8px;
     --radius-md: 14px;
     --radius-lg: 22px;
@@ -117,8 +113,7 @@ a {
     justify-content: center;
     text-align: center;
     color: var(--white);
-    background:
-        radial-gradient(circle at 15% 20%, rgba(47, 111, 168, 0.14), transparent 28%),
+    background: radial-gradient(circle at 15% 20%, rgba(47, 111, 168, 0.14), transparent 28%),
         radial-gradient(circle at 85% 80%, rgba(23, 69, 121, 0.12), transparent 30%),
         linear-gradient(135deg, var(--navy-950), var(--navy-800));
     overflow: hidden;
@@ -508,8 +503,7 @@ a {
     gap: 35px;
     position: relative;
     overflow: hidden;
-    background:
-        radial-gradient(circle at 90% 10%, rgba(70, 132, 185, 0.18), transparent 30%),
+    background: radial-gradient(circle at 90% 10%, rgba(70, 132, 185, 0.18), transparent 30%),
         linear-gradient(135deg, var(--navy-950), var(--navy-800));
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-lg);
@@ -639,8 +633,7 @@ footer {
 }
 
 @media (max-width: 1000px) {
-
-    .header {
+.header {
         padding: 0 4%;
     }
 
@@ -672,8 +665,7 @@ footer {
 }
 
 @media (max-width: 760px) {
-
-    .header {
+.header {
         min-height: 70px;
         padding: 15px 5%;
         align-items: flex-start;
@@ -804,8 +796,7 @@ footer {
 }
 
 @media (max-width: 480px) {
-
-    .header {
+.header {
         flex-direction: column;
         align-items: center;
         padding: 14px 4%;
@@ -905,5 +896,155 @@ footer {
 
     .btn {
         width: 100%;
+    }
+}
+@media (max-width: 480px) {
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: hidden;
+    }
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    img,
+    svg,
+    video,
+    canvas,
+    iframe {
+        max-width: 100%;
+        height: auto;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    table {
+        width: 100%;
+        max-width: 100%;
+        table-layout: fixed;
+    }
+
+    th,
+    td {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    pre,
+    code {
+        max-width: 100%;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    p,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    label,
+    span {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    .container,
+    .page-container,
+    .page-content,
+    .main-content,
+    .content,
+    .main,
+    .app,
+    .wrapper {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    [class*="grid"] {
+        min-width: 0;
+    }
+
+    [class*="row"],
+    [class*="actions"],
+    [class*="header"],
+    [class*="toolbar"] {
+        min-width: 0;
+        flex-wrap: wrap;
+    }
+
+    [class*="card"],
+    [class*="panel"],
+    [class*="modal"],
+    [class*="section"] {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    [class*="modal"] {
+        max-height: calc(100vh - 24px);
+        overflow-y: auto;
+    }
+
+    .table-responsive,
+    [class*="table-wrap"],
+    [class*="table-container"] {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    button,
+    .btn,
+    [class*="button"] {
+        max-width: 100%;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 360px) {
+    body {
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: clamp(20px, 7vw, 28px);
+    }
+
+    h2 {
+        font-size: clamp(18px, 6vw, 24px);
+    }
+
+    h3 {
+        font-size: clamp(16px, 5vw, 20px);
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+        font-size: 14px;
     }
 }

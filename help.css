@@ -113,8 +113,7 @@ img {
     grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
     align-items: center;
     gap: 70px;
-    background:
-        linear-gradient(
+    background: linear-gradient(
             135deg,
             var(--navy-950) 0%,
             var(--navy-900) 55%,
@@ -298,8 +297,7 @@ img {
     border: 1px solid var(--border);
     border-radius: 16px;
     box-shadow: 0 8px 25px rgba(6, 20, 38, 0.045);
-    transition:
-        transform 0.25s ease,
+    transition: transform 0.25s ease,
         box-shadow 0.25s ease,
         border-color 0.25s ease;
 }
@@ -352,8 +350,7 @@ img {
     color: var(--navy-900);
     font-size: 14px;
     font-weight: 500;
-    transition:
-        background 0.25s ease,
+    transition: background 0.25s ease,
         border-color 0.25s ease,
         transform 0.25s ease;
 }
@@ -390,8 +387,7 @@ img {
     border: 1px solid var(--border);
     border-radius: 16px;
     box-shadow: 0 7px 24px rgba(6, 20, 38, 0.045);
-    transition:
-        transform 0.25s ease,
+    transition: transform 0.25s ease,
         box-shadow 0.25s ease,
         border-color 0.25s ease;
 }
@@ -462,8 +458,7 @@ img {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    background:
-        linear-gradient(
+    background: linear-gradient(
             135deg,
             var(--navy-950),
             var(--navy-800)
@@ -528,8 +523,7 @@ img {
     font-weight: 600;
     position: relative;
     z-index: 2;
-    transition:
-        background 0.25s ease,
+    transition: background 0.25s ease,
         color 0.25s ease,
         transform 0.25s ease;
 }
@@ -558,7 +552,7 @@ footer p {
 }
 
 @media (max-width: 1100px) {
-    .header {
+.header {
         padding: 0 5%;
     }
 
@@ -582,7 +576,7 @@ footer p {
 }
 
 @media (max-width: 800px) {
-    .header {
+.header {
         min-height: 70px;
         padding: 0 5%;
     }
@@ -641,7 +635,7 @@ footer p {
 }
 
 @media (max-width: 560px) {
-    .header {
+.header {
         min-height: auto;
         padding-top: 18px;
         padding-bottom: 18px;
@@ -764,5 +758,155 @@ footer p {
 
     footer {
         min-height: 65px;
+    }
+}
+@media (max-width: 480px) {
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: hidden;
+    }
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    img,
+    svg,
+    video,
+    canvas,
+    iframe {
+        max-width: 100%;
+        height: auto;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    table {
+        width: 100%;
+        max-width: 100%;
+        table-layout: fixed;
+    }
+
+    th,
+    td {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    pre,
+    code {
+        max-width: 100%;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    p,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    label,
+    span {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    .container,
+    .page-container,
+    .page-content,
+    .main-content,
+    .content,
+    .main,
+    .app,
+    .wrapper {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    [class*="grid"] {
+        min-width: 0;
+    }
+
+    [class*="row"],
+    [class*="actions"],
+    [class*="header"],
+    [class*="toolbar"] {
+        min-width: 0;
+        flex-wrap: wrap;
+    }
+
+    [class*="card"],
+    [class*="panel"],
+    [class*="modal"],
+    [class*="section"] {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    [class*="modal"] {
+        max-height: calc(100vh - 24px);
+        overflow-y: auto;
+    }
+
+    .table-responsive,
+    [class*="table-wrap"],
+    [class*="table-container"] {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    button,
+    .btn,
+    [class*="button"] {
+        max-width: 100%;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 360px) {
+    body {
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: clamp(20px, 7vw, 28px);
+    }
+
+    h2 {
+        font-size: clamp(18px, 6vw, 24px);
+    }
+
+    h3 {
+        font-size: clamp(16px, 5vw, 20px);
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+        font-size: 14px;
     }
 }

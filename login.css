@@ -333,7 +333,7 @@ body {
     justify-content: center;
     border-radius: 14px;
     background: #eaf2ff;
-    color: #2563eb;
+    color: #17457D;
 }
 
 .login-icon i {
@@ -413,7 +413,7 @@ body {
 }
 
 .input-box input:focus {
-    border-color: #2563eb;
+    border-color: #17457D;
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.11);
 }
 
@@ -437,7 +437,7 @@ body {
 
 .toggle-password:hover {
     background: #f1f5f9;
-    color: #2563eb;
+    color: #17457D;
 }
 
 .login-options {
@@ -461,18 +461,18 @@ body {
 .remember input {
     width: 15px;
     height: 15px;
-    accent-color: #2563eb;
+    accent-color: #17457D;
 }
 
 .forgot-password {
-    color: #2563eb;
+    color: #17457D;
     font-size: 12px;
     font-weight: 600;
     text-decoration: none;
 }
 
 .forgot-password:hover {
-    color: #1d4ed8;
+    color: #12345F;
     text-decoration: underline;
 }
 
@@ -576,7 +576,7 @@ body {
 }
 
 .login-security i {
-    color: #2563eb;
+    color: #17457D;
     font-size: 15px;
 }
 
@@ -619,7 +619,7 @@ footer span {
 }
 
 @media (max-width: 900px) {
-    .topbar {
+.topbar {
         padding: 0 30px;
     }
 
@@ -645,7 +645,7 @@ footer span {
 }
 
 @media (max-width: 650px) {
-    .topbar {
+.topbar {
         min-height: 70px;
         padding: 0 18px;
     }
@@ -731,7 +731,7 @@ footer span {
 }
 
 @media (max-width: 390px) {
-    .left-content h1 {
+.left-content h1 {
         font-size: 32px;
     }
 
@@ -741,5 +741,155 @@ footer span {
 
     .social-login {
         grid-template-columns: 1fr;
+    }
+}
+@media (max-width: 480px) {
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: hidden;
+    }
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    img,
+    svg,
+    video,
+    canvas,
+    iframe {
+        max-width: 100%;
+        height: auto;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    table {
+        width: 100%;
+        max-width: 100%;
+        table-layout: fixed;
+    }
+
+    th,
+    td {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    pre,
+    code {
+        max-width: 100%;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    p,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    label,
+    span {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    .container,
+    .page-container,
+    .page-content,
+    .main-content,
+    .content,
+    .main,
+    .app,
+    .wrapper {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    [class*="grid"] {
+        min-width: 0;
+    }
+
+    [class*="row"],
+    [class*="actions"],
+    [class*="header"],
+    [class*="toolbar"] {
+        min-width: 0;
+        flex-wrap: wrap;
+    }
+
+    [class*="card"],
+    [class*="panel"],
+    [class*="modal"],
+    [class*="section"] {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    [class*="modal"] {
+        max-height: calc(100vh - 24px);
+        overflow-y: auto;
+    }
+
+    .table-responsive,
+    [class*="table-wrap"],
+    [class*="table-container"] {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    button,
+    .btn,
+    [class*="button"] {
+        max-width: 100%;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 360px) {
+    body {
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: clamp(20px, 7vw, 28px);
+    }
+
+    h2 {
+        font-size: clamp(18px, 6vw, 24px);
+    }
+
+    h3 {
+        font-size: clamp(16px, 5vw, 20px);
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+        font-size: 14px;
     }
 }

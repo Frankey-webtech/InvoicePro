@@ -8,24 +8,19 @@
     --navy-500: #2c73b9;
     --navy-100: #e8f2fc;
     --navy-50: #f4f8fd;
-
     --white: #ffffff;
     --text: #12233d;
     --muted: #64748b;
     --muted-light: #8b9aad;
-
     --green: #16845b;
     --green-light: #eaf8f2;
     --red: #c94b4b;
     --gold: #b98518;
-
     --border: #dce5ef;
     --border-light: #e9eef5;
-
     --shadow-sm: 0 8px 25px rgba(6, 21, 45, 0.06);
     --shadow-md: 0 16px 40px rgba(6, 21, 45, 0.09);
     --shadow-lg: 0 25px 70px rgba(6, 21, 45, 0.13);
-
     --radius-sm: 10px;
     --radius-md: 14px;
     --radius-lg: 20px;
@@ -270,8 +265,7 @@ img {
     gap: 70px;
     position: relative;
     overflow: hidden;
-    background:
-        radial-gradient(circle at 8% 18%, rgba(31, 95, 159, 0.1), transparent 29%),
+    background: radial-gradient(circle at 8% 18%, rgba(31, 95, 159, 0.1), transparent 29%),
         radial-gradient(circle at 92% 90%, rgba(13, 40, 77, 0.07), transparent 27%),
         linear-gradient(135deg, var(--white) 0%, var(--navy-50) 100%);
 }
@@ -285,8 +279,7 @@ img {
     top: -240px;
     border-radius: 50%;
     border: 1px solid rgba(22, 69, 121, 0.08);
-    box-shadow:
-        0 0 0 60px rgba(22, 69, 121, 0.025),
+    box-shadow: 0 0 0 60px rgba(22, 69, 121, 0.025),
         0 0 0 120px rgba(22, 69, 121, 0.018);
 }
 
@@ -621,8 +614,7 @@ img {
     position: relative;
     overflow: hidden;
     border-radius: 8px;
-    background:
-        linear-gradient(to bottom, transparent 24%, #edf2f7 25%, transparent 26%),
+    background: linear-gradient(to bottom, transparent 24%, #edf2f7 25%, transparent 26%),
         linear-gradient(to bottom, transparent 49%, #edf2f7 50%, transparent 51%),
         linear-gradient(to bottom, transparent 74%, #edf2f7 75%, transparent 76%);
 }
@@ -835,8 +827,7 @@ img {
     background: var(--white);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    transition:
-        transform 0.25s ease,
+    transition: transform 0.25s ease,
         box-shadow 0.25s ease,
         border-color 0.25s ease;
 }
@@ -906,8 +897,7 @@ img {
     grid-template-columns: minmax(0, 1fr) minmax(390px, 0.85fr);
     align-items: center;
     gap: 90px;
-    background:
-        linear-gradient(135deg, var(--navy-50) 0%, var(--white) 100%);
+    background: linear-gradient(135deg, var(--navy-50) 0%, var(--white) 100%);
     border-top: 1px solid var(--border-light);
     border-bottom: 1px solid var(--border-light);
 }
@@ -1282,8 +1272,7 @@ img {
     align-items: center;
     flex-direction: column;
     text-align: center;
-    background:
-        radial-gradient(circle at 50% 0%, rgba(70, 127, 181, 0.2), transparent 32%),
+    background: radial-gradient(circle at 50% 0%, rgba(70, 127, 181, 0.2), transparent 32%),
         linear-gradient(135deg, var(--navy-950), var(--navy-800));
     position: relative;
     overflow: hidden;
@@ -1299,8 +1288,7 @@ img {
     transform: translateX(-50%);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 50%;
-    box-shadow:
-        0 0 0 70px rgba(255, 255, 255, 0.025),
+    box-shadow: 0 0 0 70px rgba(255, 255, 255, 0.025),
         0 0 0 140px rgba(255, 255, 255, 0.018);
 }
 
@@ -1481,7 +1469,7 @@ img {
 }
 
 @media (max-width: 1150px) {
-    .header {
+.header {
         padding: 0 4%;
     }
 
@@ -1524,7 +1512,7 @@ img {
 }
 
 @media (max-width: 950px) {
-    .main-nav {
+.main-nav {
         gap: 15px;
     }
 
@@ -1607,7 +1595,7 @@ img {
 }
 
 @media (max-width: 760px) {
-    .header {
+.header {
         min-height: 70px;
         padding: 13px 5%;
         flex-wrap: wrap;
@@ -1831,7 +1819,7 @@ img {
 }
 
 @media (max-width: 500px) {
-    .header {
+.header {
         padding: 12px 4%;
     }
 
@@ -2097,7 +2085,7 @@ img {
 }
 
 @media (max-width: 350px) {
-    .hero h1 {
+.hero h1 {
         font-size: 33px;
     }
 
@@ -2126,5 +2114,155 @@ img {
 
     .footer-column:last-child {
         grid-column: auto;
+    }
+}
+@media (max-width: 480px) {
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: hidden;
+    }
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    img,
+    svg,
+    video,
+    canvas,
+    iframe {
+        max-width: 100%;
+        height: auto;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    table {
+        width: 100%;
+        max-width: 100%;
+        table-layout: fixed;
+    }
+
+    th,
+    td {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    pre,
+    code {
+        max-width: 100%;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    p,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    label,
+    span {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    .container,
+    .page-container,
+    .page-content,
+    .main-content,
+    .content,
+    .main,
+    .app,
+    .wrapper {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    [class*="grid"] {
+        min-width: 0;
+    }
+
+    [class*="row"],
+    [class*="actions"],
+    [class*="header"],
+    [class*="toolbar"] {
+        min-width: 0;
+        flex-wrap: wrap;
+    }
+
+    [class*="card"],
+    [class*="panel"],
+    [class*="modal"],
+    [class*="section"] {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    [class*="modal"] {
+        max-height: calc(100vh - 24px);
+        overflow-y: auto;
+    }
+
+    .table-responsive,
+    [class*="table-wrap"],
+    [class*="table-container"] {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    button,
+    .btn,
+    [class*="button"] {
+        max-width: 100%;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 360px) {
+    body {
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: clamp(20px, 7vw, 28px);
+    }
+
+    h2 {
+        font-size: clamp(18px, 6vw, 24px);
+    }
+
+    h3 {
+        font-size: clamp(16px, 5vw, 20px);
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+        font-size: 14px;
     }
 }

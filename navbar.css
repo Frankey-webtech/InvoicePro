@@ -46,49 +46,6 @@
     color: #8bb8dc;
 }
 
-.main-navigation {
-    min-width: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    margin-left: auto;
-    margin-right: 10px;
-
-    overflow-x: auto;
-    overflow-y: hidden;
-    white-space: nowrap;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-}
-
-.main-navigation::-webkit-scrollbar {
-    display: none;
-}
-
-.main-navigation a {
-    flex: 0 0 auto;
-    padding: 10px 14px;
-    color: #aebfd2;
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 1.4;
-    border-radius: 9px;
-    transition: 0.25s ease;
-    white-space: nowrap;
-}
-
-.main-navigation a:hover {
-    color: var(--white);
-    background: rgba(255, 255, 255, 0.08);
-}
-
-.main-navigation a.active {
-    color: var(--white);
-    background: rgba(255, 255, 255, 0.13);
-    font-weight: 600;
-}
-
 .header-buttons {
     display: flex;
     align-items: center;
@@ -135,8 +92,7 @@
 }
 
 @media (max-width: 1100px) {
-
-    .header {
+.header {
         padding-left: 4%;
         padding-right: 4%;
     }
@@ -162,8 +118,7 @@
 }
 
 @media (max-width: 900px) {
-
-    .header {
+.header {
         flex-wrap: wrap;
         min-height: auto;
         padding-top: 14px;
@@ -183,8 +138,7 @@
 }
 
 @media (max-width: 760px) {
-
-    .header {
+.header {
         min-height: auto;
         padding: 15px 20px;
         display: flex;
@@ -244,8 +198,7 @@
 }
 
 @media (max-width: 420px) {
-
-    .header {
+.header {
         padding: 14px 16px;
     }
 
@@ -280,8 +233,7 @@
 }
 
 @media (max-width: 340px) {
-
-    .header {
+.header {
         justify-content: center;
     }
 
@@ -291,7 +243,7 @@
 }
 
 @media (max-width: 900px) {
-    .main-navigation {
+.main-navigation {
         width: 100%;
         margin: 0;
         order: 3;
@@ -302,7 +254,7 @@
 }
 
 @media (max-width: 760px) {
-    .main-navigation {
+.main-navigation {
         width: 100%;
         order: 3;
         justify-content: flex-start;
@@ -331,7 +283,6 @@
     gap: 4px;
     margin-left: auto;
     margin-right: 10px;
-
     overflow-x: auto;
     overflow-y: hidden;
     white-space: nowrap;
@@ -347,7 +298,6 @@
 
 .main-navigation a {
     flex: 0 0 auto;
-    white-space: nowrap;
     padding: 10px 14px;
     color: #aebfd2;
     font-size: 12px;
@@ -355,6 +305,7 @@
     line-height: 1.4;
     border-radius: 9px;
     transition: 0.25s ease;
+    white-space: nowrap;
 }
 
 .main-navigation a:hover {
@@ -375,4 +326,154 @@
     border-radius: 50%;
     object-fit: cover;
     display: block;
+}
+@media (max-width: 480px) {
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: hidden;
+    }
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    img,
+    svg,
+    video,
+    canvas,
+    iframe {
+        max-width: 100%;
+        height: auto;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    table {
+        width: 100%;
+        max-width: 100%;
+        table-layout: fixed;
+    }
+
+    th,
+    td {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    pre,
+    code {
+        max-width: 100%;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    p,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    label,
+    span {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    .container,
+    .page-container,
+    .page-content,
+    .main-content,
+    .content,
+    .main,
+    .app,
+    .wrapper {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    [class*="grid"] {
+        min-width: 0;
+    }
+
+    [class*="row"],
+    [class*="actions"],
+    [class*="header"],
+    [class*="toolbar"] {
+        min-width: 0;
+        flex-wrap: wrap;
+    }
+
+    [class*="card"],
+    [class*="panel"],
+    [class*="modal"],
+    [class*="section"] {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    [class*="modal"] {
+        max-height: calc(100vh - 24px);
+        overflow-y: auto;
+    }
+
+    .table-responsive,
+    [class*="table-wrap"],
+    [class*="table-container"] {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    button,
+    .btn,
+    [class*="button"] {
+        max-width: 100%;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 360px) {
+    body {
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: clamp(20px, 7vw, 28px);
+    }
+
+    h2 {
+        font-size: clamp(18px, 6vw, 24px);
+    }
+
+    h3 {
+        font-size: clamp(16px, 5vw, 20px);
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+        font-size: 14px;
+    }
 }

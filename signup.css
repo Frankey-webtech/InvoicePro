@@ -74,18 +74,13 @@ img {
     background: var(--white);
 }
 
-/* ================================
-   SIGNUP HERO
-================================ */
-
 .signup-hero {
     position: relative;
     width: 100%;
     padding: 90px 7% 85px;
     text-align: center;
     overflow: hidden;
-    background:
-        radial-gradient(
+    background: radial-gradient(
             circle at 15% 20%,
             rgba(255, 255, 255, 0.08),
             transparent 30%
@@ -173,17 +168,12 @@ img {
     line-height: 1.8;
 }
 
-/* ================================
-   SIGNUP SECTION
-================================ */
-
 .signup-section {
     width: 100%;
     padding: 90px 7% 100px;
     display: flex;
     justify-content: center;
-    background:
-        linear-gradient(
+    background: linear-gradient(
             180deg,
             var(--blue-50) 0%,
             #f9fbfe 100%
@@ -277,8 +267,7 @@ img {
     border: 1px solid var(--border);
     border-radius: 11px;
     background: #fbfdff;
-    transition:
-        border-color 0.2s ease,
+    transition: border-color 0.2s ease,
         box-shadow 0.2s ease,
         background 0.2s ease;
 }
@@ -329,7 +318,7 @@ img {
 }
 
 .select-box::after {
-    content: "\ea4e";
+    content: "";
     position: absolute;
     right: 15px;
     top: 50%;
@@ -365,10 +354,6 @@ img {
     line-height: 1.5;
 }
 
-/* ================================
-   TERMS
-================================ */
-
 .terms {
     margin-top: 22px;
 }
@@ -398,8 +383,7 @@ img {
     border: 1px solid #c5d2df;
     border-radius: 5px;
     background: var(--white);
-    transition:
-        background 0.2s ease,
+    transition: background 0.2s ease,
         border-color 0.2s ease;
 }
 
@@ -409,7 +393,7 @@ img {
 }
 
 .checkbox input:checked + .checkmark::after {
-    content: "\eb7b";
+    content: "";
     font-family: "remixicon";
     color: var(--white);
     font-size: 13px;
@@ -430,10 +414,6 @@ img {
     color: var(--navy-800);
 }
 
-/* ================================
-   CREATE ACCOUNT BUTTON
-================================ */
-
 .create-btn {
     width: 100%;
     min-height: 50px;
@@ -449,8 +429,7 @@ img {
     color: var(--white);
     font-size: 13px;
     font-weight: 700;
-    transition:
-        transform 0.2s ease,
+    transition: transform 0.2s ease,
         background 0.2s ease,
         box-shadow 0.2s ease;
 }
@@ -469,10 +448,6 @@ img {
     transform: translateY(0);
 }
 
-/* ================================
-   SIGN IN LINK
-================================ */
-
 .signin-link {
     margin-top: 18px;
     text-align: center;
@@ -489,10 +464,6 @@ img {
 .signin-link a:hover {
     color: var(--navy-800);
 }
-
-/* ================================
-   DIVIDER
-================================ */
 
 .divider {
     position: relative;
@@ -519,10 +490,6 @@ img {
     white-space: nowrap;
 }
 
-/* ================================
-   SOCIAL LOGIN
-================================ */
-
 .social-login {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -541,8 +508,7 @@ img {
     color: var(--navy-800);
     font-size: 12px;
     font-weight: 700;
-    transition:
-        border-color 0.2s ease,
+    transition: border-color 0.2s ease,
         background 0.2s ease,
         transform 0.2s ease,
         box-shadow 0.2s ease;
@@ -560,10 +526,6 @@ img {
     box-shadow: var(--shadow-sm);
     transform: translateY(-2px);
 }
-
-/* ================================
-   TRUST SECTION
-================================ */
 
 .signup-trust {
     width: 100%;
@@ -615,16 +577,11 @@ img {
     line-height: 1.5;
 }
 
-/* ================================
-   SIGNUP CTA
-================================ */
-
 .signup-cta {
     width: 100%;
     padding: 90px 7px 95px;
     text-align: center;
-    background:
-        radial-gradient(
+    background: radial-gradient(
             circle at 50% 100%,
             rgba(37, 99, 166, 0.14),
             transparent 35%
@@ -703,8 +660,7 @@ img {
     color: var(--white);
     font-size: 12px;
     font-weight: 700;
-    transition:
-        background 0.2s ease,
+    transition: background 0.2s ease,
         border-color 0.2s ease,
         transform 0.2s ease;
 }
@@ -719,10 +675,6 @@ img {
     color: var(--white);
     transform: translateY(-2px);
 }
-
-/* ================================
-   TOAST
-================================ */
 
 #toastContainer {
     position: fixed;
@@ -772,7 +724,7 @@ img {
 }
 
 @keyframes toastIn {
-    from {
+from {
         opacity: 0;
         transform: translateY(12px);
     }
@@ -784,7 +736,7 @@ img {
 }
 
 @keyframes toastOut {
-    from {
+from {
         opacity: 1;
         transform: translateY(0);
     }
@@ -795,12 +747,8 @@ img {
     }
 }
 
-/* ================================
-   RESPONSIVE
-================================ */
-
 @media (max-width: 1150px) {
-    .header {
+.header {
         padding: 0 4%;
     }
 
@@ -822,7 +770,7 @@ img {
 }
 
 @media (max-width: 900px) {
-    .header {
+.header {
         min-height: 72px;
     }
 
@@ -859,7 +807,7 @@ img {
 }
 
 @media (max-width: 760px) {
-    .header {
+.header {
         min-height: 70px;
         padding: 13px 5%;
         flex-wrap: wrap;
@@ -959,7 +907,7 @@ img {
 }
 
 @media (max-width: 500px) {
-    .header {
+.header {
         padding: 12px 4%;
     }
 
@@ -1126,7 +1074,7 @@ img {
 }
 
 @media (max-width: 360px) {
-    .signup-hero h1 {
+.signup-hero h1 {
         font-size: 33px;
     }
 
@@ -1243,7 +1191,7 @@ img {
 }
 
 @media (max-width: 900px) {
-    .footer-main {
+.footer-main {
         grid-template-columns: 1.5fr 1fr 1fr;
     }
 
@@ -1254,7 +1202,7 @@ img {
 }
 
 @media (max-width: 760px) {
-    .footer-main {
+.footer-main {
         padding-top: 55px;
         padding-bottom: 45px;
         grid-template-columns: repeat(2, 1fr);
@@ -1267,7 +1215,7 @@ img {
 }
 
 @media (max-width: 500px) {
-    .footer-main {
+.footer-main {
         padding-left: 5%;
         padding-right: 5%;
         grid-template-columns: 1fr 1fr;
@@ -1287,7 +1235,157 @@ img {
 }
 
 @media (max-width: 360px) {
-    .footer-main {
+.footer-main {
         grid-template-columns: 1fr;
+    }
+}
+@media (max-width: 480px) {
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: hidden;
+    }
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    img,
+    svg,
+    video,
+    canvas,
+    iframe {
+        max-width: 100%;
+        height: auto;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    table {
+        width: 100%;
+        max-width: 100%;
+        table-layout: fixed;
+    }
+
+    th,
+    td {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    pre,
+    code {
+        max-width: 100%;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    p,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    label,
+    span {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    .container,
+    .page-container,
+    .page-content,
+    .main-content,
+    .content,
+    .main,
+    .app,
+    .wrapper {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    [class*="grid"] {
+        min-width: 0;
+    }
+
+    [class*="row"],
+    [class*="actions"],
+    [class*="header"],
+    [class*="toolbar"] {
+        min-width: 0;
+        flex-wrap: wrap;
+    }
+
+    [class*="card"],
+    [class*="panel"],
+    [class*="modal"],
+    [class*="section"] {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    [class*="modal"] {
+        max-height: calc(100vh - 24px);
+        overflow-y: auto;
+    }
+
+    .table-responsive,
+    [class*="table-wrap"],
+    [class*="table-container"] {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    button,
+    .btn,
+    [class*="button"] {
+        max-width: 100%;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 360px) {
+    body {
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: clamp(20px, 7vw, 28px);
+    }
+
+    h2 {
+        font-size: clamp(18px, 6vw, 24px);
+    }
+
+    h3 {
+        font-size: clamp(16px, 5vw, 20px);
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+        font-size: 14px;
     }
 }
