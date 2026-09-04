@@ -271,9 +271,6 @@ const refreshPreviewBtn =
 const printPreviewBtn =
     document.getElementById("printPreviewBtn");
 
-const fullscreenPreviewBtn =
-    document.getElementById("fullscreenPreviewBtn");
-
 const previewZoomSelect =
     document.getElementById("previewZoomSelect");
 
@@ -3524,11 +3521,33 @@ function formatInvoicePreviewDate(
 }
 
 async function duplicateInvoice(invoiceId) {
+
     if (!invoiceId) {
         return;
     }
 
     try {
+
+        const subscription =
+            await Parse.Cloud.run(
+                "getCurrentSubscription"
+            );
+
+        const invoiceCount =
+            subscription.usage.invoices.used;
+
+        const maxInvoices =
+            subscription.usage.invoices.maximum;
+
+        if (
+            maxInvoices !== -1 &&
+            invoiceCount >= maxInvoices
+        ) {
+            throw new Error(
+                "You've reached your invoice limit. Upgrade your plan."
+            );
+        }
+
         const result =
             await Parse.Cloud.run(
                 "duplicateInvoice",
@@ -3539,7 +3558,7 @@ async function duplicateInvoice(invoiceId) {
 
         if (
             !result ||
-            !result.success
+            result.success === false
         ) {
             throw new Error(
                 result?.message ||
@@ -3548,22 +3567,30 @@ async function duplicateInvoice(invoiceId) {
         }
 
         await loadInvoices();
+
         await loadInvoiceStatistics();
-showToast(
-    "Invoice duplicated successfully.",
-    "success"
-);
+
+        showToast(
+            result.message ||
+            "Invoice duplicated successfully.",
+            "success"
+        );
+
     } catch (error) {
+
         console.error(
             "Duplicate Invoice Error:",
             error
         );
+
         showToast(
-    error.message ||
-    "Unable to duplicate invoice.",
-    "error"
-);
+            error.message ||
+            "Unable to duplicate invoice.",
+            "error"
+        );
+
     }
+
 }
 
 async function createInvoiceExportCanvas() {
@@ -4046,20 +4073,33 @@ function openInvoicePreviewModal() {
         );
     }
 
-    invoicePreviewOverlay.classList.add("show");
+    invoicePreviewOverlay.classList.add(
+    "show"
+);
 
-    document.body.classList.add(
-        "invoice-preview-open"
-    );
+invoicePreviewOverlay.setAttribute(
+    "aria-hidden",
+    "false"
+);
+
+document.body.classList.add(
+    "invoice-preview-open"
+);
 }
 
-function closeInvoicePreviewModal() {
+async function closeInvoicePreviewModal() {
     if (!invoicePreviewOverlay) {
         return;
     }
 
+
     invoicePreviewOverlay.classList.remove(
         "show"
+    );
+
+    invoicePreviewOverlay.setAttribute(
+        "aria-hidden",
+        "true"
     );
 
     document.body.classList.remove(
@@ -5069,43 +5109,6 @@ function initializeInvoicePrint() {
     );
 }
 
-function toggleInvoicePreviewFullscreen() {
-    openInvoicePreviewModal();
-}
-
-function initializeInvoiceFullscreen() {
-    if (!fullscreenPreviewBtn) {
-        return;
-    }
-
-    fullscreenPreviewBtn.addEventListener(
-        "click",
-        toggleInvoicePreviewFullscreen
-    );
-
-    document.addEventListener(
-        "fullscreenchange",
-        () => {
-            if (
-                document.fullscreenElement ===
-                invoicePreviewCard
-            ) {
-                fullscreenPreviewBtn.title =
-                    "Exit Fullscreen";
-
-                fullscreenPreviewBtn.innerHTML =
-                    '<i class="ri-fullscreen-exit-line"></i>';
-            } else {
-                fullscreenPreviewBtn.title =
-                    "Fullscreen Preview";
-
-                fullscreenPreviewBtn.innerHTML =
-                    '<i class="ri-fullscreen-line"></i>';
-            }
-        }
-    );
-}
-
 function updateInvoicePreviewZoom() {
     if (
         !previewZoomSelect ||
@@ -5757,6 +5760,48 @@ function closeSendInvoiceModal() {
     }
 }
 
+function showInvoiceResultModal(
+    title,
+    message,
+    buttonText = "",
+    buttonAction = null
+) {
+    if (invoiceResultTitle) {
+        invoiceResultTitle.textContent =
+            title;
+    }
+
+    if (invoiceResultMessage) {
+        invoiceResultMessage.textContent =
+            message;
+    }
+
+    if (invoiceResultButton) {
+        if (buttonText) {
+            invoiceResultButton.textContent =
+                buttonText;
+
+            invoiceResultButton.style.display =
+                "inline-block";
+
+            invoiceResultButton.onclick =
+                buttonAction || null;
+        } else {
+            invoiceResultButton.style.display =
+                "none";
+
+            invoiceResultButton.onclick =
+                null;
+        }
+    }
+
+    if (invoiceResultOverlay) {
+        invoiceResultOverlay.classList.add(
+            "show"
+        );
+    }
+}
+
 async function sendInvoiceToClient(button) {
     const modal =
         document.getElementById(
@@ -5876,6 +5921,17 @@ async function sendInvoiceToClient(button) {
 
         button.disabled =
             false;
+            
+        showInvoiceResultModal(
+    "Business Plan Required",
+    error?.message ||
+    "This feature is only available on the Business plan or above.",
+    "Upgrade Plan",
+    () => {
+        window.location.href =
+            "subscription.html?section=subscription";
+    }
+);
 
         button.innerHTML =
             button.dataset.originalContent ||
@@ -6164,18 +6220,24 @@ async function saveInvoice(statusOverride) {
     }
 
     const buttons = [
-        saveInvoiceDraftButton,
-        saveInvoiceButton
-    ];
+    saveInvoiceDraftButton,
+    saveInvoiceButton
+];
 
-    buttons.forEach(
-        button => {
-            if (button) {
-                button.disabled = true;
-            }
-        }
-    );
+if (saveInvoiceButton) {
+    saveInvoiceButton.disabled = true;
 
+    const saveText =
+        saveInvoiceButton.querySelector("span");
+
+    if (saveText) {
+        saveText.textContent = "Saving...";
+    }
+}
+
+if (saveInvoiceDraftButton) {
+    saveInvoiceDraftButton.disabled = true;
+}
     try {
         showLoading();
 
@@ -6192,26 +6254,47 @@ async function saveInvoice(statusOverride) {
 
         let result;
 
-        if (
-            editingInvoice &&
-            editingInvoiceId
-        ) {
-            result =
-                await Parse.Cloud.run(
-                    "updateInvoice",
-                    {
-                        invoiceId:
-                            editingInvoiceId,
-                        ...data
-                    }
-                );
-        } else {
-            result =
-                await Parse.Cloud.run(
-                    "createInvoice",
-                    data
-                );
-        }
+if (
+    editingInvoice &&
+    editingInvoiceId
+) {
+    result =
+        await Parse.Cloud.run(
+            "updateInvoice",
+            {
+                invoiceId:
+                    editingInvoiceId,
+                ...data
+            }
+        );
+} else {
+
+    const subscription =
+        await Parse.Cloud.run(
+            "getCurrentSubscription"
+        );
+
+    const invoiceCount =
+        subscription.usage.invoices.used;
+
+    const maxInvoices =
+        subscription.usage.invoices.maximum;
+
+    if (
+        maxInvoices !== -1 &&
+        invoiceCount >= maxInvoices
+    ) {
+        throw new Error(
+            "You've reached your invoice limit. Upgrade your plan."
+        );
+    }
+
+    result =
+        await Parse.Cloud.run(
+            "createInvoice",
+            data
+        );
+}
 
         if (
             !result ||
@@ -6279,12 +6362,21 @@ async function saveInvoice(statusOverride) {
         hideLoading();
 
         buttons.forEach(
-            button => {
-                if (button) {
-                    button.disabled = false;
-                }
-            }
-        );
+    button => {
+        if (button) {
+            button.disabled = false;
+        }
+    }
+);
+
+if (saveInvoiceButton) {
+    const saveText =
+        saveInvoiceButton.querySelector("span");
+
+    if (saveText) {
+        saveText.textContent = "Save Invoice";
+    }
+}
     }
 }
 
@@ -6385,20 +6477,41 @@ async function saveInvoiceDraft() {
 
         let result;
 
-        if (editingInvoice && editingInvoiceId) {
-            result = await Parse.Cloud.run(
-                "updateInvoice",
-                {
-                    invoiceId: editingInvoiceId,
-                    ...data
-                }
-            );
-        } else {
-            result = await Parse.Cloud.run(
-                "createInvoice",
-                data
-            );
+if (editingInvoice && editingInvoiceId) {
+    result = await Parse.Cloud.run(
+        "updateInvoice",
+        {
+            invoiceId: editingInvoiceId,
+            ...data
         }
+    );
+} else {
+
+    const subscription =
+        await Parse.Cloud.run(
+            "getCurrentSubscription"
+        );
+
+    const invoiceCount =
+        subscription.usage.invoices.used;
+
+    const maxInvoices =
+        subscription.usage.invoices.maximum;
+
+    if (
+        maxInvoices !== -1 &&
+        invoiceCount >= maxInvoices
+    ) {
+        throw new Error(
+            "You've reached your invoice limit. Upgrade your plan."
+        );
+    }
+
+    result = await Parse.Cloud.run(
+        "createInvoice",
+        data
+    );
+}
 
         if (!result || result.success === false) {
             throw new Error(
@@ -6602,7 +6715,6 @@ async function initializeInvoicePage() {
     initializeInvoicePdfDownload();
     initializeInvoiceExport();
     initializeInvoicePrint();
-    initializeInvoiceFullscreen();
     initializeInvoicePreviewZoom();
     initializeInvoicePreviewModal();
 
@@ -6614,11 +6726,45 @@ async function initializeInvoicePage() {
     await initializeInvoicePreview();
     initializeSendInvoiceModal();
     showToast("Page Loaded Successfully");
+        const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    const invoiceId =
+        params.get("invoiceId");
+
+    if (invoiceId) {
+        await viewInvoice(invoiceId);
+    }
 
 }
+
 document.addEventListener(
     "DOMContentLoaded",
-    initializeInvoicePage
+    async () => {
+
+        await initializeInvoicePage();
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        const invoiceId =
+            params.get(
+                "viewInvoice"
+            );
+
+        if (invoiceId) {
+
+            await viewInvoice(
+                invoiceId
+            );
+
+        }
+
+    }
 );
 
 window.addEventListener(

@@ -3441,3 +3441,142 @@ body * {
     scrollbar-width: thin;
     scrollbar-color: #173b73 #f0f3f7;
 }
+
+/* ========================================================================
+   INVOICE LAYOUT — AUTHORITATIVE FINAL LAYER
+   This section intentionally comes last. It removes the old fixed-width
+   behaviour without requiring HTML/JS changes.
+   ======================================================================== */
+
+html, body {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+img, svg, video, canvas, iframe {
+    max-width: 100%;
+}
+
+.invoice-content {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.invoice-panel {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.invoice-table-header,
+.invoice-toolbar,
+.table-wrapper,
+.pagination-container {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+/* The table always fills the available container on larger screens. */
+.table-wrapper {
+    display: block;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+.table-wrapper .invoice-table,
+.invoice-table {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    table-layout: fixed !important;
+    border-collapse: collapse;
+    box-sizing: border-box;
+}
+
+.invoice-table th,
+.invoice-table td {
+    box-sizing: border-box;
+    min-width: 0 !important;
+    max-width: none !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.invoice-table th:nth-child(1),
+.invoice-table td:nth-child(1) { width: 13%; }
+.invoice-table th:nth-child(2),
+.invoice-table td:nth-child(2) { width: 27%; }
+.invoice-table th:nth-child(3),
+.invoice-table td:nth-child(3) { width: 13%; }
+.invoice-table th:nth-child(4),
+.invoice-table td:nth-child(4) { width: 12%; }
+.invoice-table th:nth-child(5),
+.invoice-table td:nth-child(5) { width: 12%; }
+.invoice-table th:nth-child(6),
+.invoice-table td:nth-child(6) { width: 12%; }
+.invoice-table th:nth-child(7),
+.invoice-table td:nth-child(7) { width: 11%; }
+
+.invoice-table .client-table-info {
+    width: 100%;
+    min-width: 0;
+}
+
+.invoice-table .client-table-details {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.invoice-table .table-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+    width: 100%;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: visible;
+}
+
+.invoice-table .action-btn {
+    flex: 0 0 30px;
+    width: 30px;
+    min-width: 30px;
+    max-width: 30px;
+    height: 30px;
+}
+
+@media (max-width: 760px) {
+    .table-wrapper .invoice-table {
+        width: 760px !important;
+        min-width: 760px !important;
+        table-layout: fixed !important;
+    }
+
+    .invoice-table th:nth-child(1), .invoice-table td:nth-child(1) { width: 105px; }
+    .invoice-table th:nth-child(2), .invoice-table td:nth-child(2) { width: 220px; }
+    .invoice-table th:nth-child(3), .invoice-table td:nth-child(3) { width: 100px; }
+    .invoice-table th:nth-child(4), .invoice-table td:nth-child(4) { width: 90px; }
+    .invoice-table th:nth-child(5), .invoice-table td:nth-child(5) { width: 100px; }
+    .invoice-table th:nth-child(6), .invoice-table td:nth-child(6) { width: 100px; }
+    .invoice-table th:nth-child(7), .invoice-table td:nth-child(7) { width: 145px; }
+}
+
+@media (max-width: 480px) {
+    .invoice-content { padding-left: 0; padding-right: 0; }
+    .table-wrapper { padding-left: 15px; padding-right: 15px; }
+}

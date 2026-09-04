@@ -1880,3 +1880,16 @@ body.template-transfer-modal-open {
         bottom: 16px;
     }
 }
+
+#templateSaveButton.saving,
+#templateSaveButton:disabled {
+    background-color: #a6a6a6 !important;
+    color: #ffffff !important;
+    border-color: #a6a6a6 !important;
+    cursor: not-allowed !important;
+    opacity: 1 !important;
+}
+
+#templateSaveButton.saving {
+    pointer-events: none;
+}

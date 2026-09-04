@@ -2038,13 +2038,6 @@ id="estimatePaper">
     class="invoice-selection"
     id="previewDatesSection">
 
-    <div
-        class="invoice-edit-badge"
-        id="previewDetailsBadge">
-
-        Editing Estimate Details
-
-    </div>
 
     <div
         class="invoice-details-grid">
@@ -2228,13 +2221,6 @@ id="estimatePaper">
     class="invoice-selection"
     id="previewItemsSection">
 
-    <div
-        class="invoice-edit-badge"
-        id="previewItemsBadge">
-
-        Editing Items Table
-
-    </div>
 
     <table
         class="invoice-items-table"
@@ -2294,13 +2280,6 @@ id="estimatePaper">
     class="invoice-selection"
     id="previewSummarySection">
 
-    <div
-        class="invoice-edit-badge"
-        id="previewTotalsBadge">
-
-        Editing Totals
-
-    </div>
 
     <div
         class="invoice-totals-wrapper">
@@ -2408,12 +2387,12 @@ id="estimatePaper">
 <div
     class="invoice-company-section"
     id="previewPaymentSection"
-    style="display: none;"
+    
     >
 
 
     <div
-        class="invoice-selection">
+        class="invoice-selection" style="display: none;">
 
         <h4
             class="invoice-payment-title">
@@ -2629,6 +2608,15 @@ id="estimatePaper">
         Approve
 
     </button>
+
+    <button
+        type="button"
+        id="sendEstimateButton"
+        class="primary-button">
+
+        Send Estimate
+
+    </button>
     
         <button
         type="button"
@@ -2691,7 +2679,7 @@ id="estimatePaper">
     onerror="console.error('PARSE SDK LOAD ERROR:', event)">
 </script>
           <script src="api.js"></script>
-              <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>

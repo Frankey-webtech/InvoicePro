@@ -6,7 +6,7 @@ const params =
 const clientId =
     params.get("clientId");
 
-const historyType =
+let historyType =
     params.get("type") === "invoices"
         ? "invoices"
         : "estimates";
@@ -18,8 +18,6 @@ let invoices = [];
 
 let estimatesCurrentPage = 1;
 let invoicesCurrentPage = 1;
-
-let currencySymbol = "";
 
 const clientName =
     document.getElementById(
@@ -303,11 +301,12 @@ function setClientProfile(
 
 
 function formatAmount(
-    amount
+    amount,
+    symbol
 ) {
 
     return (
-        currencySymbol +
+        symbol +
         Number(
             amount || 0
         ).toLocaleString(
@@ -419,7 +418,7 @@ function renderEstimateRows() {
                         <td>
                             <span class="document-title">
                                 ${
-                                    estimate.title ||
+                                    estimate.estimateTitle ||
                                     estimate.projectName ||
                                     "Estimate"
                                 }
@@ -430,7 +429,8 @@ function renderEstimateRows() {
                             <span class="document-amount">
                                 ${
                                     formatAmount(
-                                        estimate.grandTotal
+                                        estimate.grandTotal,
+                                        estimate.currencySymbol || ""
                                     )
                                 }
                             </span>
@@ -567,7 +567,8 @@ function renderInvoiceRows() {
                             <span class="document-amount">
                                 ${
                                     formatAmount(
-                                        invoice.totalAmount
+                                        invoice.totalAmount,
+                                        invoice.currencySymbol || ""
                                     )
                                 }
                             </span>
@@ -726,21 +727,16 @@ function renderPagination(
 
 function arrangeHistorySections() {
 
-    const parent =
-        estimatesSection.parentElement;
-
     if (
         historyType ===
         "invoices"
     ) {
 
-        parent.appendChild(
-            invoicesSection
-        );
+        estimatesSection.style.display =
+            "none";
 
-        parent.appendChild(
-            estimatesSection
-        );
+        invoicesSection.style.display =
+            "block";
 
         currentHistoryType.textContent =
             "Invoices";
@@ -751,13 +747,11 @@ function arrangeHistorySections() {
     }
     else {
 
-        parent.appendChild(
-            estimatesSection
-        );
+        estimatesSection.style.display =
+            "block";
 
-        parent.appendChild(
-            invoicesSection
-        );
+        invoicesSection.style.display =
+            "none";
 
         currentHistoryType.textContent =
             "Estimates";
@@ -767,29 +761,28 @@ function arrangeHistorySections() {
 
     }
 
-    estimatesSection.style.display =
-        "block";
-
-    invoicesSection.style.display =
-        "block";
-
 }
 
 
 function revealOtherHistory() {
 
-    arrangeHistorySections();
-
-    const targetSection =
+    if (
         historyType ===
         "estimates"
-            ? invoicesSection
-            : estimatesSection;
+    ) {
 
-    targetSection.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-    });
+        historyType =
+            "invoices";
+
+    }
+    else {
+
+        historyType =
+            "estimates";
+
+    }
+
+    arrangeHistorySections();
 
 }
 
@@ -840,27 +833,24 @@ async function loadClientHistory() {
         const client =
             result.client;
 
-        currencySymbol =
-            result.currencySymbol ||
-            "";
 
         setClientProfile(
             client
         );
 
         estimates =
-            Array.isArray(
-                client.estimates
-            )
-                ? client.estimates
-                : [];
+    Array.isArray(
+        result.estimates
+    )
+        ? result.estimates
+        : [];
 
-        invoices =
-            Array.isArray(
-                client.invoices
-            )
-                ? client.invoices
-                : [];
+invoices =
+    Array.isArray(
+        result.invoices
+    )
+        ? result.invoices
+        : [];
 
         renderEstimateRows();
 

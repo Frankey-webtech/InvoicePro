@@ -314,6 +314,11 @@ const signatureImageInput =
 
 const signaturePreview =
     document.getElementById("signaturePreview");
+    
+const sendEstimateButton =
+document.getElementById(
+    "sendEstimateButton"
+);
 
 if (downloadEstimatePdfButton) {
 
@@ -2353,35 +2358,49 @@ function renderEstimatesTable() {
 
             <td>${estimate.estimateNumber}</td>
 
-            <td>
-    <div class="client-table-info">
+<td>
 
-        ${
-            estimate.clientImageUrl
-            ?
-            `
-            <img
-                src="${estimate.clientImageUrl}"
-                class="client-table-avatar"
-                alt="${estimate.clientName || "Client"}"
-            >
-            `
-            :
-            `
-            <div
-                class="client-table-avatar client-table-initials"
-                style="background-color: ${getClientAvatarColor(estimate.clientName || "")};"
-            >
-                ${getClientInitials(estimate.clientName)}
-            </div>
-            `
-        }
+    ${
+        showClientImage
+        ?
+        `
+        <div class="client-table-info">
 
+            ${
+                estimate.clientImageUrl
+                ?
+                `
+                <img
+                    src="${estimate.clientImageUrl}"
+                    class="client-table-avatar"
+                    alt="${estimate.clientName || "Client"}"
+                >
+                `
+                :
+                `
+                <div
+                    class="client-table-avatar client-table-initials"
+                    style="background-color: ${getClientAvatarColor(estimate.clientName || "")};"
+                >
+                    ${getClientInitials(estimate.clientName)}
+                </div>
+                `
+            }
+
+            <span>
+                ${estimate.clientName || "No client"}
+            </span>
+
+        </div>
+        `
+        :
+        `
         <span>
             ${estimate.clientName || "No client"}
         </span>
+        `
+    }
 
-    </div>
 </td>
 
             <td>${formatDate(estimate.createdDate)}</td>
@@ -5991,15 +6010,35 @@ async function exportAllEstimatesAsPdf() {
 async function duplicateEstimate(
     estimateId
 ) {
-    
+
     if (!estimateId) {
-        
         return;
-        
     }
-    
+
     try {
-        
+
+        const subscription =
+            await Parse.Cloud.run(
+                "getCurrentSubscription"
+            );
+
+        const estimateCount =
+            subscription.usage.estimates.used;
+
+        const maxEstimates =
+            subscription.usage.estimates.maximum;
+
+        if (
+            maxEstimates !== -1 &&
+            estimateCount >= maxEstimates
+        ) {
+
+            throw new Error(
+                "You've reached your estimate limit. Upgrade your plan."
+            );
+
+        }
+
         const result =
             await Parse.Cloud.run(
                 "duplicateEstimate",
@@ -6007,46 +6046,138 @@ async function duplicateEstimate(
                     estimateId
                 }
             );
-        
+
         if (
             !result ||
             !result.success
         ) {
-            
+
             throw new Error(
                 result?.message ||
                 "Unable to duplicate estimate."
             );
-            
+
         }
-        
+
         showToast(
             result.message ||
             "Estimate duplicated successfully.",
             "success"
         );
-        
+
         await Promise.all([
             loadEstimateStatistics(),
             loadEstimates()
         ]);
-        
+
     }
     catch (error) {
-        
+
         console.error(
             "Duplicate Estimate Error:",
             error
         );
-        
+
         showToast(
             error.message ||
             "Unable to duplicate estimate.",
             "error"
         );
-        
+
     }
-    
+
+}
+
+async function sendEstimateToClient(estimateId) {
+
+    if (!estimateId) {
+
+        showEstimateResultModal(
+            "Send Estimate Failed",
+            "The estimate ID is missing. Please close this window and try again."
+        );
+
+        return;
+    }
+
+    try {
+
+        if (sendEstimateButton) {
+
+            sendEstimateButton.disabled = true;
+
+            sendEstimateButton.textContent =
+                "Sending...";
+
+        }
+
+        const result =
+            await Parse.Cloud.run(
+                "sendEstimateToClient",
+                {
+                    estimateId
+                }
+            );
+
+        console.log(
+            "SEND ESTIMATE: result",
+            result
+        );
+
+        if (!result || !result.success) {
+
+            throw new Error(
+                result?.message ||
+                "Unable to send estimate."
+            );
+
+        }
+
+        showEstimateResultModal(
+            "Estimate Sent",
+            result.message ||
+            `Estimate sent successfully to ${result.sentTo || "the client"}.`
+        );
+
+        await loadEstimateDetails(
+            estimateId
+        );
+
+        await Promise.all([
+            loadEstimateStatistics(),
+            loadEstimates()
+        ]);
+
+        populateEstimatePreview();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Send Estimate Error:",
+            error
+        );
+
+        showEstimateResultModal(
+            "Send Estimate Failed",
+            error.message ||
+            "Unable to send this estimate to the client."
+        );
+
+    }
+    finally {
+
+        if (sendEstimateButton) {
+
+            sendEstimateButton.disabled = false;
+
+            sendEstimateButton.textContent =
+                "Send Estimate";
+
+        }
+
+    }
+
 }
 
 exportEstimatesPdfButton.addEventListener(
@@ -6154,6 +6285,25 @@ if(approveEstimateButton){
             );
 
             await approveEstimate(
+                selectedEstimate?.objectId
+            );
+
+        }
+    );
+
+}
+
+if (sendEstimateButton) {
+
+    sendEstimateButton.addEventListener(
+        "click",
+        async function () {
+
+            console.log(
+                "SEND ESTIMATE BUTTON CLICKED"
+            );
+
+            await sendEstimateToClient(
                 selectedEstimate?.objectId
             );
 

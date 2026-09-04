@@ -4592,3 +4592,37 @@ width: 100%;
         font-size: 14px;
     }
 }
+
+
+#viewClientModal .view-all-client-history-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: fit-content;
+    margin: 12px 0 0 auto;
+    padding: 8px 14px;
+    border: 1px solid #12345f;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #12345f;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+        background .2s ease,
+        color .2s ease,
+        border-color .2s ease;
+}
+
+#viewClientModal .view-all-client-history-button:hover {
+    background: #12345f;
+    color: #ffffff;
+    border-color: #12345f;
+}
+
+#viewClientModal .view-all-client-history-button i {
+    font-size: 14px;
+}

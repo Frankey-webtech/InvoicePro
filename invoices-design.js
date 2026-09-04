@@ -495,6 +495,40 @@ function setActivePreset(name){
     if(button) button.classList.add("active");
 }
 
+function setInvoiceSaveButtonSaving(isSaving){
+    const button = $("templateSaveButton");
+    if(!button) return;
+
+    if(isSaving){
+        if(!button.dataset.originalText){
+            button.dataset.originalText = button.textContent.trim();
+        }
+
+        button.disabled = true;
+        button.classList.add("saving");
+        button.textContent = "Saving";
+        
+        // Animated dots: Saving → Saving. → Saving.. → Saving...
+        clearInterval(button._savingInterval);
+
+        let dots = 0;
+
+        button._savingInterval = setInterval(()=>{
+            dots = (dots + 1) % 4;
+            button.textContent = "Saving" + ".".repeat(dots);
+        },400);
+
+    }else{
+        clearInterval(button._savingInterval);
+        button._savingInterval = null;
+
+        button.disabled = false;
+        button.classList.remove("saving");
+
+        button.textContent = button.dataset.originalText || "Save Templates";
+    }
+}
+
 function loadPreset(name){
     if(!presets[name]) return;
     setCurrentSettings({...getSectionSettings(currentSectionId),...cloneDefaults(),...presets[name]});
@@ -737,7 +771,7 @@ function prepareTransferAfterSave(savedSections, templateName){
     openTemplateTransferModal();
 }
 
-async function saveTemplateToCloud(){
+/*async function saveTemplateToCloud(){
     try{
         sectionSettings[currentSectionId] = {...templateSettings};
 
@@ -801,6 +835,107 @@ async function saveTemplateToCloud(){
     }catch(error){
         console.error(error);
         alert(error && error.message ? error.message : "Unable to save template.");
+    }
+} */
+
+async function saveTemplateToCloud(){
+    const saveButton = $("templateSaveButton");
+
+    if(saveButton && saveButton.disabled) return;
+
+    setInvoiceSaveButtonSaving(true);
+
+    try{
+        sectionSettings[currentSectionId] = {...templateSettings};
+
+        let sectionsToSave = Array.from(dirtySections);
+
+        if(globalVisibilityDirty){
+            sectionsToSave = sections.map(item=>item.section);
+        }
+
+        if(!sectionsToSave.length){
+            setInvoiceSaveButtonSaving(false);
+            alert("There are no changes to save.");
+            return;
+        }
+
+        const responses = [];
+        const savedSections = {};
+
+        for(const sectionId of sectionsToSave){
+            let settings;
+
+            if(sectionId === currentSectionId){
+                settings = {...templateSettings};
+
+            }else if(globalVisibilityDirty){
+                const loaded = await Parse.Cloud.run(
+                    TEMPLATE_GET_FUNCTION,
+                    {section:sectionId}
+                );
+
+                settings = loaded && loaded.exists && loaded.settings
+                    ? {...cloneDefaults(),...loaded.settings}
+                    : {...getSectionSettings(sectionId)};
+
+            }else{
+                settings = {...getSectionSettings(sectionId)};
+            }
+
+            if(globalVisibilityDirty){
+                Object.keys(globalVisibilitySettings).forEach(key=>{
+                    settings[key] = globalVisibilitySettings[key];
+                });
+            }
+
+            delete settings._cloudLoaded;
+
+            const response = await Parse.Cloud.run(
+                TEMPLATE_SAVE_FUNCTION,
+                {
+                    templateName:"Modern",
+                    section:sectionId,
+                    settings:{...settings}
+                }
+            );
+
+            sectionSettings[sectionId] = {...settings};
+            savedSections[sectionId] = cloneTemplateData(settings);
+
+            responses.push(response);
+        }
+
+        dirtySections.clear();
+        globalVisibilityDirty = false;
+        sectionSettings[currentSectionId] = {...templateSettings};
+
+        const importedSave = !!window.__templateImportedFromTransfer;
+        window.__templateImportedFromTransfer = false;
+
+        setInvoiceSaveButtonSaving(false);
+
+        const transferReady = !importedSave;
+
+        if(transferReady){
+            prepareTransferAfterSave(savedSections,"Modern");
+        }else{
+            alert("Invoice template saved successfully.");
+        }
+
+        console.log(responses);
+
+    }catch(error){
+
+        console.error("Invoice template save failed:",error);
+
+        setInvoiceSaveButtonSaving(false);
+
+        alert(
+            error && error.message
+                ? error.message
+                : "Unable to save invoice template."
+        );
     }
 }
 

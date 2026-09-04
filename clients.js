@@ -1040,44 +1040,54 @@ function renderClientEstimates(
                         .replace(/\s+/g, "-");
 
                 return `
-                    <div
-                        class="client-estimate-card"
-                        data-id="${estimate.objectId || ""}">
+    <div
+        class="client-estimate-card"
+        data-id="${estimate.objectId || ""}">
 
-                        <div class="client-estimate-info">
+        <div class="client-estimate-info">
 
-                            <strong>
-                                ${estimate.estimateNumber || "-"}
-                            </strong>
+            <strong>
+                ${estimate.estimateNumber || "-"}
+            </strong>
 
-                            <span>
-                                ${
-                                    estimate.title ||
-                                    estimate.projectName ||
-                                    "Estimate"
-                                }
-                            </span>
+            <span>
+                ${
+                    estimate.title ||
+                    estimate.projectName ||
+                    "Estimate"
+                }
+            </span>
 
-                        </div>
+        </div>
 
-                        <div class="client-estimate-amount">
+        <div class="client-estimate-amount">
 
-                            ${currencySymbol || ""}
-                            ${amount}
+            ${currencySymbol || ""}
+            ${amount}
 
-                        </div>
+        </div>
 
-                        <span
-                            class="status-badge ${statusClass}">
+        <span
+            class="status-badge ${statusClass}">
 
-                            ${status}
+            ${status}
 
-                        </span>
+        </span>
 
-                    </div>
-                `;
+        <button
+            type="button"
+            class="send-client-estimate-button"
+            data-id="${estimate.objectId || ""}">
 
-            }
+            <i class="ri-send-plane-line"></i>
+
+            Send Estimate
+
+        </button>
+
+    </div>
+`;
+}
         ).join("");
 
 }
@@ -1156,42 +1166,53 @@ function renderClientInvoices(
                         .replace(/\s+/g, "-");
 
                 return `
-                    <div
-                        class="client-invoice-card"
-                        data-id="${invoice.objectId || ""}">
+    <div
+        class="client-invoice-card"
+        data-id="${invoice.objectId || ""}">
 
-                        <div class="client-invoice-info">
+        <div class="client-invoice-info">
 
-                            <strong>
-                                ${invoice.invoiceNumber || "-"}
-                            </strong>
+            <strong>
+                ${invoice.invoiceNumber || "-"}
+            </strong>
 
-                            <span>
-                                ${
-                                    invoice.invoiceTitle ||
-                                    invoice.projectName ||
-                                    "Invoice"
-                                }
-                            </span>
+            <span>
+                ${
+                    invoice.invoiceTitle ||
+                    invoice.projectName ||
+                    "Invoice"
+                }
+            </span>
 
-                        </div>
+        </div>
 
-                        <div class="client-invoice-amount">
+        <div class="client-invoice-amount">
 
-                            ${currencySymbol || ""}
-                            ${amount}
+            ${currencySymbol || ""}
+            ${amount}
 
-                        </div>
+        </div>
 
-                        <span
-                            class="status-badge ${statusClass}">
+        <span
+            class="status-badge ${statusClass}">
 
-                            ${status}
+            ${status}
 
-                        </span>
+        </span>
 
-                    </div>
-                `;
+        <button
+            type="button"
+            class="send-client-invoice-button"
+            data-id="${invoice.objectId || ""}">
+
+            <i class="ri-send-plane-line"></i>
+
+            Send Invoice
+
+        </button>
+
+    </div>
+`;
 
             }
         ).join("");
@@ -3359,7 +3380,6 @@ if (viewAllClientEstimatesButton) {
     
 }
 
-
 if (viewAllClientInvoicesButton) {
     
     viewAllClientInvoicesButton.addEventListener(
@@ -3643,47 +3663,94 @@ if(selectedClientImage){
 
 }
 
-        const result =
-await Parse.Cloud.run(
+let result;
 
-    isEditingClient ?
+if (isEditingClient) {
 
-    "updateClient"
+    result =
+        await Parse.Cloud.run(
+            "updateClient",
+            {
+                clientId:
+                    editingClientId,
 
-    :
+                contactPerson,
 
-    "createClient",
+                companyName,
 
-    {
+                clientEmail,
 
-        clientId:
-        editingClientId,
+                clientPhone,
 
-        contactPerson,
+                clientTaxId,
 
-        companyName,
+                billingAddressLine1,
 
-        clientEmail,
+                billingAddressLine2,
 
-        clientPhone,
+                billingCityStateZip,
 
-        clientTaxId,
+                billingCountry,
 
-        billingAddressLine1,
+                clientImage,
 
-billingAddressLine2,
+                status
+            }
+        );
 
-billingCityStateZip,
+} else {
 
-billingCountry,
+    const subscription =
+        await Parse.Cloud.run(
+            "getCurrentSubscription"
+        );
 
-clientImage,
+    const clientCount =
+        subscription.usage.clients.used;
 
-status
+    const maxClients =
+        subscription.usage.clients.maximum;
+
+    if (
+        maxClients !== -1 &&
+        clientCount >= maxClients
+    ) {
+
+        throw new Error(
+            "You've reached your client limit. Upgrade your plan."
+        );
 
     }
 
-);
+    result =
+        await Parse.Cloud.run(
+            "createClient",
+            {
+                contactPerson,
+
+                companyName,
+
+                clientEmail,
+
+                clientPhone,
+
+                clientTaxId,
+
+                billingAddressLine1,
+
+                billingAddressLine2,
+
+                billingCityStateZip,
+
+                billingCountry,
+
+                clientImage,
+
+                status
+            }
+        );
+
+}
 
         showToast(
     result.message,
@@ -3903,6 +3970,39 @@ clientImageInput.addEventListener(
         };
 
         reader.readAsDataURL(file);
+
+    }
+);
+
+document.addEventListener(
+    "click",
+    function(event){
+
+        const sendButton =
+            event.target.closest(
+                ".send-client-estimate-button"
+            );
+
+        if(!sendButton){
+            return;
+        }
+
+        const estimateId =
+            sendButton.dataset.id;
+
+        if(!estimateId){
+
+            showToast(
+                "Estimate ID is missing.",
+                "error"
+            );
+
+            return;
+        }
+
+        openSendEstimateModal(
+            estimateId
+        );
 
     }
 );
