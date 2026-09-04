@@ -459,26 +459,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
             <div class="subscription-info-item">
 
                 <div class="subscription-info-icon">
-                    <i class="ri-money-naira-circle-line"></i>
-                </div>
-
-                <div>
-                    <span class="subscription-label">
-                        Monthly Price
-                    </span>
-
-                    <h3
-                        class="subscription-value"
-                        id="currentPlanPrice">
-                        $0
-                    </h3>
-                </div>
-
-            </div>
-
-            <div class="subscription-info-item">
-
-                <div class="subscription-info-icon">
                     <i class="ri-calendar-line"></i>
                 </div>
 
@@ -491,6 +471,26 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
                         class="subscription-value"
                         id="currentPlanBilling">
                         Free Forever
+                    </h3>
+                </div>
+
+            </div>
+            
+            <div class="subscription-info-item">
+
+                <div class="subscription-info-icon">
+                 <i class="ri-money-dollar-circle-line"></i>
+                </div>
+
+                <div>
+                    <span class="subscription-label">
+                        Monthly Price
+                    </span>
+
+                    <h3
+                        class="subscription-value"
+                        id="currentPlanPrice">
+                        $0
                     </h3>
                 </div>
 
@@ -619,9 +619,10 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
         <div class="plans-grid">
 
-            <div
-                class="plan-card current-plan-card"
-                id="freePlanCard">
+           <div
+    class="plan-card current-plan-card"
+    id="freePlanCard"
+    data-plan="Free">
 
                 <div class="plan-card-header">
 
@@ -645,9 +646,10 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
                 <div class="plan-price-wrapper">
 
-                    <h1
-                        class="plan-price"
-                        id="freePlanPrice">
+                  <h1
+    class="plan-price"
+    id="freePlanPrice"
+    data-plan-price>
                         $0
                         <span>/forever</span>
                     </h1>
@@ -700,8 +702,9 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
             </div>
 
             <div
-                class="plan-card"
-                id="starterPlanCard">
+    class="plan-card"
+    id="starterPlanCard"
+    data-plan="Starter">
 
                 <div class="plan-card-header">
 
@@ -721,9 +724,10 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
                 <div class="plan-price-wrapper">
 
-                    <h1
-                        class="plan-price"
-                        id="starterPlanPrice">
+                   <h1
+    class="plan-price"
+    id="starterPlanPrice"
+    data-plan-price>
                         $0
                         <span>/month</span>
                     </h1>
@@ -787,9 +791,10 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
             </div>
 
-            <div
-                class="plan-card featured-plan"
-                id="businessPlanCard">
+           <div
+    class="plan-card featured-plan"
+    id="businessPlanCard"
+    data-plan="Business">
 
                 <div class="featured-plan-top">
 
@@ -817,9 +822,10 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
                 <div class="plan-price-wrapper">
 
-                    <h1
-                        class="plan-price"
-                        id="businessPlanPrice">
+                  <h1
+    class="plan-price"
+    id="businessPlanPrice"
+    data-plan-price>
                         $0
                         <span>/month</span>
                     </h1>
@@ -893,9 +899,10 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
             </div>
 
-            <div
-                class="plan-card"
-                id="enterprisePlanCard">
+           <div
+    class="plan-card"
+    id="enterprisePlanCard"
+    data-plan="Enterprise">
 
                 <div class="plan-card-header">
 
@@ -915,9 +922,10 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
                 <div class="plan-price-wrapper">
 
-                    <h1
-                        class="plan-price"
-                        id="enterprisePlanPrice">
+                   <h1
+    class="plan-price"
+    id="enterprisePlanPrice"
+    data-plan-price>
                         $0
                         <span>/month</span>
                     </h1>
@@ -1110,7 +1118,7 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
     </section>
 
 
-    <section class="payment-summary-section">
+<section class="payment-summary-section">
 
         <div class="payment-summary-card">
 
@@ -1163,8 +1171,90 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
                     <span
                         class="summary-value"
                         id="summaryBillingCycle">
-          
+                        —
+                    </span>
+
+                </div>
+                
+                <div class="summary-item">
+
+    <span class="summary-label">
+        Payment Method
+    </span>
+
+    <span
+        class="summary-value"
+        id="summaryPaymentMethod">
+        Credit / Debit Card
+    </span>
+
+</div>
+
+                <div class="summary-item">
+
+                    <span class="summary-label">
+                        Plan Price
+                    </span>
+
+                    <span
+                        class="summary-value"
+                        id="summaryPlanPrice">
+                        $0
+                    </span>
+
+                </div>
+
+                <div class="summary-divider"></div>
+
+                <div class="summary-item summary-total">
+
+                    <span class="summary-label">
+                        Total
+                    </span>
+
+                    <span
+                        class="summary-value"
+                        id="summaryTotalPrice">
+                        $0
+                    </span>
+
+                </div>
+                
+
+            </div>
+
+<div class="payment-summary-action">
+
+    <button
+        type="button"
+        class="subscribe-btn"
+        id="subscribeButton">
+
+        <span class="subscribe-button-text">
+            Subscribe Now
+        </span>
+
+        <i class="ri-arrow-right-line"></i>
+
+    </button>
+
+</div>
+
+<p class="checkout-note">
+    <i class="ri-shield-check-line"></i>
+    Secure payment processing
+</p>
+
+        </div>
+
+    </section>
+
+</main>
+
+</div>
+
 <script src="subscription.js"></script>
+
 </body>
 
 </html>
