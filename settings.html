@@ -415,31 +415,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
         </div>
 
-        <div class="settings-row account-row">
-
-            <div class="settings-row-info">
-
-                <div class="settings-icon">
-                    <i class="ri-lock-password-line"></i>
-                </div>
-
-                <div>
-                    <h3>Password</h3>
-                    <p>
-                        Change your account password.
-                    </p>
-                </div>
-
-            </div>
-
-            <button
-                type="button"
-                class="settings-action-btn"
-                id="changePasswordButton">
-                Change
-            </button>
-
-        </div>
 
         <div class="settings-row account-row" style="display: none;">
 
@@ -798,7 +773,8 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
             <button
                 type="button"
                 class="settings-action-btn"
-                id="manageSubscriptionButton">
+                id="manageSubscriptionButton"
+                onclick="window.location='subscription.html'">
                 Manage
             </button>
 
@@ -839,7 +815,7 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
             <button
                 type="button"
                 class="settings-action-btn"
-                id="securityChangePasswordButton">
+                id="changePasswordButton">
                 Change
             </button>
 
@@ -865,10 +841,13 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
             <button
                 type="button"
                 class="settings-action-btn"
-                id="loginActivityButton">
+                id="loginActivityButton"
+                style="display: none;">
                 View
             </button>
-
+            <span class="security-coming-soon">
+                Coming Soon
+            </span>
         </div>
 
         <div class="settings-row security-row">
@@ -957,7 +936,8 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
             <button
                 type="button"
                 class="settings-action-btn"
-                id="privacyInformationButton">
+                id="privacyInformationButton"
+                onclick="window.location.href='privacy.html'">
                 View
             </button>
 

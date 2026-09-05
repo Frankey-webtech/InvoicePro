@@ -1,163 +1,44 @@
 const toggleButtons = document.querySelectorAll(".toggle-password");
 
 toggleButtons.forEach(button => {
-
+    
     button.addEventListener("click", () => {
-
+        
         const input = button.parentElement.querySelector("input");
         const icon = button.querySelector("i");
-
+        
         if (input.type === "password") {
-
+            
             input.type = "text";
-
+            
             icon.classList.remove("ri-eye-line");
             icon.classList.add("ri-eye-off-line");
-
+            
             button.setAttribute("aria-label", "Hide password");
-
+            
         } else {
-
+            
             input.type = "password";
-
+            
             icon.classList.remove("ri-eye-off-line");
             icon.classList.add("ri-eye-line");
-
+            
             button.setAttribute("aria-label", "Show password");
-
+            
         }
-
+        
     });
-
+    
 });
 
 const loginForm = document.getElementById("loginForm");
 const loginBtn = document.getElementById("loginBtn");
 const googleBtn = document.getElementById("googleBtn");
+const LOGIN_SETTINGS_KEY =
+    "invoiceProLogoutSettings";
 
-async function checkExistingLogin() {
-
-    try {
-
-        const currentUser = await Parse.User.currentAsync();
-
-        if (currentUser) {
-
-            window.location.replace("dashboard.html");
-
-        }
-
-    } catch (error) {
-
-        console.error("Session check error:", error);
-
-    }
-
-}
-
-loginForm.addEventListener("submit", async (e) => {
-
-    e.preventDefault();
-
-    const email =
-        document.getElementById("email").value
-            .trim()
-            .toLowerCase();
-
-    const password =
-        document.getElementById("password").value;
-
-    if (!email || !password) {
-
-        alert("Please enter your email and password.");
-
-        return;
-
-    }
-
-    loginBtn.disabled = true;
-
-    loginBtn.innerHTML = "Logging In...";
-
-    try {
-
-        const user =
-            await Parse.User.logIn(
-                email,
-                password
-            );
-
-        localStorage.setItem(
-            "userId",
-            user.id
-        );
-
-        localStorage.setItem(
-            "fullName",
-            user.get("fullName") || ""
-        );
-
-        localStorage.setItem(
-            "email",
-            user.get("email") || ""
-        );
-
-        localStorage.setItem(
-            "country",
-            user.get("country") || ""
-        );
-
-        localStorage.setItem(
-            "currencyCode",
-            user.get("currencyCode") || ""
-        );
-
-        localStorage.setItem(
-            "currencySymbol",
-            user.get("currencySymbol") || ""
-        );
-
-        localStorage.setItem(
-            "userPlan",
-            JSON.stringify({
-                name: user.get("plan") || "",
-                price: user.get("planPrice") || 0,
-                billing: user.get("planBilling") || ""
-            })
-        );
-
-        const loggedInUser =
-            await Parse.User.currentAsync();
-
-        if (!loggedInUser) {
-
-            throw new Error(
-                "Login succeeded, but your session could not be saved. Please try again."
-            );
-
-        }
-
-        window.location.replace("dashboard.html");
-
-    } catch (error) {
-
-        console.error(
-            "Login Error:",
-            error
-        );
-
-        alert(
-            error.message ||
-            "Unable to log in."
-        );
-
-        loginBtn.disabled = false;
-
-        loginBtn.innerHTML = "<span>Log In</span>";
-
-    }
-
-});
+const REMEMBERED_SESSION_KEY =
+    "invoiceProRememberedSession";
 
 async function initializeGoogleLogin() {
 
@@ -167,16 +48,15 @@ async function initializeGoogleLogin() {
             await auth0.createAuth0Client({
 
                 domain:
-                    "dev-2tvu028qm4wmvd0l.us.auth0.com",
-
+                    "dev-4mpuls6ree381pqd.us.auth0.com",
                 clientId:
-                    "LpoyuFK4GqAA6gzsVzu2yxGarfb8mXs6",
+                    "CfxLswv3awjuN3irjFb44ddd8wP2QAe2",
 
                 authorizationParams: {
 
                     redirect_uri:
                         window.location.origin +
-                        "/dashboard.html"
+                        "/login.html"
 
                 }
 
@@ -210,7 +90,9 @@ async function initializeGoogleLogin() {
                 const appState =
                     callbackResult.appState || {};
 
-                if (appState.mode !== "login") {
+                if (
+                    appState.mode !== "login"
+                ) {
 
                     throw new Error(
                         "Invalid Google login request."
@@ -227,88 +109,95 @@ async function initializeGoogleLogin() {
                         }
                     );
 
-if (
-    !result ||
-    !result.sessionToken
-) {
+                if (
+                    !result ||
+                    !result.sessionToken
+                ) {
 
-    throw new Error(
-        "Unable to log you in with Google."
-    );
+                    throw new Error(
+                        "Unable to log you in with Google."
+                    );
 
-}
+                }
 
-const loggedInUser =
-    await Parse.User.become(
-        result.sessionToken
-    );
+                const loggedInUser =
+                    await Parse.User.become(
+                        result.sessionToken
+                    );
 
-if (!loggedInUser) {
+                if (!loggedInUser) {
 
-    throw new Error(
-        "Google login succeeded, but the InvoicePro session could not be created."
-    );
+                    throw new Error(
+                        "Google login succeeded, but the InvoicePro session could not be created."
+                    );
 
-}
+                }
 
-const currentUser =
-    await Parse.User.currentAsync();
+                const currentUser =
+                    await Parse.User.currentAsync();
 
-if (!currentUser) {
+                if (!currentUser) {
 
-    throw new Error(
-        "Google login succeeded, but the InvoicePro session could not be restored."
-    );
+                    throw new Error(
+                        "Google login succeeded, but the InvoicePro session could not be restored."
+                    );
 
-}
+                }
 
-localStorage.setItem(
-    "userId",
-    currentUser.id
-);
+                await InvoiceProAuth.rememberCurrentSession();
 
-localStorage.setItem(
-    "fullName",
-    currentUser.get("fullName") || ""
-);
+                localStorage.setItem(
+                    "userId",
+                    currentUser.id
+                );
 
-localStorage.setItem(
-    "email",
-    currentUser.get("email") || ""
-);
+                localStorage.setItem(
+                    "fullName",
+                    currentUser.get("fullName") || ""
+                );
 
-localStorage.setItem(
-    "country",
-    currentUser.get("country") || ""
-);
+                localStorage.setItem(
+                    "email",
+                    currentUser.get("email") || ""
+                );
 
-localStorage.setItem(
-    "currencyCode",
-    currentUser.get("currencyCode") || ""
-);
+                localStorage.setItem(
+                    "country",
+                    currentUser.get("country") || ""
+                );
 
-localStorage.setItem(
-    "currencySymbol",
-    currentUser.get("currencySymbol") || ""
-);
+                localStorage.setItem(
+                    "currencyCode",
+                    currentUser.get("currencyCode") || ""
+                );
 
-localStorage.setItem(
-    "userPlan",
-    JSON.stringify({
-        name:
-            currentUser.get("plan") || "",
-        price:
-            currentUser.get("planPrice") || 0,
-        billing:
-            currentUser.get("planBilling") || ""
-    })
-);
+                localStorage.setItem(
+                    "currencySymbol",
+                    currentUser.get("currencySymbol") || ""
+                );
 
-window.location.replace(
-    "dashboard.html"
-);
+                localStorage.setItem(
+                    "userPlan",
+                    JSON.stringify({
+                        name:
+                            currentUser.get("plan") || "",
+                        price:
+                            currentUser.get("planPrice") || 0,
+                        billing:
+                            currentUser.get("planBilling") || ""
+                    })
+                );
 
-return;
+                const returnUrl =
+                    InvoiceProAuth.getReturnUrl();
+
+                InvoiceProAuth.clearReturnUrl();
+
+                window.location.replace(
+                    returnUrl
+                );
+
+                return;
 
             } catch (error) {
 
@@ -317,7 +206,10 @@ return;
                     error
                 );
 
-                if (typeof showToast === "function") {
+                if (
+                    typeof showToast ===
+                    "function"
+                ) {
 
                     showToast(
                         error.message ||
@@ -344,7 +236,8 @@ return;
 
                 try {
 
-                    googleBtn.disabled = true;
+                    googleBtn.disabled =
+                        true;
 
                     googleBtn.innerHTML =
                         "Connecting...";
@@ -369,9 +262,14 @@ return;
 
                 } catch (error) {
 
-                    console.error(error);
+                    console.error(
+                        error
+                    );
 
-                    if (typeof showToast === "function") {
+                    if (
+                        typeof showToast ===
+                        "function"
+                    ) {
 
                         showToast(
                             error.message ||
@@ -388,7 +286,8 @@ return;
 
                     }
 
-                    googleBtn.disabled = false;
+                    googleBtn.disabled =
+                        false;
 
                     googleBtn.innerHTML = `
                         <img src="google.svg" alt="Google">
@@ -410,6 +309,157 @@ return;
     }
 
 }
+
+async function checkExistingLogin() {
+    
+    try {
+        
+        const user =
+            await InvoiceProAuth.restoreSession();
+        
+        if (!user) {
+            return;
+        }
+        
+        const returnUrl =
+            InvoiceProAuth.getReturnUrl();
+        
+        InvoiceProAuth.clearReturnUrl();
+        
+        window.location.replace(
+            returnUrl
+        );
+        
+    } catch (error) {
+        
+        console.error(
+            "Session check error:",
+            error
+        );
+        
+    }
+    
+}
+
+loginForm.addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    const email =
+        document.getElementById("email").value
+            .trim()
+            .toLowerCase();
+
+    const password =
+        document.getElementById("password").value;
+
+    if (!email || !password) {
+
+        alert(
+            "Please enter your email and password."
+        );
+
+        return;
+
+    }
+
+    loginBtn.disabled = true;
+
+    loginBtn.innerHTML =
+        "Logging In...";
+
+    try {
+
+        const user =
+            await Parse.User.logIn(
+                email,
+                password
+            );
+
+        const loggedInUser =
+            await Parse.User.currentAsync();
+
+        if (!loggedInUser) {
+
+            throw new Error(
+                "Login succeeded, but your session could not be saved. Please try again."
+            );
+
+        }
+
+        await InvoiceProAuth.rememberCurrentSession();
+
+        localStorage.setItem(
+            "userId",
+            loggedInUser.id
+        );
+
+        localStorage.setItem(
+            "fullName",
+            loggedInUser.get("fullName") || ""
+        );
+
+        localStorage.setItem(
+            "email",
+            loggedInUser.get("email") || ""
+        );
+
+        localStorage.setItem(
+            "country",
+            loggedInUser.get("country") || ""
+        );
+
+        localStorage.setItem(
+            "currencyCode",
+            loggedInUser.get("currencyCode") || ""
+        );
+
+        localStorage.setItem(
+            "currencySymbol",
+            loggedInUser.get("currencySymbol") || ""
+        );
+
+        localStorage.setItem(
+            "userPlan",
+            JSON.stringify({
+                name:
+                    loggedInUser.get("plan") || "",
+                price:
+                    loggedInUser.get("planPrice") || 0,
+                billing:
+                    loggedInUser.get("planBilling") || ""
+            })
+        );
+
+        const returnUrl =
+            InvoiceProAuth.getReturnUrl();
+
+        InvoiceProAuth.clearReturnUrl();
+
+        window.location.replace(
+            returnUrl
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Login Error:",
+            error
+        );
+
+        alert(
+            error.message ||
+            "Unable to log in."
+        );
+
+        loginBtn.disabled = false;
+
+        loginBtn.innerHTML =
+            "<span>Log In</span>";
+
+    }
+
+});
 
 checkExistingLogin();
 initializeGoogleLogin();

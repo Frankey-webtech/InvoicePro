@@ -625,3 +625,13 @@ background:#0a1f3d;
         font-size: 14px;
     }
 }
+
+#businessLogoFileName {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    scrollbar-width: thin;
+    cursor: default;
+}

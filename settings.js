@@ -528,77 +528,6 @@
         }
     }
 
-    async function loadUserProfileImage() {
-
-        try {
-
-            const result =
-                await Parse.Cloud.run(
-                    "getUserProfile"
-                );
-
-            if (
-                !result ||
-                !result.success ||
-                !result.profile
-            ) {
-                return;
-            }
-
-            const profile =
-                result.profile;
-
-            let imageURL =
-                DEFAULT_PROFILE_IMAGE;
-
-            if (profile.profileImage) {
-
-                if (
-                    typeof profile.profileImage ===
-                    "string"
-                ) {
-
-                    imageURL =
-                        profile.profileImage;
-
-                } else if (
-                    profile.profileImage.url
-                ) {
-
-                    imageURL =
-                        typeof profile.profileImage.url ===
-                        "function"
-                            ? profile.profileImage.url()
-                            : profile.profileImage.url;
-
-                }
-
-            }
-
-            const profileImage =
-                $("profileImage");
-
-            const headerProfileImage =
-                $("headerProfileImage");
-
-            if (profileImage) {
-                profileImage.src = imageURL;
-            }
-
-            if (headerProfileImage) {
-                headerProfileImage.src = imageURL;
-            }
-
-        } catch (error) {
-
-            console.error(
-                "Profile image loading failed:",
-                error
-            );
-
-        }
-    }
-
     async function loadSettingsBusinessProfile() {
 
     try {
@@ -2901,8 +2830,6 @@ const checkExportWindow = setInterval(() => {
             initializePrivacyInformation();
 
             initializeKeyboardControls();
-
-            await loadUserProfileImage();
 
             console.log(
                 "Settings page initialized successfully."
