@@ -100,15 +100,6 @@ document.addEventListener(
         const enterprisePlanPrice =
             document.getElementById("enterprisePlanPrice");
         
-        const cardPaymentMethod =
-            document.getElementById("cardPaymentMethod");
-        
-        const cardRadio =
-            document.getElementById("cardRadio");
-        
-        const saveCard =
-            document.getElementById("saveCard");
-        
         const summaryPlanName =
             document.getElementById("summaryPlanName");
         
@@ -270,6 +261,9 @@ document.addEventListener(
                 
                 summaryTotalPrice.textContent =
                     formatMoney(response.planPrice);
+                
+                summaryPaymentMethod.textContent =
+                    "Paystack";
                 
                 saveCard.checked = false;
                 
@@ -1091,24 +1085,6 @@ document.addEventListener(
             
         );
         
-        cardRadio.addEventListener(
-            "change",
-            () => {
-                
-                selectPaymentMethod("Paystack");
-                
-            }
-        );
-        
-        paypalRadio.addEventListener(
-            "change",
-            () => {
-                
-                selectPaymentMethod("PayPal");
-                
-            }
-        );
-        
         subscribeButton.addEventListener(
             
             "click",
@@ -1251,22 +1227,16 @@ document.addEventListener(
             new URLSearchParams(
                 window.location.search
             );
-        
-        const orderId =
-            params.get("token");
-        
+
         const reference =
             params.get("reference");
-        
-        if (orderId && reference) {
-            return
-            
-        } else if (reference) {
-            
+
+        if (reference) {
+
             await verifyPaystackPayment();
-            
+
         }
-        
+
     }
     
 );

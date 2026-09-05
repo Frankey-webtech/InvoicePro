@@ -1280,6 +1280,52 @@
     line-height: 1;
 }
 
+.payment-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.payment-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 15px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.03);
+    line-height: 1.5;
+}
+
+.payment-step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 30px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+@media (max-width: 600px) {
+    .payment-steps {
+        gap: 10px;
+    }
+
+    .payment-step {
+        align-items: flex-start;
+        padding: 12px;
+    }
+
+    .payment-step-number {
+        flex: 0 0 28px;
+        width: 28px;
+        height: 28px;
+    }
+}
+
 .billing-toggle-option.active .billing-save-badge {
     background: rgba(255, 255, 255, 0.18);
     color: #ffffff;

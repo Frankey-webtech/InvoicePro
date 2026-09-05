@@ -2411,3 +2411,87 @@ img {
     font-weight: 700;
     cursor: pointer;
 }
+
+
+.invoice-pro-install-banner {
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 1000;
+}
+
+.invoice-pro-install-content {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 15px 20px;
+}
+
+.invoice-pro-install-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.invoice-pro-install-text h3 {
+    margin: 0 0 5px;
+}
+
+.invoice-pro-install-text p {
+    margin: 0;
+}
+
+.invoice-pro-install-button {
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.invoice-pro-ios-modal {
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 1001;
+    padding: 15px;
+}
+
+.invoice-pro-ios-modal-content {
+    position: relative;
+    width: 100%;
+    max-width: 700px;
+    box-sizing: border-box;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.invoice-pro-ios-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+
+.invoice-pro-ios-done {
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .invoice-pro-install-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .invoice-pro-install-button {
+        width: 100%;
+    }
+
+    .invoice-pro-ios-modal {
+        padding: 10px;
+    }
+
+    .invoice-pro-ios-modal-content {
+        padding: 20px 15px;
+    }
+}
