@@ -1,17 +1,42 @@
 if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/sw.js", {
+    window.addEventListener("load", async () => {
+        try {
+            const registration = await navigator.serviceWorker.register("/sw.js", {
                 scope: "/"
-            })
-            .then(() => {
-                console.log("Service Worker registered successfully.");
-            })
-            .catch(error => {
-                console.error(
-                    "Service Worker registration failed:",
-                    error
-                );
             });
+
+            console.log("Service Worker registered successfully.");
+
+            registration.addEventListener("updatefound", () => {
+                const newWorker = registration.installing;
+
+                if (!newWorker) {
+                    return;
+                }
+
+                newWorker.addEventListener("statechange", () => {
+                    if (
+                        newWorker.state === "installed" &&
+                        navigator.serviceWorker.controller
+                    ) {
+                        newWorker.postMessage({
+                            type: "SKIP_WAITING"
+                        });
+                    }
+                });
+            });
+
+            navigator.serviceWorker.addEventListener("controllerchange", () => {
+                console.log("Service Worker updated successfully.");
+            });
+
+            await registration.update();
+        } catch (error) {
+            console.error(
+                "Service Worker registration failed:",
+                error
+            );
+        }
     });
 }
 
@@ -1624,6 +1649,124 @@ if (!window.Parse) {
         
     }
     
+})();
+
+(function () {
+    let deferredInstallPrompt = null;
+
+    const installBanner = document.getElementById("invoiceProInstallBanner");
+    const installButton = document.getElementById("invoiceProInstallButton");
+    const installMessage = document.getElementById("invoiceProInstallMessage");
+
+    const iosModal = document.getElementById("invoiceProIOSModal");
+    const iosClose = document.getElementById("invoiceProIOSClose");
+    const iosDone = document.getElementById("invoiceProIOSDone");
+
+    if (!installBanner || !installButton || !installMessage) {
+        return;
+    }
+
+    const isStandalone =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        window.navigator.standalone === true;
+
+    const isIOS =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (
+            navigator.platform === "MacIntel" &&
+            navigator.maxTouchPoints > 1
+        );
+
+    const isSafari =
+        /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+    function showInstallBanner() {
+        installBanner.hidden = false;
+    }
+
+    function hideInstallBanner() {
+        installBanner.hidden = true;
+    }
+
+    function openIOSModal() {
+        if (iosModal) {
+            iosModal.hidden = false;
+        }
+    }
+
+    function closeIOSModal() {
+        if (iosModal) {
+            iosModal.hidden = true;
+        }
+    }
+
+    if (isStandalone) {
+        hideInstallBanner();
+        return;
+    }
+
+    if (isIOS && isSafari) {
+        installMessage.textContent =
+            "Download the Invoice Pro Business App now.";
+
+        installButton.textContent = "HOW TO INSTALL";
+
+        installButton.addEventListener("click", openIOSModal);
+
+        showInstallBanner();
+    }
+
+    window.addEventListener("beforeinstallprompt", event => {
+        event.preventDefault();
+
+        deferredInstallPrompt = event;
+
+        installMessage.textContent =
+            "Download the Invoice Pro Business App now.";
+
+        installButton.textContent = "DOWNLOAD APP";
+
+        showInstallBanner();
+    });
+
+    installButton.addEventListener("click", async () => {
+        if (!deferredInstallPrompt) {
+            return;
+        }
+
+        const promptEvent = deferredInstallPrompt;
+
+        deferredInstallPrompt = null;
+
+        await promptEvent.prompt();
+
+        const choiceResult = await promptEvent.userChoice;
+
+        if (choiceResult.outcome === "accepted") {
+            hideInstallBanner();
+        }
+    });
+
+    window.addEventListener("appinstalled", () => {
+        deferredInstallPrompt = null;
+        hideInstallBanner();
+    });
+
+    if (iosClose) {
+        iosClose.addEventListener("click", closeIOSModal);
+    }
+
+    if (iosDone) {
+        iosDone.addEventListener("click", closeIOSModal);
+    }
+
+    if (iosModal) {
+        iosModal.addEventListener("click", event => {
+            if (event.target === iosModal) {
+                closeIOSModal();
+            }
+        });
+    }
 })();
 
 /*

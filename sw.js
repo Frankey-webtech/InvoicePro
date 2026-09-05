@@ -22,13 +22,13 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
     event.waitUntil(
         caches.keys()
-            .then(cacheNames => {
-                return Promise.all(
+            .then(cacheNames =>
+                Promise.all(
                     cacheNames
                         .filter(cacheName => cacheName !== CACHE_NAME)
                         .map(cacheName => caches.delete(cacheName))
-                );
-            })
+                )
+            )
             .then(() => self.clients.claim())
     );
 });
@@ -46,36 +46,142 @@ self.addEventListener("fetch", event => {
         return;
     }
 
-    event.respondWith(
-        fetch(request)
-            .then(response => {
-                if (response && response.status === 200) {
-                    const responseClone = response.clone();
+    if (request.mode === "navigate") {
+        event.respondWith(
+            fetch(request)
+                .then(response => {
+                    if (response && response.ok) {
+                        const responseClone = response.clone();
 
-                    caches.open(CACHE_NAME)
-                        .then(cache => {
-                            cache.put(request, responseClone);
-                        });
-                }
+                        caches.open(CACHE_NAME)
+                            .then(cache => {
+                                cache.put(request, responseClone);
+                            });
+                    }
 
-                return response;
-            })
-            .catch(() => {
-                return caches.match(request)
-                    .then(cachedResponse => {
-                        if (cachedResponse) {
-                            return cachedResponse;
-                        }
+                    return response;
+                })
+                .catch(() =>
+                    caches.match(request)
+                        .then(cachedResponse => {
+                            if (cachedResponse) {
+                                return cachedResponse;
+                            }
 
-                        if (request.mode === "navigate") {
                             return caches.match(OFFLINE_PAGE);
+                        })
+                )
+        );
+
+        return;
+    }
+
+    event.respondWith(
+        caches.match(request)
+            .then(cachedResponse => {
+                const networkRequest = fetch(request)
+                    .then(response => {
+                        if (response && response.ok) {
+                            const responseClone = response.clone();
+
+                            caches.open(CACHE_NAME)
+                                .then(cache => {
+                                    cache.put(request, responseClone);
+                                });
                         }
 
-                        return new Response("", {
-                            status: 503,
-                            statusText: "Service Unavailable"
-                        });
-                    });
+                        return response;
+                    })
+                    .catch(() => cachedResponse);
+
+                return cachedResponse || networkRequest;
             })
+    );
+});
+
+self.addEventListener("message", event => {
+    if (!event.data) {
+        return;
+    }
+
+    if (event.data.type === "SKIP_WAITING") {
+        self.skipWaiting();
+    }
+
+    if (event.data.type === "CLEAR_CACHE") {
+        event.waitUntil(
+            caches.keys()
+                .then(cacheNames =>
+                    Promise.all(
+                        cacheNames.map(cacheName => caches.delete(cacheName))
+                    )
+                )
+        );
+    }
+});
+
+self.addEventListener("push", event => {
+    if (!event.data) {
+        return;
+    }
+
+    let data;
+
+    try {
+        data = event.data.json();
+    } catch (error) {
+        data = {
+            title: "Invoice Pro",
+            body: event.data.text()
+        };
+    }
+
+    const title = data.title || "Invoice Pro";
+
+    const options = {
+        body: data.body || "",
+        icon: data.icon || "./icon-192.png",
+        badge: data.badge || "./icon-192.png",
+        data: data.data || {},
+        tag: data.tag || "invoicepro-notification",
+        renotify: Boolean(data.renotify),
+        requireInteraction: Boolean(data.requireInteraction)
+    };
+
+    event.waitUntil(
+        self.registration.showNotification(title, options)
+    );
+});
+
+self.addEventListener("notificationclick", event => {
+    event.notification.close();
+
+    const notificationData = event.notification.data || {};
+
+    const targetUrl =
+        notificationData.url ||
+        notificationData.path ||
+        "./";
+
+    event.waitUntil(
+        clients.matchAll({
+            type: "window",
+            includeUncontrolled: true
+        })
+        .then(clientList => {
+            for (const client of clientList) {
+                if ("focus" in client) {
+                    if (targetUrl) {
+                        client.navigate(targetUrl);
+                    }
+
+                    return client.focus();
+                }
+            }
+
+            if (clients.openWindow) {
+                return clients.openWindow(targetUrl);
+            }
+        })
     );
 });
