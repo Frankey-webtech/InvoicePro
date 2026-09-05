@@ -6881,6 +6881,28 @@ async function initializeInvoicePage() {
 
 }
 
+async function testSendGridEmail() {
+    try {
+        const result =
+            await Parse.Cloud.run(
+                "sendSendGridTestEmail"
+            );
+
+        console.log(result);
+
+        alert(
+            "Test email sent successfully."
+        );
+    } catch (error) {
+        console.error(error);
+
+        alert(
+            error.message ||
+            "Test email failed."
+        );
+    }
+}
+
 if (sendInvoiceTaxLabel) {
     const taxPercent =
         Number(
@@ -6891,39 +6913,6 @@ if (sendInvoiceTaxLabel) {
         `Tax (${taxPercent}%)`;
 }
 
-document
-    .getElementById("sendSendGridTestButton")
-    .addEventListener("click", async () => {
-        
-        try {
-            
-            const result =
-                await Parse.Cloud.run(
-                    "sendSendGridTestEmail"
-                );
-            
-            console.log(
-                "SendGrid test result:",
-                result
-            );
-            
-            alert(
-                "Test email was sent successfully."
-            );
-            
-        } catch (error) {
-            
-            console.error(
-                "SendGrid test error:",
-                error
-            );
-            
-            alert(
-                error.message ||
-                "SendGrid test failed."
-            );
-        }
-    });
 
 document.addEventListener(
     "DOMContentLoaded",
