@@ -1,10 +1,10 @@
 "use strict";
 
 const AUTH0_DOMAIN =
-"dev-2tvu028qm4wmvd0l.us.auth0.com";
+"dev-4mpuls6ree381pqd.us.auth0.com";
 
 const AUTH0_CLIENT_ID =
-"LpoyuFK4GqAA6gzsVzu2yxGarfb8mXs6";
+"CfxLswv3awjuN3irjFb44ddd8wP2QAe2";
 
 const statusIcon =
 document.getElementById("statusIcon");
