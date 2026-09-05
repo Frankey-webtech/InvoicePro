@@ -415,16 +415,26 @@
                         confirmPassword
                     }
                 );
+                
+                closeSecurityPasswordModal();
 
-            showToast(
-                result?.message ||
-                "Password changed successfully. Please log in again.",
-                "success",
-                5000
-            );
+            if (!result || result.success !== true) {
+    throw new Error(
+        result?.message ||
+        "Unable to verify that your password was changed."
+    );
+}
 
-            closeSecurityPasswordModal();
+showToast(
+    result.message ||
+    "Password changed successfully. Please log in again.",
+    "success",
+    5000
+);
 
+setTimeout(() => {
+    window.location.href = "login.html";
+}, 1500);
         } catch (error) {
 
             console.error(
@@ -459,6 +469,7 @@
                     "getUserProfile"
                 );
 
+        
             if (
                 !result ||
                 !result.success ||

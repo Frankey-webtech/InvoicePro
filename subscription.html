@@ -1013,110 +1013,154 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
     </section>
 
-    <section class="current-subscription-card payment-section">
+<section class="current-subscription-card payment-section">
 
-        <div class="payment-method-header">
+    <div class="payment-method-header">
 
-            <span class="section-label">
-                PAYMENT
-            </span>
+        <span class="section-label">
+            PAYMENT
+        </span>
 
-            <h2 class="payment-method-title">
-                Choose your payment method
-            </h2>
+        <h2 class="payment-method-title">
+            Secure payment with Paystack
+        </h2>
 
-            <p class="payment-method-subtitle">
-                Select how you'd like to complete your subscription.
+        <p class="payment-method-subtitle">
+            Complete your subscription securely through Paystack and choose the payment method that works best for you.
+        </p>
+
+    </div>
+
+    <div class="payment-method-grid">
+
+        <div
+            class="payment-method-card active-payment-method"
+            id="paystackPaymentMethod">
+
+            <div class="payment-method-top">
+
+                <div class="payment-method-icon">
+                    <i class="ri-secure-payment-line"></i>
+                </div>
+
+                <div class="payment-method-check">
+                    <i class="ri-checkbox-circle-fill"></i>
+                </div>
+
+            </div>
+
+            <h3 class="payment-method-name">
+                Paystack
+            </h3>
+
+            <p class="payment-method-description">
+                You'll be securely redirected to Paystack to complete your subscription.
             </p>
+
+            <div class="payment-brands">
+
+                <span>Card</span>
+                <span>Bank Transfer</span>
+                <span>USSD</span>
+                <span>QR</span>
+
+            </div>
 
         </div>
 
-        <div class="payment-method-grid">
+        <div
+            class="payment-method-card"
+            id="paymentStepsCard">
 
-            <label
-                class="payment-method-card active-payment-method"
-                id="cardPaymentMethod">
+            <div class="payment-method-top">
 
-                <div class="payment-method-top">
-
-                    <div class="payment-method-icon">
-                        <i class="ri-bank-card-line"></i>
-                    </div>
-
-                    <input
-                        type="radio"
-                        name="paymentMethod"
-                        id="cardRadio"
-                        checked>
-
+                <div class="payment-method-icon">
+                    <i class="ri-list-check-2"></i>
                 </div>
 
-                <h3 class="payment-method-name">
-                    Credit / Debit Card
-                </h3>
-
-                <p class="payment-method-description">
-                    Pay securely using Visa, Mastercard, Verve or another supported card.
-                </p>
-
-                <div class="payment-brands">
-
-                    <span>VISA</span>
-                    <span>Mastercard</span>
-                    <span>Verve</span>
-
+                <div class="payment-method-step">
+                    Step 1
                 </div>
 
-            </label>
+            </div>
 
-            <label
-                class="payment-method-card"
-                id="paypalPaymentMethod">
-                <div class="payment-method-top">
+            <h3 class="payment-method-name">
+                How payment works
+            </h3>
 
-                    <div class="payment-method-icon">
-                        <i class="ri-paypal-line"></i>
-                    </div>
+            <p class="payment-method-description">
+                Click Subscribe Now to open the secure Paystack checkout.
+            </p>
 
-                    <input
-                        type="radio"
-                        name="paymentMethod"
-                        id="paypalRadio">
+            <div class="payment-steps">
 
-                </div>
+                <div class="payment-step">
 
-                <h3 class="payment-method-name">
-                    PayPal
-                </h3>
+                    <span class="payment-step-number">
+                        1
+                    </span>
 
-                <p class="payment-method-description">
-                    Complete your subscription securely using your PayPal account.
-                </p>
-
-                <div class="payment-brands">
-
-                    <span class="paypal-brand">
-                        <i class="ri-paypal-fill"></i>
-                        PayPal
+                    <span>
+                        Click Subscribe Now.
                     </span>
 
                 </div>
 
-            </label>
+                <div class="payment-step">
+
+                    <span class="payment-step-number">
+                        2
+                    </span>
+
+                    <span>
+                        Choose your preferred payment method on Paystack.
+                    </span>
+
+                </div>
+
+                <div class="payment-step">
+
+                    <span class="payment-step-number">
+                        3
+                    </span>
+
+                    <span>
+                        Complete your payment securely.
+                    </span>
+
+                </div>
+
+                <div class="payment-step">
+
+                    <span class="payment-step-number">
+                        4
+                    </span>
+
+                    <span>
+                        Once your payment is verified, you'll be redirected back to InvoicePro.
+                    </span>
+
+                </div>
+
+            </div>
 
         </div>
+
+    </div>
+
     <label class="save-card-option">
-    <input
-        type="checkbox"
-        id="saveCard"
-    >
 
-    <span>
-        Save payment method for automatic renewal
-    </span>
-</label>
-    </section>
+        <input
+            type="checkbox"
+            id="saveCard">
 
+        <span>
+            Enable automatic renewal for this subscription
+        </span>
+
+    </label>
+
+</section>
 
 <section class="payment-summary-section">
 

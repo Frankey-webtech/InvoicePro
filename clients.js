@@ -338,12 +338,6 @@ document.getElementById("sendEstimateStatus");
 const sendEstimateMessage = 
 document.getElementById("sendEstimateMessage");
 
-const notificationButton =
-document.getElementById("notificationButton");
-
-const notificationBadge =
-document.getElementById("notificationBadge");
-
 const sendInvoiceOverlay =
     document.getElementById("sendInvoiceOverlay");
 
@@ -523,29 +517,31 @@ function hideLoader(){
 
 }
 
-function showToast(
-message,
-type="success"){
+function showToast(message, type = "success") {
+    if (type === "error") {
+        console.error("[Toast error]", message);
 
-    const toast =
-    document.createElement("div");
+        if (message instanceof Error && message.stack) {
+            console.error(message.stack);
+        }
 
-    toast.className =
-    `toast ${type}`;
+        console.trace("[Toast error trace]");
+    } else {
+        console.log(`[Toast ${type}]`, message);
+    }
 
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
     toast.textContent =
-    message;
+        message instanceof Error
+            ? message.message
+            : String(message);
 
-    toastContainer.appendChild(
-        toast
-    );
+    toastContainer.appendChild(toast);
 
-    setTimeout(()=>{
-
+    setTimeout(() => {
         toast.remove();
-
-    },3000);
-
+    }, 3000);
 }
 
 function closeViewClientModal(){
@@ -2755,51 +2751,6 @@ async function loadClientStatistics(){
 
 }
 
-async function loadNotificationCount() {
-
-    try {
-
-        const result =
-        await Parse.Cloud.run(
-            "getNotificationCount"
-        );
-
-        if (result.unreadCount > 0) {
-
-            notificationBadge.style.display =
-                "flex";
-
-            notificationBadge.textContent =
-                result.unreadCount;
-
-        }
-
-        else {
-
-            notificationBadge.style.display =
-                "none";
-
-        }
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Notification Error:",
-            error
-        );
-
-        showToast(
-            error.message ||
-            "Unable to load notifications.",
-            "error"
-        );
-
-    }
-
-}
-
 async function loadClientImageSetting(){
 
     try{
@@ -3764,14 +3715,15 @@ if (isEditingClient) {
     }
 
     catch(error){
-        
-        showLoader();
+    console.error("Create Client Error:", error);
 
-        showToast(
-    error.message,
-    "error"
-);
-    }
+    hideLoader();
+
+    showToast(
+        error.message || "Unable to save client.",
+        "error"
+    );
+}
 
     finally{
         
@@ -4209,8 +4161,6 @@ document.addEventListener(
     loadClientImageSetting()
 
     loadClients();
-    
-    loadNotificationCount();
     
     registerSendEstimateListeners();
     

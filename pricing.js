@@ -29,31 +29,19 @@ if (!window.Parse) {
 
     let pricingData = null;
     let currentUser = null;
-    let pricingRequestInProgress = false;
 
     const $ = (id) => document.getElementById(id);
 
     function showElement(element) {
-        if (element) element.classList.add("is-visible");
+        if (element) {
+            element.classList.add("is-visible");
+        }
     }
 
     function hideElement(element) {
-        if (element) element.classList.remove("is-visible");
-    }
-
-    function setLocationStatus(icon, message) {
-        const status = $("pricingLocationStatus");
-        const text = $("pricingLocationText");
-
-        if (!status || !text) return;
-
-        const statusIcon = status.querySelector("i");
-
-        if (statusIcon) {
-            statusIcon.className = icon;
+        if (element) {
+            element.classList.remove("is-visible");
         }
-
-        text.textContent = message;
     }
 
     function showToast(title, message) {
@@ -61,10 +49,17 @@ if (!window.Parse) {
         const toastTitle = $("pricingToastTitle");
         const toastMessage = $("pricingToastMessage");
 
-        if (!toast) return;
+        if (!toast) {
+            return;
+        }
 
-        if (toastTitle) toastTitle.textContent = title;
-        if (toastMessage) toastMessage.textContent = message;
+        if (toastTitle) {
+            toastTitle.textContent = title;
+        }
+
+        if (toastMessage) {
+            toastMessage.textContent = message;
+        }
 
         toast.classList.add("is-visible");
 
@@ -73,6 +68,15 @@ if (!window.Parse) {
         window.pricingToastTimer = window.setTimeout(() => {
             toast.classList.remove("is-visible");
         }, 5000);
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 
     function formatPrice(price, currencyCode, currencySymbol) {
@@ -89,7 +93,7 @@ if (!window.Parse) {
         try {
             return new Intl.NumberFormat(undefined, {
                 style: "currency",
-                currency: currencyCode || "USD",
+                currency: currencyCode || "GBP",
                 currencyDisplay: "symbol",
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 2
@@ -99,72 +103,148 @@ if (!window.Parse) {
         }
     }
 
-    function getBillingText(plan, currencySymbol) {
+    function getBillingText(plan, currencyCode, currencySymbol) {
         if (plan.billing === "Forever") {
             return "Free forever";
         }
 
-        return `${currencySymbol || ""}${Number(plan.price || 0).toLocaleString()} billed monthly`;
+        const monthlyPrice = Number(
+            plan.monthlyPrice ?? plan.price ?? 0
+        );
+
+        return `${formatPrice(
+            monthlyPrice,
+            currencyCode,
+            currencySymbol
+        )} billed monthly · Price will be converted to your local currency when you subscribe.`;
     }
 
-    function escapeHtml(value) {
-        return String(value ?? "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+    function getYearlyBillingText(plan, currencyCode, currencySymbol) {
+        if (plan.billing === "Forever") {
+            return "Free forever";
+        }
+
+        const yearlyPrice = Number(
+            plan.yearlyPrice ?? 0
+        );
+
+        if (!Number.isFinite(yearlyPrice)) {
+            return "Billed yearly · Price will be converted to your local currency when you subscribe.";
+        }
+
+        return `${formatPrice(
+            yearlyPrice,
+            currencyCode,
+            currencySymbol
+        )} billed yearly · Price will be converted to your local currency when you subscribe.`;
+    }
+
+    function normalizePricingResult(result) {
+        if (!result || typeof result !== "object") {
+            return null;
+        }
+
+        const currencyCode =
+            String(result.currencyCode || "GBP")
+                .trim()
+                .toUpperCase();
+
+        const currencySymbol =
+            String(result.currencySymbol || "£").trim();
+
+        const plans =
+            result.plans &&
+            typeof result.plans === "object"
+                ? result.plans
+                : null;
+
+        if (!plans) {
+            return null;
+        }
+
+        return {
+            ...result,
+            currencyCode,
+            currencySymbol,
+            plans
+        };
     }
 
     function renderPlans() {
         const grid = $("pricingGrid");
 
-        if (!grid || !pricingData) return;
+        if (!grid || !pricingData) {
+            return;
+        }
 
-        const currencyCode = pricingData.currencyCode || "";
-        const currencySymbol = pricingData.currencySymbol || "";
-        const plans = pricingData.plans || {};
-        const planOrder = ["Free", "Starter", "Business", "Enterprise"];
+        const currencyCode =
+            pricingData.currencyCode || "GBP";
+
+        const currencySymbol =
+            pricingData.currencySymbol || "£";
+
+        const plans =
+            pricingData.plans || {};
+
+        const planOrder = [
+            "Free",
+            "Starter",
+            "Business",
+            "Enterprise"
+        ];
 
         grid.innerHTML = "";
 
         planOrder.forEach((planKey) => {
             const plan = plans[planKey];
 
-            if (!plan) return;
-
-            const card = document.createElement("article");
-            card.className = "pricing-plan-card";
-
-            if (plan.popular) {
-                card.classList.add("pricing-plan-popular");
+            if (!plan) {
+                return;
             }
 
-            const popularBadge = plan.popular
-                ? `
-                    <div class="pricing-popular-badge">
-                        <i class="ri-star-fill"></i>
-                        <span>Most Popular</span>
-                    </div>
-                `
-                : "";
+            const card =
+                document.createElement("article");
 
-            const features = Array.isArray(plan.features)
-                ? plan.features
-                : [];
+            card.className =
+                "pricing-plan-card";
 
-            const featureMarkup = features.map((feature) => `
-                <li class="pricing-plan-feature">
-                    <i class="ri-check-line"></i>
-                    <span>${escapeHtml(feature)}</span>
-                </li>
-            `).join("");
+            if (plan.popular) {
+                card.classList.add(
+                    "pricing-plan-popular"
+                );
+            }
 
-            const price = formatPrice(
-                plan.price,
-                currencyCode,
-                currencySymbol
-            );
+            const popularBadge =
+                plan.popular
+                    ? `
+                        <div class="pricing-popular-badge">
+                            <i class="ri-star-fill"></i>
+                            <span>Most Popular</span>
+                        </div>
+                    `
+                    : "";
+
+            const features =
+                Array.isArray(plan.features)
+                    ? plan.features
+                    : [];
+
+            const featureMarkup =
+                features.map((feature) => `
+                    <li class="pricing-plan-feature">
+                        <i class="ri-check-line"></i>
+                        <span>${escapeHtml(feature)}</span>
+                    </li>
+                `).join("");
+
+            const price =
+                formatPrice(
+                    plan.monthlyPrice ??
+                    plan.price ??
+                    0,
+                    currencyCode,
+                    currencySymbol
+                );
 
             const period =
                 plan.billing === "Forever"
@@ -172,7 +252,11 @@ if (!window.Parse) {
                     : "/month";
 
             const billingText =
-                getBillingText(plan, currencySymbol);
+                getBillingText(
+                    plan,
+                    currencyCode,
+                    currencySymbol
+                );
 
             const planName =
                 plan.name || planKey;
@@ -181,13 +265,18 @@ if (!window.Parse) {
                 ${popularBadge}
 
                 <div class="pricing-plan-icon">
-                    <i class="${escapeHtml(plan.icon || "ri-price-tag-3-line")}"></i>
+                    <i class="${escapeHtml(
+                        plan.icon ||
+                        "ri-price-tag-3-line"
+                    )}"></i>
                 </div>
 
                 <div class="pricing-plan-header">
                     <h3>${escapeHtml(planName)}</h3>
                     <p class="pricing-plan-description">
-                        ${escapeHtml(plan.description || "")}
+                        ${escapeHtml(
+                            plan.description || ""
+                        )}
                     </p>
                 </div>
 
@@ -203,7 +292,9 @@ if (!window.Parse) {
                 <div class="pricing-plan-divider"></div>
 
                 <div class="pricing-plan-includes">
-                    ${escapeHtml(plan.includes || "")}
+                    ${escapeHtml(
+                        plan.includes || ""
+                    )}
                 </div>
 
                 <ul class="pricing-plan-features">
@@ -228,97 +319,32 @@ if (!window.Parse) {
     }
 
     function bindPlanButtons() {
-        document.querySelectorAll(".pricing-plan-button").forEach((button) => {
-            button.addEventListener("click", () => {
-                handlePlanSelection(button.dataset.plan);
+        document
+            .querySelectorAll(".pricing-plan-button")
+            .forEach((button) => {
+                button.addEventListener(
+                    "click",
+                    () => {
+                        handlePlanSelection(
+                            button.dataset.plan
+                        );
+                    }
+                );
             });
-        });
     }
 
     function handlePlanSelection(planName) {
-        if (!planName) return;
+        if (!planName) {
+            return;
+        }
 
         window.location.href =
-            `signup.html?plan=${encodeURIComponent(planName)}`;
+            `signup.html?plan=${encodeURIComponent(
+                planName
+            )}`;
     }
 
-    function normalizePricingResult(result) {
-        if (!result || typeof result !== "object") {
-            return null;
-        }
-
-        const country =
-            result.country ||
-            result.countryName ||
-            "";
-
-        const countryCode =
-            String(
-                result.countryCode ||
-                ""
-            ).trim().toUpperCase();
-
-        const currencyCode =
-            String(
-                result.currencyCode ||
-                ""
-            ).trim().toUpperCase();
-
-        const currencySymbol =
-            result.currencySymbol ||
-            "";
-
-        const plans =
-            result.plans &&
-            typeof result.plans === "object"
-                ? result.plans
-                : null;
-
-        if (
-            !country ||
-            !countryCode ||
-            !currencyCode ||
-            !currencySymbol ||
-            !plans
-        ) {
-            return null;
-        }
-
-        return {
-            ...result,
-            country,
-            countryCode,
-            currencyCode,
-            currencySymbol,
-            plans
-        };
-    }
-
-    function applyPricingResult(result) {
-        pricingData = result;
-        window.invoiceProPricingData = result;  
-
-        const countryElement =
-            $("pricingCountry");
-
-        if (countryElement) {
-            countryElement.textContent =
-                result.country;
-        }
-
-        const currencyElement =
-            $("pricingCurrency");
-
-        if (currencyElement) {
-            currencyElement.textContent =
-                `${result.currencySymbol} ${result.currencyCode}`;
-        }
-
-        renderPlans();
-        showPricing();
-    }
-
-    async function loadPricingForLoggedInUser() {
+    async function loadPricing() {
         if (
             typeof Parse === "undefined" ||
             !Parse.Cloud
@@ -330,7 +356,7 @@ if (!window.Parse) {
 
         const result =
             await Parse.Cloud.run(
-                "getPublicPricing"
+                "getPricingPageConfig"
             );
 
         const normalized =
@@ -342,69 +368,14 @@ if (!window.Parse) {
             );
         }
 
-        applyPricingResult(normalized);
+        pricingData =
+            normalized;
 
-        setLocationStatus(
-            "ri-user-location-line",
-            `${normalized.country} · ${normalized.currencyCode}`
-        );
+        window.invoiceProPricingData =
+            normalized;
 
-        return true;
-    }
-
-    async function loadPricingByLocation(
-        latitude,
-        longitude
-    ) {
-        if (
-            typeof Parse === "undefined" ||
-            !Parse.Cloud
-        ) {
-            throw new Error(
-                "Parse SDK is not available."
-            );
-        }
-
-        const lat = Number(latitude);
-        const lng = Number(longitude);
-
-        if (
-            !Number.isFinite(lat) ||
-            !Number.isFinite(lng) ||
-            lat < -90 ||
-            lat > 90 ||
-            lng < -180 ||
-            lng > 180
-        ) {
-            throw new Error(
-                "Invalid location coordinates."
-            );
-        }
-
-        const result =
-            await Parse.Cloud.run(
-                "getPublicPricing",
-                {
-                    latitude: lat,
-                    longitude: lng
-                }
-            );
-
-        const normalized =
-            normalizePricingResult(result);
-
-        if (!normalized) {
-            throw new Error(
-                "Invalid pricing information received."
-            );
-        }
-
-        applyPricingResult(normalized);
-
-        setLocationStatus(
-            "ri-map-pin-check-line",
-            `${normalized.country} · ${normalized.currencyCode}`
-        );
+        renderPlans();
+        showPricing();
 
         return true;
     }
@@ -453,191 +424,6 @@ if (!window.Parse) {
         }
     }
 
-    function showPricing() {
-        hideElement(
-            $("pricingLoadingSection")
-        );
-
-        hideElement(
-            $("pricingLocationSection")
-        );
-
-        showElement(
-            $("pricingContent")
-        );
-
-        if (pricingData) {
-            setLocationStatus(
-                currentUser
-                    ? "ri-user-location-line"
-                    : "ri-map-pin-check-line",
-                `${pricingData.country} · ${pricingData.currencyCode}`
-            );
-        }
-    }
-
-    function showLocationRequest() {
-        hideElement(
-            $("pricingLoadingSection")
-        );
-
-        hideElement(
-            $("pricingContent")
-        );
-
-        showElement(
-            $("pricingLocationSection")
-        );
-    }
-
-    function showLoading(
-        message = "Preparing your pricing"
-    ) {
-        hideElement(
-            $("pricingLocationSection")
-        );
-
-        hideElement(
-            $("pricingContent")
-        );
-
-        showElement(
-            $("pricingLoadingSection")
-        );
-
-        const loadingTitle =
-            $("pricingLoadingSection")
-                ?.querySelector("h2");
-
-        if (loadingTitle) {
-            loadingTitle.textContent =
-                message;
-        }
-
-        setLocationStatus(
-            "ri-loader-4-line",
-            "Preparing your pricing..."
-        );
-    }
-
-    function clearLocationError() {
-        const errorElement =
-            $("pricingLocationError");
-
-        if (errorElement) {
-            errorElement.textContent = "";
-        }
-    }
-
-    function showPricingError(message) {
-        const errorElement =
-            $("pricingLocationError");
-
-        if (errorElement) {
-            errorElement.textContent =
-                message;
-        }
-
-        showLocationRequest();
-    }
-
-    function handleLocationError(error) {
-        let message =
-            "We couldn't access your location. Please try again.";
-
-        if (
-            error &&
-            error.code ===
-            error.PERMISSION_DENIED
-        ) {
-            message =
-                "Location permission was denied. Please allow location access and try again.";
-        } else if (
-            error &&
-            error.code ===
-            error.POSITION_UNAVAILABLE
-        ) {
-            message =
-                "Your location could not be determined. Please check your device location settings and try again.";
-        } else if (
-            error &&
-            error.code ===
-            error.TIMEOUT
-        ) {
-            message =
-                "Location detection timed out. Please try again.";
-        }
-
-        showPricingError(message);
-    }
-
-    async function requestLocation() {
-        if (pricingRequestInProgress) {
-            return;
-        }
-
-        if (currentUser) {
-            return;
-        }
-
-        clearLocationError();
-
-        if (!navigator.geolocation) {
-            showPricingError(
-                "Location services are not supported by this browser."
-            );
-            return;
-        }
-
-        pricingRequestInProgress = true;
-
-        showLoading(
-            "Determining your pricing"
-        );
-
-        try {
-            const position =
-                await new Promise(
-                    (resolve, reject) => {
-                        navigator.geolocation.getCurrentPosition(
-                            resolve,
-                            reject,
-                            {
-                                enableHighAccuracy: false,
-                                timeout: 15000,
-                                maximumAge: 600000
-                            }
-                        );
-                    }
-                );
-
-            await loadPricingByLocation(
-                Number(position.coords.latitude),
-                Number(position.coords.longitude)
-            );
-        } catch (error) {
-            console.error(
-                "Pricing location error:",
-                error
-            );
-
-            if (
-                error &&
-                typeof error.code === "number" &&
-                error.code >= 1 &&
-                error.code <= 3
-            ) {
-                handleLocationError(error);
-            } else {
-                showPricingError(
-                    "We couldn't load pricing from your location. Please try again."
-                );
-            }
-        } finally {
-            pricingRequestInProgress = false;
-        }
-    }
-
     function updateHeaderForUser(user) {
         const loginButton =
             $("headerLoginBtn");
@@ -645,7 +431,10 @@ if (!window.Parse) {
         const signupButton =
             $("headerSignupBtn");
 
-        if (!loginButton || !signupButton) {
+        if (
+            !loginButton ||
+            !signupButton
+        ) {
             return;
         }
 
@@ -696,6 +485,84 @@ if (!window.Parse) {
         );
     }
 
+    function showPricing() {
+        hideElement(
+            $("pricingLoadingSection")
+        );
+
+        showElement(
+            $("pricingContent")
+        );
+    }
+
+    function showLoading(message) {
+        hideElement(
+            $("pricingContent")
+        );
+
+        showElement(
+            $("pricingLoadingSection")
+        );
+
+        const loadingTitle =
+            $("pricingLoadingSection")
+                ?.querySelector("h2");
+
+        if (loadingTitle && message) {
+            loadingTitle.textContent =
+                message;
+        }
+    }
+
+    function showPricingError(message) {
+        hideElement(
+            $("pricingLoadingSection")
+        );
+
+        const content =
+            $("pricingContent");
+
+        if (content) {
+            content.classList.add(
+                "is-visible"
+            );
+
+            const grid =
+                $("pricingGrid");
+
+            if (grid) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px;">
+                        <h3>Unable to load pricing</h3>
+                        <p>${escapeHtml(message)}</p>
+                        <button
+                            type="button"
+                            class="pricing-plan-button"
+                            id="retryPricingButton"
+                        >
+                            Try again
+                        </button>
+                    </div>
+                `;
+
+                const retryButton =
+                    $("retryPricingButton");
+
+                if (retryButton) {
+                    retryButton.addEventListener(
+                        "click",
+                        initializePricing
+                    );
+                }
+            }
+        }
+
+        showToast(
+            "Pricing unavailable",
+            message
+        );
+    }
+
     function initializeMobileNavigation() {
         const menuButton =
             $("pricingMenuButton");
@@ -703,7 +570,10 @@ if (!window.Parse) {
         const navigation =
             $("pricingMobileNavigation");
 
-        if (!menuButton || !navigation) {
+        if (
+            !menuButton ||
+            !navigation
+        ) {
             return;
         }
 
@@ -735,7 +605,10 @@ if (!window.Parse) {
         const toast =
             $("pricingToast");
 
-        if (!closeButton || !toast) {
+        if (
+            !closeButton ||
+            !toast
+        ) {
             return;
         }
 
@@ -749,55 +622,31 @@ if (!window.Parse) {
         );
     }
 
-    async function initialize() {
-        initializeMobileNavigation();
-        initializeToast();
-
-        const locationButton =
-            $("enableLocationButton");
-
-        if (locationButton) {
-            locationButton.addEventListener(
-                "click",
-                requestLocation
-            );
-        }
-
+    async function initializePricing() {
         showLoading(
             "Preparing your pricing"
         );
 
-        currentUser =
-            await getLoggedInUser();
+        try {
+            currentUser =
+                await getLoggedInUser();
 
-        updateHeaderForUser(
-            currentUser
-        );
+            updateHeaderForUser(
+                currentUser
+            );
 
-        if (currentUser) {
-            try {
-                await loadPricingForLoggedInUser();
-                return;
-            } catch (error) {
-                console.error(
-                    "Pricing: account pricing failed.",
-                    error
-                );
+            await loadPricing();
+        } catch (error) {
+            console.error(
+                "Pricing initialization failed:",
+                error
+            );
 
-                showPricingError(
-                    "We couldn't load your account pricing right now. Please try again."
-                );
-
-                return;
-            }
+            showPricingError(
+                error?.message ||
+                "We couldn't load pricing right now. Please try again."
+            );
         }
-
-        showLocationRequest();
-
-        setLocationStatus(
-            "ri-map-pin-line",
-            "Location permission required"
-        );
     }
 
     if (
@@ -806,10 +655,16 @@ if (!window.Parse) {
     ) {
         document.addEventListener(
             "DOMContentLoaded",
-            initialize
+            () => {
+                initializeMobileNavigation();
+                initializeToast();
+                initializePricing();
+            }
         );
     } else {
-        initialize();
+        initializeMobileNavigation();
+        initializeToast();
+        initializePricing();
     }
 })();
 
@@ -849,7 +704,9 @@ if (!window.Parse) {
                     const value =
                         storage.getItem(key);
 
-                    if (!value) continue;
+                    if (!value) {
+                        continue;
+                    }
 
                     const parsed =
                         JSON.parse(value);
@@ -933,7 +790,9 @@ if (!window.Parse) {
     }
 
     function getProfileImage(user) {
-        if (!user) return "";
+        if (!user) {
+            return "";
+        }
 
         return (
             user.profileImage ||
@@ -982,7 +841,9 @@ if (!window.Parse) {
             getInitial(user);
 
         const profileButton =
-            document.createElement("button");
+            document.createElement(
+                "button"
+            );
 
         profileButton.type =
             "button";
@@ -997,7 +858,9 @@ if (!window.Parse) {
 
         if (profileImage) {
             const image =
-                document.createElement("img");
+                document.createElement(
+                    "img"
+                );
 
             image.src =
                 profileImage;
@@ -1076,7 +939,9 @@ if (!window.Parse) {
                 ".header-buttons"
             );
 
-        if (!headerButtons) return;
+        if (!headerButtons) {
+            return;
+        }
 
         if (!user) {
             if (loginButton) {
@@ -1158,230 +1023,221 @@ if (!window.Parse) {
     }
 })();
 
-(function() {
+(function () {
     "use strict";
-    
-    const YEARLY_DISCOUNT = 0.20;
-    
-    function formatYearlyPrice(price, currencyCode, currencySymbol) {
-        const yearlyPrice =
-            Number(price || 0) * 12 * (1 - YEARLY_DISCOUNT);
-        
-        if (!Number.isFinite(yearlyPrice)) {
+
+    function formatCurrency(
+        value,
+        currencyCode,
+        currencySymbol
+    ) {
+        const numericValue =
+            Number(value || 0);
+
+        if (!Number.isFinite(numericValue)) {
             return `${currencySymbol || ""}0`;
         }
-        
-        if (yearlyPrice === 0) {
+
+        if (numericValue === 0) {
             return currencySymbol || "0";
         }
-        
+
         try {
-            return new Intl.NumberFormat(undefined, {
-                style: "currency",
-                currency: currencyCode || "USD",
-                currencyDisplay: "symbol",
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 2
-            }).format(yearlyPrice);
+            return new Intl.NumberFormat(
+                undefined,
+                {
+                    style: "currency",
+                    currency:
+                        currencyCode || "GBP",
+                    currencyDisplay: "symbol",
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+                }
+            ).format(numericValue);
         } catch (error) {
-            return `${currencySymbol || ""}${yearlyPrice.toLocaleString()}`;
+            return `${currencySymbol || ""}${numericValue.toLocaleString()}`;
         }
     }
-    
-    function formatMonthlyPrice(price, currencyCode, currencySymbol) {
-        const numericPrice =
-            Number(price || 0);
-        
-        if (!Number.isFinite(numericPrice)) {
-            return `${currencySymbol || ""}0`;
-        }
-        
-        if (numericPrice === 0) {
-            return currencySymbol || "0";
-        }
-        
-        try {
-            return new Intl.NumberFormat(undefined, {
-                style: "currency",
-                currency: currencyCode || "USD",
-                currencyDisplay: "symbol",
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 2
-            }).format(numericPrice);
-        } catch (error) {
-            return `${currencySymbol || ""}${numericPrice.toLocaleString()}`;
-        }
-    }
-    
+
     function updateBillingDisplay() {
         const toggle =
-            document.getElementById("billingToggle");
-        
-        const pricingData =
+            document.getElementById(
+                "billingToggle"
+            );
+
+        const data =
             window.invoiceProPricingData;
-        
-        if (!toggle || !pricingData) {
+
+        if (!toggle || !data) {
             return;
         }
-        
+
         const isYearly =
             toggle.checked;
-        
+
         const currencyCode =
-            pricingData.currencyCode || "USD";
-        
+            data.currencyCode || "GBP";
+
         const currencySymbol =
-            pricingData.currencySymbol || "";
-        
+            data.currencySymbol || "£";
+
         const plans =
-            pricingData.plans || {};
-        
+            data.plans || {};
+
         const planOrder = [
             "Free",
             "Starter",
             "Business",
             "Enterprise"
         ];
-        
+
         const cards =
             document.querySelectorAll(
                 ".pricing-plan-card"
             );
-        
-        cards.forEach(function(card, index) {
-            
-            const planKey =
-                planOrder[index];
-            
-            const plan =
-                plans[planKey];
-            
-            if (!plan) {
-                return;
-            }
-            
-            const priceElement =
-                card.querySelector(
-                    ".pricing-plan-price-amount"
-                );
-            
-            const periodElement =
-                card.querySelector(
-                    ".pricing-plan-price-period"
-                );
-            
-            const billingElement =
-                card.querySelector(
-                    ".pricing-plan-billing"
-                );
-            
-            if (!priceElement || !periodElement) {
-                return;
-            }
-            
-            const monthlyPrice =
-                Number(plan.price || 0);
-            
-            if (!Number.isFinite(monthlyPrice)) {
-                return;
-            }
-            
-            if (plan.billing === "Forever") {
-                priceElement.textContent =
-                    currencySymbol || "0";
-                
-                periodElement.textContent =
-                    "Forever";
-                
-                if (billingElement) {
-                    billingElement.textContent =
-                        "Free forever";
+
+        cards.forEach(
+            function (card, index) {
+                const planKey =
+                    planOrder[index];
+
+                const plan =
+                    plans[planKey];
+
+                if (!plan) {
+                    return;
                 }
-                
-                return;
-            }
-            
-            if (isYearly) {
-                
-                const yearlyPrice =
-                    monthlyPrice *
-                    12 *
-                    (1 - YEARLY_DISCOUNT);
-                
-                const normalYearlyPrice =
-                    monthlyPrice * 12;
-                
-                const savings =
-                    normalYearlyPrice -
-                    yearlyPrice;
-                
-                priceElement.textContent =
-                    formatYearlyPrice(
-                        monthlyPrice,
-                        currencyCode,
-                        currencySymbol
+
+                const priceElement =
+                    card.querySelector(
+                        ".pricing-plan-price-amount"
                     );
-                
-                periodElement.textContent =
-                    "/year";
-                
-                if (billingElement) {
-                    billingElement.innerHTML = `
-                        <span>
-                            ${formatYearlyPrice(
+
+                const periodElement =
+                    card.querySelector(
+                        ".pricing-plan-price-period"
+                    );
+
+                const billingElement =
+                    card.querySelector(
+                        ".pricing-plan-billing"
+                    );
+
+                if (
+                    !priceElement ||
+                    !periodElement
+                ) {
+                    return;
+                }
+
+                const monthlyPrice =
+                    Number(
+                        plan.monthlyPrice ??
+                        plan.price ??
+                        0
+                    );
+
+                if (
+                    !Number.isFinite(
+                        monthlyPrice
+                    )
+                ) {
+                    return;
+                }
+
+                if (
+                    plan.billing ===
+                    "Forever"
+                ) {
+                    priceElement.textContent =
+                        formatCurrency(
+                            0,
+                            currencyCode,
+                            currencySymbol
+                        );
+
+                    periodElement.textContent =
+                        "Forever";
+
+                    if (billingElement) {
+                        billingElement.textContent =
+                            "Free forever";
+                    }
+
+                    return;
+                }
+
+                if (isYearly) {
+                    const yearlyPrice =
+                        Number(
+                            plan.yearlyPrice ??
+                            (
+                                monthlyPrice *
+                                12 *
+                                0.80
+                            )
+                        );
+
+                    priceElement.textContent =
+                        formatCurrency(
+                            yearlyPrice,
+                            currencyCode,
+                            currencySymbol
+                        );
+
+                    periodElement.textContent =
+                        "/year";
+
+                    if (billingElement) {
+                        billingElement.textContent =
+                            `${formatCurrency(
+                                yearlyPrice,
+                                currencyCode,
+                                currencySymbol
+                            )} billed yearly · Price will be converted to your local currency when you subscribe.`;
+                    }
+                } else {
+                    priceElement.textContent =
+                        formatCurrency(
+                            monthlyPrice,
+                            currencyCode,
+                            currencySymbol
+                        );
+
+                    periodElement.textContent =
+                        "/month";
+
+                    if (billingElement) {
+                        billingElement.textContent =
+                            `${formatCurrency(
                                 monthlyPrice,
                                 currencyCode,
                                 currencySymbol
-                            )} billed yearly
-                        </span>
-                        <small>
-                            Save 20% · Save ${formatMonthlyPrice(
-                                savings,
-                                currencyCode,
-                                currencySymbol
-                            )}
-                        </small>
-                    `;
-                }
-                
-            } else {
-                
-                priceElement.textContent =
-                    formatMonthlyPrice(
-                        monthlyPrice,
-                        currencyCode,
-                        currencySymbol
-                    );
-                
-                periodElement.textContent =
-                    "/month";
-                
-                if (billingElement) {
-                    billingElement.textContent =
-                        `${currencySymbol}${monthlyPrice.toLocaleString()} billed monthly`;
+                            )} billed monthly · Price will be converted to your local currency when you subscribe.`;
+                    }
                 }
             }
-        });
+        );
     }
-    
+
     function initializeBillingToggle() {
         const toggle =
             document.getElementById(
                 "billingToggle"
             );
-        
+
         if (!toggle) {
             return;
         }
-        
+
         toggle.addEventListener(
             "change",
             updateBillingDisplay
         );
-        
+
         updateBillingDisplay();
     }
-    
+
     if (
         document.readyState ===
         "loading"
@@ -1393,7 +1249,6 @@ if (!window.Parse) {
     } else {
         initializeBillingToggle();
     }
-    
 })();
 
 document.addEventListener(
@@ -1424,7 +1279,9 @@ document.addEventListener(
                 "settingsDropdown"
             );
 
-        if (!sidebar) return;
+        if (!sidebar) {
+            return;
+        }
 
         function updateSidebarLayout() {
             if (window.innerWidth > 992) {
@@ -1531,7 +1388,8 @@ document.addEventListener(
                     "click",
                     function () {
                         if (
-                            window.innerWidth <= 992
+                            window.innerWidth <=
+                            992
                         ) {
                             sidebar.classList.remove(
                                 "show"
@@ -1571,7 +1429,9 @@ document.addEventListener(
             const user =
                 Parse.User.current();
 
-            if (!user) return;
+            if (!user) {
+                return;
+            }
 
             const profileImage =
                 user.get("profileImage");
@@ -1587,7 +1447,9 @@ document.addEventListener(
             const imageUrl =
                 profileImage.url();
 
-            if (!imageUrl) return;
+            if (!imageUrl) {
+                return;
+            }
 
             const profileImages =
                 document.querySelectorAll(

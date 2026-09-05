@@ -1626,6 +1626,49 @@ if (!window.Parse) {
     
 })();
 
+/*
+(function() {
+
+    const COMPANIES_PAGE = "companies.html";
+
+    function getPostLoginUrl() {
+
+        const savedUrl =
+            localStorage.getItem("invoiceProReturnUrl");
+
+        if (savedUrl) {
+
+            try {
+
+                const savedUrlObject =
+                    new URL(savedUrl, window.location.origin);
+
+                if (
+                    savedUrlObject.origin === window.location.origin &&
+                    !savedUrlObject.pathname.endsWith("/login.html")
+                ) {
+
+                    return savedUrlObject.href;
+
+                }
+
+            } catch (error) {
+
+            }
+
+        }
+
+        return COMPANIES_PAGE;
+
+    }
+
+    window.InvoiceProPostLogin = {
+        getPostLoginUrl: getPostLoginUrl
+    };
+
+})();
+*/
+
 document.addEventListener(
     "DOMContentLoaded",
     function() {
