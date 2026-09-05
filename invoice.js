@@ -493,6 +493,12 @@ const invoiceLimitMessage =
 const invoiceLimitButton =
     document.getElementById("invoiceLimitButton");
     
+const downloadInvoicePdfButton =
+    document.getElementById("downloadInvoicePdfButton");
+    
+const sendInvoiceTaxLabel =
+    document.getElementById( "sendInvoiceTaxLabel");
+    
 const invoicePreviewState = {
     userProfile: null,
     initialized: false };
@@ -3600,124 +3606,254 @@ async function createInvoiceExportCanvas() {
 
     updateInvoicePreview();
 
-    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    await new Promise(resolve =>
+        requestAnimationFrame(() =>
+            requestAnimationFrame(resolve)
+        )
+    );
 
     const exportContainer = document.createElement("div");
     const exportPaper = invoicePaper.cloneNode(true);
-    const paperWidth = invoicePaper.getBoundingClientRect().width || invoicePaper.offsetWidth || 820;
+
+    const paperWidth =
+        invoicePaper.getBoundingClientRect().width ||
+        invoicePaper.offsetWidth ||
+        820;
 
     exportContainer.style.position = "fixed";
-    exportContainer.style.left = "-100000px";
+    exportContainer.style.left = "0";
     exportContainer.style.top = "0";
     exportContainer.style.width = `${paperWidth}px`;
-    exportContainer.style.minHeight = "0";
     exportContainer.style.height = "auto";
     exportContainer.style.margin = "0";
     exportContainer.style.padding = "0";
     exportContainer.style.background = "#ffffff";
     exportContainer.style.overflow = "visible";
-    exportContainer.style.zIndex = "-1";
+    exportContainer.style.zIndex = "999999";
     exportContainer.style.pointerEvents = "none";
+    exportContainer.style.opacity = "0.01";
 
+    exportPaper.style.position = "relative";
     exportPaper.style.transform = "none";
     exportPaper.style.transformOrigin = "top left";
     exportPaper.style.margin = "0";
-    exportPaper.style.marginBottom = "0";
     exportPaper.style.width = `${paperWidth}px`;
     exportPaper.style.maxWidth = "none";
     exportPaper.style.maxHeight = "none";
     exportPaper.style.height = "auto";
+    exportPaper.style.minHeight = "1120px";
     exportPaper.style.overflow = "visible";
+    exportPaper.style.borderRadius = "0";
+    exportPaper.style.boxShadow = "none";
 
     exportContainer.appendChild(exportPaper);
     document.body.appendChild(exportContainer);
 
     try {
-        const images = Array.from(exportPaper.querySelectorAll("img"));
+        const images = Array.from(
+            exportPaper.querySelectorAll("img")
+        );
 
         await Promise.all(
             images.map(image => {
-                if (image.complete && image.naturalWidth > 0) {
+                if (
+                    image.complete &&
+                    image.naturalWidth > 0
+                ) {
                     return Promise.resolve();
                 }
 
                 return new Promise(resolve => {
-                    const finish = () => resolve();
-                    image.addEventListener("load", finish, { once: true });
-                    image.addEventListener("error", finish, { once: true });
+                    let finished = false;
+
+                    const finish = () => {
+                        if (finished) {
+                            return;
+                        }
+
+                        finished = true;
+                        resolve();
+                    };
+
+                    image.addEventListener(
+                        "load",
+                        finish,
+                        { once: true }
+                    );
+
+                    image.addEventListener(
+                        "error",
+                        finish,
+                        { once: true }
+                    );
+
+                    setTimeout(finish, 15000);
                 });
             })
         );
 
-        await new Promise(resolve => requestAnimationFrame(resolve));
+        await new Promise(resolve =>
+            requestAnimationFrame(resolve)
+        );
 
-        return await html2canvas(exportPaper, {
-            scale: 2,
-            useCORS: true,
-            allowTaint: false,
-            backgroundColor: "#ffffff",
-            logging: false,
-            imageTimeout: 15000,
-            width: Math.ceil(exportPaper.scrollWidth),
-            height: Math.ceil(exportPaper.scrollHeight),
-            windowWidth: Math.ceil(exportPaper.scrollWidth),
-            windowHeight: Math.ceil(exportPaper.scrollHeight),
-            scrollX: 0,
-            scrollY: 0
-        });
+        const width = Math.ceil(
+            exportPaper.getBoundingClientRect().width ||
+            exportPaper.scrollWidth ||
+            paperWidth
+        );
+
+        const height = Math.ceil(
+            exportPaper.scrollHeight
+        );
+
+        if (
+            !width ||
+            !height ||
+            width < 10 ||
+            height < 10
+        ) {
+            throw new Error(
+                "Unable to render the invoice for PDF export."
+            );
+        }
+
+        return await html2canvas(
+            exportPaper,
+            {
+                scale: 2,
+                useCORS: true,
+                allowTaint: false,
+                backgroundColor: "#ffffff",
+                logging: false,
+                imageTimeout: 15000,
+                width,
+                height,
+                windowWidth: width,
+                windowHeight: height,
+                scrollX: 0,
+                scrollY: 0
+            }
+        );
     } finally {
         exportContainer.remove();
     }
 }
 
-function addInvoiceCanvasToPdf(pdf, canvas) {
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    const imageWidth = pageWidth;
-    const pixelsPerPdfPage = Math.floor(canvas.width * pageHeight / pageWidth);
-    let offsetY = 0;
+function addInvoiceCanvasToPdf(
+    pdf,
+    canvas,
+    isFirstPage = true
+) {
+    if (!pdf || !canvas) {
+        throw new Error(
+            "Unable to create the PDF page."
+        );
+    }
+
+    const pageWidth = 210;
+    const pageHeight = 297;
+
+    const margin = 0;
+
+    const usableWidth =
+        pageWidth - (margin * 2);
+
+    const usableHeight =
+        pageHeight - (margin * 2);
+
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+
+    if (
+        !canvasWidth ||
+        !canvasHeight
+    ) {
+        throw new Error(
+            "Invoice rendering returned an empty page."
+        );
+    }
+
+    const ratio =
+        usableWidth / canvasWidth;
+
+    const renderedHeight =
+        canvasHeight * ratio;
+
+    let sourceY = 0;
+    let remainingHeight = canvasHeight;
     let pageNumber = 0;
 
-    while (offsetY < canvas.height) {
-        const sliceHeight = Math.min(pixelsPerPdfPage, canvas.height - offsetY);
-        const pageCanvas = document.createElement("canvas");
-        pageCanvas.width = canvas.width;
-        pageCanvas.height = sliceHeight;
-
-        const context = pageCanvas.getContext("2d");
-        context.fillStyle = "#ffffff";
-        context.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
-        context.drawImage(
-            canvas,
-            0,
-            offsetY,
-            canvas.width,
-            sliceHeight,
-            0,
-            0,
-            canvas.width,
-            sliceHeight
-        );
-
-        if (pageNumber > 0) {
+    while (remainingHeight > 0) {
+        if (!isFirstPage || pageNumber > 0) {
             pdf.addPage();
         }
 
-        const imageHeight = sliceHeight * imageWidth / canvas.width;
+        const pagePixelHeight =
+            Math.min(
+                remainingHeight,
+                usableHeight / ratio
+            );
+
+        const pageCanvas =
+            document.createElement("canvas");
+
+        pageCanvas.width = canvasWidth;
+        pageCanvas.height =
+            Math.ceil(pagePixelHeight);
+
+        const context =
+            pageCanvas.getContext("2d");
+
+        if (!context) {
+            throw new Error(
+                "Unable to prepare PDF page."
+            );
+        }
+
+        context.fillStyle = "#ffffff";
+        context.fillRect(
+            0,
+            0,
+            pageCanvas.width,
+            pageCanvas.height
+        );
+
+        context.drawImage(
+            canvas,
+            0,
+            sourceY,
+            canvasWidth,
+            pagePixelHeight,
+            0,
+            0,
+            canvasWidth,
+            pagePixelHeight
+        );
+
+        const imageData =
+            pageCanvas.toDataURL(
+                "image/jpeg",
+                0.98
+            );
+
+        const imageHeight =
+            pagePixelHeight * ratio;
 
         pdf.addImage(
-            pageCanvas.toDataURL("image/jpeg", 0.98),
+            imageData,
             "JPEG",
-            0,
-            0,
-            imageWidth,
+            margin,
+            margin,
+            usableWidth,
             imageHeight,
             undefined,
             "FAST"
         );
 
-        offsetY += sliceHeight;
+        sourceY += pagePixelHeight;
+        remainingHeight -= pagePixelHeight;
         pageNumber++;
+        isFirstPage = false;
     }
 }
 
@@ -5099,14 +5235,21 @@ async function printInvoicePreview() {
 }
 
 function initializeInvoicePrint() {
-    if (!printPreviewBtn) {
-        return;
+    if (printPreviewBtn) {
+        printPreviewBtn.addEventListener(
+            "click",
+            printInvoicePreview
+        );
     }
 
-    printPreviewBtn.addEventListener(
-        "click",
-        printInvoicePreview
-    );
+    if (downloadInvoicePdfButton) {
+        downloadInvoicePdfButton.addEventListener(
+            "click",
+            async () => {
+                await downloadInvoicePdf();
+            }
+        );
+    }
 }
 
 function updateInvoicePreviewZoom() {
@@ -5575,20 +5718,20 @@ if (sendInvoicePaymentInstructions) {
                 }
             )}`;
 
-        document.getElementById(
-            "sendInvoiceTax"
-        ).textContent =
-            `${currencySymbol}${(
-                Number(
-                    invoice.taxAmount
-                ) || 0
-            ).toLocaleString(
-                undefined,
-                {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                }
-            )}`;
+      document.getElementById(
+    "sendInvoiceTax"
+).textContent =
+    `${currencySymbol}${(
+        Number(
+            invoice.tax
+        ) || 0
+    ).toLocaleString(
+        undefined,
+        {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }
+    )}`;
 
         document.getElementById(
             "sendInvoiceDiscount"
@@ -6382,24 +6525,22 @@ if (saveInvoiceButton) {
 
 function initializeInvoiceSaveWorkflow() {
     if (saveInvoiceButton) {
-    saveInvoiceButton.addEventListener(
-        "click",
-        async () => {
-            await saveInvoice(
-                "Pending"
-            );
-        }
-    );
-}
+        saveInvoiceButton.addEventListener(
+            "click",
+            async () => {
+                await saveInvoice();
+            }
+        );
+    }
 
     if (saveInvoiceDraftButton) {
-    saveInvoiceDraftButton.addEventListener(
-        "click",
-        async () => {
-            await saveInvoiceDraft();
-        }
-    );
-}
+        saveInvoiceDraftButton.addEventListener(
+            "click",
+            async () => {
+                await saveInvoiceDraft();
+            }
+        );
+    }
 }
 
 function collectInvoiceDraftData() {
@@ -6739,6 +6880,50 @@ async function initializeInvoicePage() {
     }
 
 }
+
+if (sendInvoiceTaxLabel) {
+    const taxPercent =
+        Number(
+            invoice.taxPercent
+        ) || 0;
+
+    sendInvoiceTaxLabel.textContent =
+        `Tax (${taxPercent}%)`;
+}
+
+document
+    .getElementById("sendSendGridTestButton")
+    .addEventListener("click", async () => {
+        
+        try {
+            
+            const result =
+                await Parse.Cloud.run(
+                    "sendSendGridTestEmail"
+                );
+            
+            console.log(
+                "SendGrid test result:",
+                result
+            );
+            
+            alert(
+                "Test email was sent successfully."
+            );
+            
+        } catch (error) {
+            
+            console.error(
+                "SendGrid test error:",
+                error
+            );
+            
+            alert(
+                error.message ||
+                "SendGrid test failed."
+            );
+        }
+    });
 
 document.addEventListener(
     "DOMContentLoaded",

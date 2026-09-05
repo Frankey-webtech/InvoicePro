@@ -919,6 +919,12 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
     </div>
 
+
+<button
+    type="button"
+    id="sendSendGridTestButton">
+    Test SendGrid Email
+</button>
 </section>
 
 <div
@@ -1719,7 +1725,8 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
                         type="button"
                         class="preview-tool-btn"
                         id="refreshPreviewBtn"
-                        title="Refresh Preview">
+                        title="Refresh Preview"
+                        style="display: none;">
 
                         <i class="ri-refresh-line"></i>
 
@@ -2536,20 +2543,9 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
             type="button"
             class="secondary-button"
             id="cancelInvoiceBtn"
-            style="display: none;">
+            style="display: none;" hidden>
 
-            Cancel
-
-        </button>
-
-        <button
-            type="button"
-            class="secondary-button"
-            id="saveInvoiceDraftButton" style="display:none;">
-
-            <i class="ri-save-3-line"></i>
-
-            <span>Save Draft</span>
+            Cancel 
 
         </button>
 
@@ -2572,18 +2568,6 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
             <i class="ri-send-plane-line"></i>
 
             <span>Send Invoice</span>
-
-        </button>
-
-        <button
-            type="button"
-            class="primary-button"
-            id="saveInvoiceButton"
-            style="display: none;">
-
-            <i class="ri-save-3-line"></i>
-
-            <span>Save Invoice</span>
 
         </button>
 
@@ -2908,18 +2892,18 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
             </div>
 
-            <div class="send-invoice-total-row">
+  <div class="send-invoice-total-row">
 
-                <span>
-                    Tax
-                </span>
+    <span id="sendInvoiceTaxLabel">
+        Tax
+    </span>
 
-                <strong
-                    id="sendInvoiceTax">
-                    -
-                </strong>
+    <strong
+        id="sendInvoiceTax">
+        -
+    </strong>
 
-            </div>
+</div>
 
             <div class="send-invoice-total-row">
 
@@ -3197,7 +3181,7 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 <div id="loadingOverlay" class="loading-overlay">
     <div class="loading-container">
         <div class="loading-spinner"></div>
-        <p class="loading-text">Please wait...</p>
+        <p class="loading-text"></p>
     </div>
 </div>
 

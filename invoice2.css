@@ -5491,3 +5491,95 @@ from {
 .invoice-action-card {
     flex: 0 0 auto !important;
 }
+
+#statusDropdown {
+    display: none;
+    position: fixed;
+    z-index: 99999;
+}
+
+#statusDropdown.active {
+    display: flex;
+}
+
+@media (max-width: 768px) {
+    .invoice-preview-overlay {
+        padding-top: 24px !important;
+        padding-bottom: 40px !important;
+        box-sizing: border-box !important;
+    }
+
+    .invoice-preview-modal {
+        height: calc(100vh - 64px) !important;
+        max-height: calc(100vh - 64px) !important;
+    }
+
+    .preview-document-area {
+        padding-top: 32px !important;
+        padding-bottom: 80px !important;
+    }
+
+    #invoiceActionCard,
+    .invoice-action-card {
+        padding-top: 20px !important;
+        padding-bottom: max(32px, calc(20px + env(safe-area-inset-bottom))) !important;
+    }
+
+    #createInvoiceOverlay {
+        padding-top: 24px !important;
+        padding-bottom: 40px !important;
+        box-sizing: border-box !important;
+    }
+
+    #createInvoiceModal {
+        max-height: calc(100vh - 64px) !important;
+    }
+
+    #createInvoiceBody {
+        padding-bottom: 40px !important;
+    }
+
+    #createInvoiceFooter {
+        padding-top: 18px !important;
+        padding-bottom: max(32px, calc(18px + env(safe-area-inset-bottom))) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .invoice-preview-overlay {
+        padding-top: 20px !important;
+        padding-bottom: 36px !important;
+    }
+
+    .invoice-preview-modal {
+        height: calc(100vh - 56px) !important;
+        max-height: calc(100vh - 56px) !important;
+    }
+
+    .preview-document-area {
+        padding-top: 28px !important;
+        padding-bottom: 90px !important;
+    }
+
+    #invoiceActionCard,
+    .invoice-action-card {
+        padding-bottom: max(36px, calc(24px + env(safe-area-inset-bottom))) !important;
+    }
+
+    #createInvoiceOverlay {
+        padding-top: 20px !important;
+        padding-bottom: 36px !important;
+    }
+
+    #createInvoiceModal {
+        max-height: calc(100vh - 56px) !important;
+    }
+
+    #createInvoiceBody {
+        padding-bottom: 45px !important;
+    }
+
+    #createInvoiceFooter {
+        padding-bottom: max(36px, calc(22px + env(safe-area-inset-bottom))) !important;
+    }
+}
