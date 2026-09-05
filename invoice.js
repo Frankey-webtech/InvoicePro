@@ -6881,28 +6881,6 @@ async function initializeInvoicePage() {
 
 }
 
-async function testSendGridEmail() {
-    try {
-        const result =
-            await Parse.Cloud.run(
-                "sendSendGridTestEmail"
-            );
-
-        console.log(result);
-
-        alert(
-            "Test email sent successfully."
-        );
-    } catch (error) {
-        console.error(error);
-
-        alert(
-            error.message ||
-            "Test email failed."
-        );
-    }
-}
-
 if (sendInvoiceTaxLabel) {
     const taxPercent =
         Number(

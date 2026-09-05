@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Button</title>
+    
+    <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+<script src="api.js"></script>
+</head>
+
+<body>
+    <button
+    type="button"
+    onclick="testSendGridEmail()">
+    Test SendGrid Email
+</button>
+<script >
+    async function testSendGridEmail() {
+    try {
+        const result =
+            await Parse.Cloud.run(
+                "sendSendGridTestEmail"
+            );
+
+        console.log(result);
+
+        alert(
+            "Test email sent successfully."
+        );
+    } catch (error) {
+        console.error(error);
+
+        alert(
+            error.message ||
+            "Test email failed."
+        );
+    }
+}
+</script>
+</body>
+
+</html>
