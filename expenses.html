@@ -593,6 +593,25 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
                     <div class="filter-group">
 
+                        <label for="expensePeriodFilter">
+                            Time Period
+                        </label>
+
+                        <select id="expensePeriodFilter">
+                            <option value="this_month">This Month</option>
+                            <option value="last_month">Last Month</option>
+                            <option value="last_2_months">Last 2 Months</option>
+                            <option value="last_3_months">Last 3 Months</option>
+                            <option value="last_6_months">Last 6 Months</option>
+                            <option value="this_year">This Year</option>
+                            <option value="all_time">All Time</option>
+                            <option value="custom">Custom Date Range</option>
+                        </select>
+
+                    </div>
+
+                    <div class="filter-group custom-date-filter" id="expenseCustomDateFromGroup">
+
                         <label for="expenseDateFrom">
                             Date From
                         </label>
@@ -604,7 +623,7 @@ href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css">
 
                     </div>
 
-                    <div class="filter-group">
+                    <div class="filter-group custom-date-filter" id="expenseCustomDateToGroup">
 
                         <label for="expenseDateTo">
                             Date To

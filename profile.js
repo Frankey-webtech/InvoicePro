@@ -200,8 +200,15 @@ async function loadUserProfile() {
         const symbol =
             profile.currencySymbol || "";
 
-        const revenue =
-            Number(profile.totalRevenue || 0);
+        const revenueResult =
+    await Parse.Cloud.run(
+        "paidInvoices"
+    );
+
+const revenue =
+    Number(
+        revenueResult?.totalPaidAmount
+    ) || 0;
 
         totalRevenue.textContent =
             symbol +

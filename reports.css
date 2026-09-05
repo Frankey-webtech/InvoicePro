@@ -1420,3 +1420,7 @@ from {
 .invoice-status-percentages > div:nth-child(4) {
     left: var(--overdue-position, 0%);
 }
+
+.report-client-cell.no-client-image {
+    gap: 0;
+}

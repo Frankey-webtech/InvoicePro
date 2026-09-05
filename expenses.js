@@ -11,6 +11,7 @@
         search: "",
         category: "",
         vendor: "",
+        period: "this_month",
         dateFrom: "",
         dateTo: "",
         sort: "date_desc",
@@ -1782,23 +1783,103 @@
         }
     }
 
+    function formatDateInputValue(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+    }
+
+    function getPeriodDates(period) {
+        const now = new Date();
+        let from;
+        let to = new Date(now);
+
+        if (period === "this_month") {
+            from = new Date(now.getFullYear(), now.getMonth(), 1);
+        } else if (period === "last_month") {
+            from = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            to = new Date(now.getFullYear(), now.getMonth(), 0);
+        } else if (period === "last_2_months") {
+            from = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        } else if (period === "last_3_months") {
+            from = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+        } else if (period === "last_6_months") {
+            from = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+        } else if (period === "this_year") {
+            from = new Date(now.getFullYear(), 0, 1);
+        } else if (period === "all_time") {
+            return {
+                dateFrom: "",
+                dateTo: ""
+            };
+        } else {
+            return {
+                dateFrom: $("expenseDateFrom") ? $("expenseDateFrom").value : "",
+                dateTo: $("expenseDateTo") ? $("expenseDateTo").value : ""
+            };
+        }
+
+        return {
+            dateFrom: formatDateInputValue(from),
+            dateTo: formatDateInputValue(to)
+        };
+    }
+
+    function updateExpensePeriodDates() {
+        const periodSelect = $("expensePeriodFilter");
+
+        if (!periodSelect) {
+            return;
+        }
+
+        const period = periodSelect.value || "this_month";
+        state.period = period;
+
+        const custom = period === "custom";
+        const fromGroup = $("expenseCustomDateFromGroup");
+        const toGroup = $("expenseCustomDateToGroup");
+
+        if (fromGroup) {
+            fromGroup.style.display = custom ? "" : "none";
+        }
+
+        if (toGroup) {
+            toGroup.style.display = custom ? "" : "none";
+        }
+
+        if (!custom) {
+            const dates = getPeriodDates(period);
+            state.dateFrom = dates.dateFrom;
+            state.dateTo = dates.dateTo;
+
+            if ($("expenseDateFrom")) {
+                $("expenseDateFrom").value = dates.dateFrom;
+            }
+
+            if ($("expenseDateTo")) {
+                $("expenseDateTo").value = dates.dateTo;
+            }
+        }
+    }
+
     function applyFilters() {
         state.page = 1;
 
-        state.dateFrom =
-            $("expenseDateFrom")
-                ? $("expenseDateFrom").value
-                : "";
+        const periodSelect = $("expensePeriodFilter");
+        state.period = periodSelect
+            ? periodSelect.value || "this_month"
+            : "this_month";
 
-        state.dateTo =
-            $("expenseDateTo")
-                ? $("expenseDateTo").value
-                : "";
+        const dates = getPeriodDates(state.period);
 
-        state.vendor =
-            $("expenseVendorFilter")
-                ? $("expenseVendorFilter").value.trim()
-                : "";
+        state.dateFrom = dates.dateFrom;
+        state.dateTo = dates.dateTo;
+
+        state.vendor = $("expenseVendorFilter")
+            ? $("expenseVendorFilter").value.trim()
+            : "";
 
         loadExpenses();
     }
@@ -1807,8 +1888,7 @@
         state.search = "";
         state.category = "";
         state.vendor = "";
-        state.dateFrom = "";
-        state.dateTo = "";
+        state.period = "this_month";
         state.page = 1;
 
         if ($("expenseSearchInput")) {
@@ -1819,18 +1899,15 @@
             $("expenseCategoryFilter").value = "";
         }
 
-        if ($("expenseDateFrom")) {
-            $("expenseDateFrom").value = "";
-        }
-
-        if ($("expenseDateTo")) {
-            $("expenseDateTo").value = "";
+        if ($("expensePeriodFilter")) {
+            $("expensePeriodFilter").value = "this_month";
         }
 
         if ($("expenseVendorFilter")) {
             $("expenseVendorFilter").value = "";
         }
 
+        updateExpensePeriodDates();
         loadExpenses();
     }
 
@@ -2108,6 +2185,9 @@
         const categoryFilter =
             $("expenseCategoryFilter");
 
+        const periodFilter =
+            $("expensePeriodFilter");
+
         const sortSelect =
             $("expenseSortSelect");
 
@@ -2259,6 +2339,20 @@ if (expensePlanUpgradeBtn) {
             categoryFilter.addEventListener(
                 "change",
                 handleCategoryChange
+            );
+        }
+
+        if (periodFilter) {
+            periodFilter.addEventListener(
+                "change",
+                () => {
+                    updateExpensePeriodDates();
+
+                    if (periodFilter.value !== "custom") {
+                        state.page = 1;
+                        loadExpenses();
+                    }
+                }
             );
         }
 
@@ -2460,6 +2554,13 @@ if (expensePlanUpgradeBtn) {
         state.currentUser = user;
 
         getUserCurrency(user);
+
+        if ($("expensePeriodFilter")) {
+            $("expensePeriodFilter").value =
+                state.period || "this_month";
+        }
+
+        updateExpensePeriodDates();
 
         setupEvents();
 

@@ -497,3 +497,44 @@ from {
         font-size: 14px;
     }
 }
+
+.upcomingPaymentActions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 18px;
+}
+
+.upcomingPaymentSendButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    border-radius: 10px;
+    padding: 11px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+    background: #0b1f4d;
+    color: #fff;
+}
+
+.upcomingPaymentSendButton:hover {
+    transform: translateY(-1px);
+    background: #081737;
+}
+
+.upcomingPaymentSendButton:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.upcomingPaymentSendButton.sent {
+    cursor: default;
+}
+
+.upcomingPaymentSendButton.error {
+    cursor: default;
+}

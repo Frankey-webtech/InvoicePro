@@ -30,41 +30,36 @@ const retryButton =
 const invoiceTemplate =
     document.getElementById("paid-invoice-template");
 
-
 function showLoading() {
-    loadingElement.hidden = false;
-    errorElement.hidden = true;
-    emptyElement.hidden = true;
-    invoicesContainer.hidden = true;
+    loadingElement.style.display = "flex";
+    errorElement.style.display = "none";
+    emptyElement.style.display = "none";
+    invoicesContainer.style.display = "none";
 }
 
-
 function showError(message) {
-    loadingElement.hidden = true;
-    errorElement.hidden = false;
-    emptyElement.hidden = true;
-    invoicesContainer.hidden = true;
-
+    loadingElement.style.display = "none";
+    errorElement.style.display = "flex";
+    emptyElement.style.display = "none";
+    invoicesContainer.style.display = "none";
+    
     errorMessageElement.textContent =
         message || "Unable to load paid invoices.";
 }
 
-
 function showEmpty() {
-    loadingElement.hidden = true;
-    errorElement.hidden = true;
-    emptyElement.hidden = false;
-    invoicesContainer.hidden = true;
+    loadingElement.style.display = "none";
+    errorElement.style.display = "none";
+    emptyElement.style.display = "flex";
+    invoicesContainer.style.display = "none";
 }
-
 
 function showInvoices() {
-    loadingElement.hidden = true;
-    errorElement.hidden = true;
-    emptyElement.hidden = true;
-    invoicesContainer.hidden = false;
+    loadingElement.style.display = "none";
+    errorElement.style.display = "none";
+    emptyElement.style.display = "none";
+    invoicesContainer.style.display = "block";
 }
-
 
 function formatAmount(
     amount,
@@ -93,7 +88,6 @@ function formatAmount(
     return `${currencySymbol || ""}${numericAmount.toFixed(2)}`;
 }
 
-
 function formatDate(dateValue) {
     if (!dateValue) {
         return "—";
@@ -116,60 +110,74 @@ function formatDate(dateValue) {
     ).format(date);
 }
 
-
 function createInvoiceRow(invoice) {
     const row =
         invoiceTemplate.content
-            .firstElementChild
-            .cloneNode(true);
-
+        .firstElementChild
+        .cloneNode(true);
+    
     const invoiceNumber =
         row.querySelector(".invoice-number");
-
+    
     const invoiceTitle =
         row.querySelector(".invoice-title");
-
+    
     const companyName =
         row.querySelector(".company-name");
-
+    
     const contactPerson =
         row.querySelector(".contact-person");
-
+    
     const invoiceAmount =
         row.querySelector(".invoice-amount");
-
+    
     const invoiceDueDate =
         row.querySelector(".invoice-due-date");
-
+    
     invoiceNumber.textContent =
         invoice.invoiceNumber || "Invoice";
-
+    
     invoiceTitle.textContent =
         invoice.invoiceTitle ||
         invoice.projectName ||
         "—";
-
+    
     companyName.textContent =
         invoice.companyName ||
         "—";
-
+    
     contactPerson.textContent =
         invoice.contactPerson ||
         "—";
-
+    
     invoiceAmount.textContent =
         formatAmount(
             invoice.totalAmount,
             invoice.currencyCode,
             invoice.currencySymbol
         );
-
+    
     invoiceDueDate.textContent =
         formatDate(invoice.dueDate);
-
+    
+    if (invoice.objectId) {
+        row.dataset.invoiceId =
+            invoice.objectId;
+        
+        row.style.cursor =
+            "pointer";
+        
+        row.addEventListener(
+            "click",
+            () => {
+                window.location.href =
+                    `invoice.html?invoiceId=${encodeURIComponent(invoice.objectId)}`;
+            }
+        );
+    }
+    
     return row;
 }
-
 
 function renderInvoices(invoices) {
     invoicesList.innerHTML = "";
@@ -183,7 +191,6 @@ function renderInvoices(invoices) {
         }
     );
 }
-
 
 function updateSummary(response) {
     const invoices =
@@ -217,7 +224,6 @@ function updateSummary(response) {
             currencySymbol
         );
 }
-
 
 async function loadPaidInvoices() {
     showLoading();
@@ -266,6 +272,7 @@ async function loadPaidInvoices() {
     }
 }
 
+showLoading();
 
 retryButton.addEventListener(
     "click",

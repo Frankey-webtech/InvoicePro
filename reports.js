@@ -1,7 +1,5 @@
 "use strict";
 
-let showClientImage = true;
-
 const ReportsState = {
     subscription: null,
     exportUsage: null,
@@ -240,8 +238,9 @@ function reportsGetInvoiceDate(invoice) {
 function reportsGetClientName(invoice) {
 
     return (
-        invoice.companyName ||
+        invoice.clientName ||
         invoice.contactPerson ||
+        invoice.companyName ||
         "Unknown Client"
     ).trim();
 }
@@ -973,6 +972,22 @@ async function reportsExportEstimatePDF() {
 
         printWindow.document.close();
 
+        const cancelButton =
+            printWindow.document.getElementById(
+                "exportCancelButton"
+            );
+
+        if (cancelButton) {
+
+            cancelButton.addEventListener(
+                "click",
+                () => {
+                    printWindow.close();
+                }
+            );
+
+        }
+
         const exportResult =
             await reportsCallCloud(
                 "recordPdfExport"
@@ -1191,6 +1206,22 @@ async function reportsExportPDF() {
 
         printWindow.document.close();
 
+        const cancelButton =
+            printWindow.document.getElementById(
+                "exportCancelButton"
+            );
+
+        if (cancelButton) {
+
+            cancelButton.addEventListener(
+                "click",
+                () => {
+                    printWindow.close();
+                }
+            );
+
+        }
+
         const exportResult =
             await reportsCallCloud(
                 "recordPdfExport"
@@ -1378,10 +1409,10 @@ function reportsBuildPDFHTML() {
                 </td>
 
               <td>
-    <div class="report-client-cell">
+    <div class="report-client-cell${ReportsState.showClientImage ? "" : " no-client-image"}">
 
 ${
-    showClientImage
+    ReportsState.showClientImage
         ? (
             row.clientImageUrl
                 ? `
@@ -2003,7 +2034,7 @@ body {
                 <button
                     type="button"
                     class="export-action-button export-cancel-button"
-                    onclick="window.close()"
+                    id="exportCancelButton"
                 >
                     Cancel
                 </button>
@@ -3374,10 +3405,10 @@ const clientInitials =
                         </td>
 
 <td>
-    <div class="report-client-cell">
+    <div class="report-client-cell${ReportsState.showClientImage ? "" : " no-client-image"}">
 
         ${
-            showClientImage
+            ReportsState.showClientImage
                 ? (
                     clientImageUrl
                         ? `
@@ -3573,10 +3604,10 @@ const clientInitials =
                             </span>
                         </td>
 <td>
-    <div class="report-client-cell">
+    <div class="report-client-cell${ReportsState.showClientImage ? "" : " no-client-image"}">
 
         ${
-            showClientImage
+            ReportsState.showClientImage
                 ? (
                     clientImageUrl
                         ? `
@@ -3890,10 +3921,10 @@ function reportsBuildEstimatePDFHTML() {
                 </td>
 
                <td>
-    <div class="report-client-cell">
+    <div class="report-client-cell${ReportsState.showClientImage ? "" : " no-client-image"}">
 
 ${
-    showClientImage
+    ReportsState.showClientImage
         ? (
             row.clientImageUrl
                 ? `
@@ -4361,7 +4392,7 @@ ${
                 <button
                     type="button"
                     class="export-action-button export-cancel-button"
-                    onclick="window.close()"
+                    id="exportCancelButton"
                 >
                     Cancel
                 </button>

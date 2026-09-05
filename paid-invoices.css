@@ -48,7 +48,7 @@ button {
 }
 
 .page-header-text h1 {
-    color: var(--navy-dark);
+    color: #fff;
     font-size: 32px;
     font-weight: 700;
     line-height: 1.2;
@@ -175,8 +175,14 @@ button {
         transform 0.2s ease;
 }
 
+.invoice-table tbody tr {
+    cursor: pointer;
+    transition: background 0.2s ease,
+        transform 0.2s ease;
+}
+
 .invoice-table tbody tr:hover {
-    background: #f7f9fc;
+    background: var(--navy-light);
 }
 
 .invoice-info {
@@ -592,3 +598,4 @@ to {
         font-size: 14px;
     }
 }
+

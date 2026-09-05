@@ -64,9 +64,9 @@ async function loadAllUpcomingPayments() {
     try {
 
         const result =
-            await Parse.Cloud.run(
-                "upcomingPaymentReminder"
-            );
+    await Parse.Cloud.run(
+        "getAllPendingInvoices"
+    );
 
         if (
             !result ||
@@ -166,7 +166,10 @@ async function loadAllUpcomingPayments() {
                 );
 
             card.className =
-                "upcomingPaymentCard";
+    "upcomingPaymentCard";
+
+card.dataset.invoiceId =
+    invoice.invoiceId;
 
             card.innerHTML = `
 
@@ -237,22 +240,88 @@ async function loadAllUpcomingPayments() {
 
                     </div>
 
-                </div>
+                    ${
+                        reminderMessage
+                            ? `
+                                <div class="upcomingPaymentReminder">
+                                    ${reminderMessage}
+                                </div>
+                            `
+                            : ""
+                    }
 
-                ${
-                    reminderMessage
-                        ? `
-                            <div class="upcomingPaymentReminder">
-                                ${reminderMessage}
-                            </div>
-                        `
-                        : ""
-                }
+                    <div class="upcomingPaymentActions">
+
+                        <button
+                            type="button"
+                            class="upcomingPaymentSendButton"
+                            data-invoice-id="${invoice.invoiceId}"
+                        >
+                            <i class="ri-send-plane-line"></i>
+                            <span>Send Invoice</span>
+                        </button>
+
+                    </div>
+
+                </div>
 
             `;
 
             paymentsList.appendChild(
                 card
+            );
+            
+            card.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target.closest(
+                ".upcomingPaymentSendButton"
+            )
+        ) {
+            return;
+        }
+
+        const invoiceId =
+            card.dataset.invoiceId;
+
+        if (!invoiceId) {
+            return;
+        }
+
+        window.location.href =
+            `invoice.html?viewInvoice=${encodeURIComponent(invoiceId)}`;
+
+    }
+);
+
+        });
+
+        const sendButtons =
+            paymentsList.querySelectorAll(
+                ".upcomingPaymentSendButton"
+            );
+
+        sendButtons.forEach(button => {
+
+            button.addEventListener(
+                "click",
+                async () => {
+
+                    const invoiceId =
+                        button.dataset.invoiceId;
+
+                    if (!invoiceId) {
+                        return;
+                    }
+
+                    await sendUpcomingInvoice(
+                        invoiceId,
+                        button
+                    );
+
+                }
             );
 
         });
@@ -288,6 +357,110 @@ async function loadAllUpcomingPayments() {
 
 }
 
+async function sendUpcomingInvoice(
+    invoiceId,
+    button
+) {
+
+    if (
+        !invoiceId ||
+        !button
+    ) {
+        return;
+    }
+
+    const originalContent =
+        button.innerHTML;
+
+    button.disabled = true;
+
+    button.innerHTML = `
+        <i class="ri-loader-4-line"></i>
+        <span>Sending...</span>
+    `;
+
+    try {
+
+        const result =
+            await Parse.Cloud.run(
+                "sendInvoiceToClient",
+                {
+                    invoiceId:
+                        invoiceId
+                }
+            );
+
+        if (
+            !result ||
+            result.success !== true
+        ) {
+            throw new Error(
+                "Unable to send invoice."
+            );
+        }
+
+        button.innerHTML = `
+            <i class="ri-check-line"></i>
+            <span>Sent Successfully</span>
+        `;
+
+        button.classList.add(
+            "sent"
+        );
+
+        setTimeout(
+            () => {
+
+                button.disabled = false;
+
+                button.innerHTML =
+                    originalContent;
+
+                button.classList.remove(
+                    "sent"
+                );
+
+            },
+            3000
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Send Upcoming Invoice Error:",
+            error
+        );
+
+        button.disabled = false;
+
+        button.innerHTML = `
+            <i class="ri-error-warning-line"></i>
+            <span>Send Failed</span>
+        `;
+
+        button.classList.add(
+            "error"
+        );
+
+        setTimeout(
+            () => {
+
+                button.innerHTML =
+                    originalContent;
+
+                button.classList.remove(
+                    "error"
+                );
+
+            },
+            3000
+        );
+
+    }
+
+}
+
 const retryUpcomingPayments =
     document.getElementById(
         "retryUpcomingPayments"
@@ -301,3 +474,12 @@ if (retryUpcomingPayments) {
     );
 
 }
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        loadAllUpcomingPayments();
+
+    }
+);
